@@ -12,16 +12,6 @@ permissions:
   pull-requests: read
 
 jobs:
-  gh-test:
-    name: Debug team lookup
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.CI_PAT }}
-    steps:
-     - run: |
-        gh api user --jq .login
-        gh api orgs/${{ github.repository_owner }}/teams --jq '.[].slug'
-
   qa-approval:
     name: QA team approval
     runs-on: ubuntu-latest
