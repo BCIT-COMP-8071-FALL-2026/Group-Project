@@ -3,7 +3,6 @@ name: Require Team Approvals
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  # Re-run when a review is submitted/dismissed so the check updates
   pull_request_review:
     types: [submitted, dismissed]
 
@@ -19,8 +18,8 @@ jobs:
       - name: Require QA team approval
         uses: op5dev/require-team-approval@v1
         with:
-          team: qa
-          token: ${{ secrets.CI_PAT }} # PAT with read:org scope
+          team: qa # replace with your QA team slug
+          token: ${{ secrets.CI_PAT }}
 
   devops-approval:
     name: DevOps team approval (main only)
@@ -30,5 +29,33 @@ jobs:
       - name: Require DevOps team approval
         uses: op5dev/require-team-approval@v1
         with:
-          team: devops
-          token: ${{ secrets.CI_PAT }} # PAT with read:org scope
+          team: devops # replace with your DevOps team slug
+          token: ${{ secrets.CI_PAT }}
+
+  no-blocking-reviews:
+    name: No outstanding change requests
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.CI_PAT }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Fail if any reviewer's latest review requests changes
+        run: |
+          # Latest meaningful review per user (comments don't change status)
+          reviews=$(gh api "repos/$REPO/pulls/$PR/reviews?per_page=100" --paginate | jq -s 'add // []')
+          requesters=$(jq -r '
+            map(select(.state=="APPROVED" or .state=="CHANGES_REQUESTED" or .state=="DISMISSED"))
+            | sort_by(.submitted_at)
+            | group_by(.user.login)
+            | map(last)
+            | map(select(.state=="CHANGES_REQUESTED") | .user.login)
+            | .[]' <<< "$reviews")
+
+          if [[ -n "$requesters" ]]; then
+            for user in $requesters; do
+              echo "::error::$user has requested changes on this PR."
+            done
+            exit 1
+          fi
+          echo "No outstanding change requests."
