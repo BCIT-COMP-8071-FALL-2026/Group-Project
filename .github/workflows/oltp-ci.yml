@@ -1,0 +1,22 @@
+name: OLTP CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0"
+      - name: Scaffold sample app (remove once Assignment 1b code lands)
+        run: dotnet new mvc -n OltpApp --no-restore
+      - run: dotnet restore OltpApp/OltpApp.csproj
+      - run: dotnet build OltpApp/OltpApp.csproj --no-restore
+      - name: Tests placeholder (no test project yet)
+        run: echo "dotnet test will run once a test project is added"
