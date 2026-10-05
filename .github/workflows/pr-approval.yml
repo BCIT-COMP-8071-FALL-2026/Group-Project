@@ -1,0 +1,34 @@
+name: Require Team Approvals
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # Re-run when a review is submitted/dismissed so the check updates
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  qa-approval:
+    name: QA team approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require QA team approval
+        uses: op5dev/require-team-approval@v1
+        with:
+          team: QA
+          token: ${{ secrets.CI_PAT }} # PAT with read:org scope
+
+  devops-approval:
+    name: DevOps team approval (main only)
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require DevOps team approval
+        uses: op5dev/require-team-approval@v1
+        with:
+          team: DevOps
+          token: ${{ secrets.CI_PAT }} # PAT with read:org scope
