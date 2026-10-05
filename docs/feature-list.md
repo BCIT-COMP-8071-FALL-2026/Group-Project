@@ -1,6 +1,6 @@
 # MVP Feature List – OLTP & OLAP Applications
 
-## OLTP Application
+### OLTP Application
 
 | Feature | Priority |
 |---|---|
@@ -17,7 +17,7 @@
 | Notifications and Reminders | Nice-to-have |
 | Profile Picture | Nice-to-have |
 
-## OLAP Application
+### OLAP Application
 
 | Feature | Priority |
 |---|---|
@@ -31,9 +31,9 @@
 | Dashboard Filtering | Nice-to-have |
 | Date Range Analysis | Nice-to-have |
 
-## Epic 1: Patient/Senior Intake & Profile Management
+# Epic 1: Patient/Senior Intake & Profile Management
 
-### OLTP
+### OLTP Application
 
 | Feature | Priority |
 |---|---|
@@ -47,7 +47,7 @@
 | Power of Attorney Information | Nice-to-have |
 | Profile Picture | Nice-to-have |
 
-### OLAP
+### OLAP Application
 
 | Feature | Priority |
 |---|---|
