@@ -3,12 +3,18 @@ name: Require Team Approvals
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  # Re-run when a review is submitted/dismissed so the checks update
   pull_request_review:
     types: [submitted, dismissed]
 
 permissions:
   contents: read
   pull-requests: read
+
+# One run per PR at a time; a newer event cancels the older in-progress run
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   qa-approval:
@@ -23,7 +29,8 @@ jobs:
 
   devops-approval:
     name: DevOps team approval (main only)
-    if: github.base_ref == 'main'
+    # github.base_ref is empty on pull_request_review events, so use the event payload
+    if: github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Require DevOps team approval
