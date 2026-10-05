@@ -20,7 +20,7 @@ Visits/check-ins, vitals, appointments, messages, emergency flags, and billing a
 - **Errors and repeated actions:** Try an unavailable database, failed save, missing record, and double submission.
 - **Usability and compatibility:** Check readable text, helpful messages, keyboard navigation, and the agreed browsers/mobile/tablet layouts. 
 
-## 3. Tools
+## 2. Tools
 
 - **xUnit / NUnit:** Both are good options for C# tests: xUnit creates a fresh test class for each test, while NUnit has explicit setup/teardown for prepping and cleaning. xUnit seems to me to have everything we need.
 
