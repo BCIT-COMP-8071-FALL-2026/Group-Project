@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OlapApi.Tests/OlapApi.Tests.csproj" />
+  <Project Path="OlapApi/OlapApi.csproj" />
+</Solution>
