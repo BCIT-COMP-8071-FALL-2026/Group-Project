@@ -20,6 +20,12 @@ A clear and concise description of what the bug is.
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Severity**
+- Critical: App not useable or data lost.
+- High: Important workflow blocked.
+- Medium: Feature impacted, but not fully blocked.
+- Low: Cosmetic or other small issue.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
