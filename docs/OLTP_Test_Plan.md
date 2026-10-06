@@ -1,38 +1,42 @@
 # OLTP Client App — Test Plan Outline
 
-Draft for October 6.
-
-This is for our ASP.NET Core MVC + Entity Framework client app, starting from Assignment 1b. I've used Jason's messages and the FigJam material we've got so far. I will update as features and acceptance criteria become more solid.
+October 6th Draft
 
 ## 1. Scope
 
-**Feature checks from FigJam and Assignment 1b**
+**Acceptance Testing**
 
-Start with senior intake, viewing/updating profiles, emergency contacts/guardians, medication instructions. Check the intended result and that the information belongs to the right senior. Might make sense to keep coverage for the Assignment 1b features in case we decide to carry some forward: CRUD, service links, photos, date selection, and validation.
+Verify functional requirements of the app as expressed by users. Ensure the application provides all functionality and features that are in the requirements. Selenium will be used frequently here.
 
-Visits/check-ins, vitals, appointments, messages, emergency flags, and billing are possible additions from the personas. We can discuss them more if/when they are selected for a sprint.
+**Unit Testing:** 
 
-**Checks across the whole app**
+Achieve an agreed upon amount of coverage throughout the app, making sure that all necessary functions and methods pass all required tests. 
 
+**Wishlist for checks across the whole app**
+
+- **Reliability:** 99% error-free operation by users. Requires hundreds of repeating tests, will involve lots of Black Box testing, and will take advantage of Selenium.
+- **Security:** Ensure working authorization, authentication (role-based), SSL, MFA. SCA is a powerful security tool.
+- **Performance:** The resources are managed efficiently in the app, and the latency meets accepted requirements. Not as important as other types of testing for our webapp but Visual Studio's memory analyzer and performance profiler are valuable tools worth exploring.
+- **Scalability:** The app does not fail under large loads or data volumes. Jmeter is a worthwhile method of load testing.
+- **Usability:** Invent user requirements for usability and meet them. Ensure the website is usable for the users by performing manual testing alongside Selenium tests. Static Code Analysis can also be used.
 - **Validation:** Missing, invalid, and boundary inputs are handled clearly. Check the server too, since browser validation can be bypassed.
-- **Permissions:** Once roles are agreed, check access to other seniors' records, direct URLs, and logged-out access.
 - **Data saving and relationships:** Changes survive reload/restart, links stay attached to the correct records, deactivating/deleting a record works as we want it to.
 - **Errors and repeated actions:** Try an unavailable database, failed save, missing record, and double submission.
-- **Usability and compatibility:** Check readable text, helpful messages, keyboard navigation, and the agreed browsers/mobile/tablet layouts. 
 
 ## 2. Tools
 
 - **xUnit / NUnit:** Both are good options for C# tests: xUnit creates a fresh test class for each test, while NUnit has explicit setup/teardown for prepping and cleaning. xUnit seems to me to have everything we need.
-
-- **Selenium / Playwright:**  Arsh's input
-
+- **Selenium / Playwright:**  Arsh's input (although Tejinder did mention using Selenium for various parts of testing).
+- **Jmeter:** Useful for performance and load testing.
+- **Static Code Analysis:** Useful for usability testing and sometimes security testing. Modern LINT tooling provides a lot of value.
+- **Visual Studio's Performance Profiler**: Uses performance and memory analysis to benchmark and check our app's performance.
 - **WebApplicationFactory:** Could use this with our C# test framework to check MVC requests, validation, permissions, and database saves together without opening a browser. It needs separate test configuration/data, and we'd still need UI tests for how pages actually behave. Might be useful, seems optional.
-- **k6:** Used to check response times when several users send requests at once, could be useful once we've agreed on performance targets. It does add setup. Seems very optional to me.
+- **k6:** Used to check response times when several users send requests at once, could be useful once we've agreed on performance targets. It does add setup.
 - **GitHub Issues:** Track bugs, who's fixing them, and whether the fix has been checked, using Sunwoo's labels and report template.
 - **Manual testing:** Readability, mobile/tablet layouts, unexpected inputs.
 
-## 3. Test environments
 
+## 3. Test environment
 Start locally, then check the shared QA build as the app comes together. Confirm the .NET version, database, and browser with DevOps. Use the same database engine as the app for database tests, with separate test data.
 
 ## 4. Test approach
@@ -45,9 +49,7 @@ Record pass/fail results against the story, including the build tested, and link
 
 ## 5. Bug Workflow
 
-Sunwoo is setting up the labels and template, but probably something like:
-
-Reported → Triaged → In progress → Needs retest → Closed
+Use the established bug reporting template.
 
 Include build/commit, steps, expected result, actual result, and a screenshot / other evidence. 
 
