@@ -8,7 +8,7 @@ October 6th Draft
 
 Verify functional requirements of the app as expressed by users. Ensure the application provides all functionality and features that are in the requirements. Selenium will be used frequently here.
 
-**Unit Testing:** 
+**Unit Testing** 
 
 Achieve an agreed upon amount of coverage throughout the app, making sure that all necessary functions and methods pass all required tests. 
 
@@ -28,7 +28,7 @@ Achieve an agreed upon amount of coverage throughout the app, making sure that a
 - **xUnit / NUnit:** Both are good options for C# tests: xUnit creates a fresh test class for each test, while NUnit has explicit setup/teardown for prepping and cleaning. xUnit seems to me to have everything we need.
 - **Selenium / Playwright:**  Arsh's input (although Tejinder did mention using Selenium for various parts of testing).
 - **Jmeter:** Useful for performance and load testing.
-- **Static Code Analysis:** Useful for usability testing and sometimes security testing. Modern LINT tooling provides a lot of value.
+- **Static Code Analysis:** Can be helpful for usability testing and sometimes security testing. Modern LINT tooling provides a lot of value.
 - **Visual Studio's Performance Profiler**: Uses performance and memory analysis to benchmark and check our app's performance.
 - **WebApplicationFactory:** Could use this with our C# test framework to check MVC requests, validation, permissions, and database saves together without opening a browser. It needs separate test configuration/data, and we'd still need UI tests for how pages actually behave. Might be useful, seems optional.
 - **k6:** Used to check response times when several users send requests at once, could be useful once we've agreed on performance targets. It does add setup.
@@ -49,7 +49,7 @@ Record pass/fail results against the story, including the build tested, and link
 
 ## 5. Bug Workflow
 
-Use the established bug reporting template.
+[Use the established bug reporting template.](https://github.com/BCIT-COMP-8071-FALL-2026/Group-Project/blob/develop/.github/ISSUE_TEMPLATE/bug_report.md)
 
 Include build/commit, steps, expected result, actual result, and a screenshot / other evidence. 
 
