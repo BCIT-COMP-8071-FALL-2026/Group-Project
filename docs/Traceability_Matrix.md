@@ -9,7 +9,7 @@
 | 2.0.0 | Include an easy to follow form to fill out personal information while keeping private details secure. | OLTP-2 | Security, Usability | Person, Senior, Scalable | Creates an easy way to gather information on the patient. | Profile form/page | Form contains all necessary fields specified in the user story acceptance criteria and are stored securely and safely. | | | |
 | 5.0.0 | Create a role hierarchy, Admin > Agency > Agency Manager > Caretakers > Seniors/Family Member, and provide permissions to view or edit certain pages and items. | OLTP-5 | Security, Scalable, Maintainable | ProfessionalRoles, Person | Keeping proper track of permissions and roles allows for ease of account creation and role assignments. | Documentation on roles and permissions permitted, and how access is defined. Implemented at a database level. | Roles follows required permission only, least amount of permissions possible. Documented and added somewhere in the GitHub. | | | |
 
-Format: 
+**Format:** 
 Requirement ID:
 Requirement Description:
 User Story:
@@ -20,6 +20,7 @@ Deliverable:
 Acceptance Criteria:
 Test Cases:
 Owner:
-
-*AI Disclosure:* AI was used to format the table for markdown.
 Status:
+
+**AI Disclosure:** AI was used to format the table for markdown.
+
