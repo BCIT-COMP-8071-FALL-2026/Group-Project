@@ -4,64 +4,297 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-5">
+            <div>
+                <div class="text-center mb-4">
+                    <h3 class="active-text">Senior Portal</h3>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
                     <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                        <p class="text-start m-1 fw-bold">Step 1 of 4</p>
+                        <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="25"
+                                aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width: 25%"></div>
                         </div>
-                    </form>
-                }
-            }
-        </section>
+                    </div>
+                </div>
+                
+                <form>
+                    @* Step 1 *@
+                    <div class="form-step" data-step="1">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Create your account</h1>
+                            <p class="text-muted mb-0">Start with the basics, it takes about 2 minutes.</p>
+                        </div>
+
+                        <div class="d-flex gap-3 mb-3">
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input class="form-check-input mt-0" type="radio" name="roleRadio" id="rolePatient"
+                                       value="Patient" checked>
+                                Patient
+                            </label>
+
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input class="form-check-input mt-0" type="radio" name="roleRadio" id="roleFamily"
+                                       value="Family">
+                                Family member
+                            </label>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="email"
+                                    class="register-input"
+                                    id="email"
+                                    placeholder="Email"
+                                    aria-label="Email"
+                                    autocomplete="email"
+                                    required>
+                            <hr class="m-0 mx-3 opacity-25">
+                            <input type="password"
+                                    class="register-input"
+                                    id="password"
+                                    placeholder="Password"
+                                    aria-label="Password"
+                                    autocomplete="current-password"
+                                    required>
+                        </div>
+
+                        <button type="button" class="btn btn-primary custom-rounded w-100" onclick="nextStep()">
+                            Continue
+                        </button>
+                    </div>
+
+                    @* Step 2 *@
+                    <div class="form-step d-none" data-step="2">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">About You</h1>
+                            <p class="text-muted mb-0">Tell us who you are.</p>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text"
+                                    class="register-input"
+                                    id="firstName"
+                                    name="FirstName"
+                                    placeholder="First name"
+                                    aria-label="First name"
+                                    autocomplete="given-name"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="middleName"
+                                    name="MiddleName"
+                                    placeholder="Middle name (optional)"
+                                    aria-label="Middle name"
+                                    autocomplete="additional-name">
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="lastName"
+                                    name="LastName"
+                                    placeholder="Last name"
+                                    aria-label="Last name"
+                                    autocomplete="family-name"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="tel"
+                                    class="register-inpu
+                                    "
+                                    id="phoneNumber"
+                                    name="PhoneNumber"
+                                    placeholder="Phone number (604-123-4567)"
+                                    aria-label="Phone number"
+                                    autocomplete="tel"
+                                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" 
+                                    title="Use the format 604-123-4567"
+                                    required>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50"
+                                    onclick="nextStep()">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Step 3 *@
+                    <div class="form-step d-none" data-step="3">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Your Address</h1>
+                            <p class="text-muted mb-0">This helps your care team reach you.</p>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text"
+                                    class="register-input"
+                                    id="streetAddress"
+                                    name="StreetAddress"
+                                    placeholder="Street address"
+                                    autocomplete="address-line1"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="city"
+                                    name="City"
+                                    placeholder="City"
+                                    autocomplete="address-level2"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="province"
+                                    name="Province"
+                                    placeholder="Province / State / Region"
+                                    autocomplete="address-level1"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="postalCode"
+                                    name="PostalCode"
+                                    placeholder="Postal / ZIP code (optional)"
+                                    autocomplete="postal-code">
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="country"
+                                    name="Country"
+                                    placeholder="Country"
+                                    autocomplete="country-name"
+                                    required>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" onclick="nextStep()">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Step 4 *@
+                    <div class="form-step d-none" data-step="4">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Insurance</h1>
+                            <p class="text-muted mb-0">Optional. You can add this later.</p>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text"
+                                    class="register-input"
+                                    id="insuranceCompany"
+                                    name="InsuranceCompany"
+                                    placeholder="Insurance company (optional)"
+                                    aria-label="Insurance company"
+                                    autocomplete="organization">
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="insuranceAccountNumber"
+                                    name="InsuranceAccountNumber"
+                                    placeholder="Insurance account number (optional)"
+                                    aria-label="Insurance account number"
+                                    autocomplete="off">
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="submit" class="btn btn-primary custom-rounded py-2 w-50">
+                                Create account
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
-</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+            let currentStep = 1;
+            const totalSteps = 4;
+
+            function showStep(step) {
+                document.querySelectorAll('.form-step').forEach(element => {
+                    element.classList.toggle(
+                        'd-none',
+                        Number(element.dataset.step) !== step
+                    );
+                });
+
+                document.querySelector('.progress-bar').style.width =
+                    `${(step / totalSteps) * 100}%`;
+
+                document.querySelector('.progress-bar').parentElement
+                    .setAttribute('aria-valuenow', (step / totalSteps) * 100);
+
+                document.querySelector('p.text-start').textContent =
+                    `Step ${step} of ${totalSteps}`;
+
+                currentStep = step;
+            }
+
+                function nextStep() {
+                    const currentStepElement = document.querySelector(
+                        `.form-step[data-step="${currentStep}"]`
+                    );
+
+                    const inputs = currentStepElement.querySelectorAll(
+                        'input, select, textarea'
+                    );
+
+                    for (const input of inputs) {
+                        if (!input.checkValidity()) {
+                            input.reportValidity();
+                            return;
+                        }
+                    }
+
+                    if (currentStep < totalSteps) {
+                        showStep(currentStep + 1);
+                    }
+                }
+
+            function previousStep() {
+                if (currentStep > 1) {
+                    showStep(currentStep - 1);
+                }
+            }
+    </script>
 }

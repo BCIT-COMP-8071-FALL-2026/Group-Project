@@ -2,6 +2,17 @@ html {
   font-size: 14px;
 }
 
+:root {
+  --color-background: #F2F2F7;
+  --color-secondary-text: #6D6D72;
+  --color-primary-text: #2F2F2F;
+  --color-row-divider: #C8C8C8;
+  --color-important: #FCB3AD;
+  --color-active: #CCFFD3;
+  --color-button-primary: #007AFF;
+  --color-active-bg: #E4EDFE;
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -12,13 +23,33 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+.active-text {
+  color: var(--color-button-primary);
+}
+
+.custom-rounded {
+  border-radius: 16px;
+}
+
+.register-input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem 1.5rem;
+}
+
+.register-input:focus {
+  box-shadow: none;
+}
+
 html {
   position: relative;
   min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+  min-height: 100%;
+  background-color: var(--color-background);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
