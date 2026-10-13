@@ -19,4 +19,6 @@ public class Person
 
     public Senior? Senior { get; set; }
     public Caregiver? Caregiver { get; set; }
+    public FamilyMember? FamilyMember { get; set; }
+    public AgencyManager? AgencyManager { get; set; }
 }

@@ -16,4 +16,5 @@ public class Agency
     [MaxLength(256)] public string Email { get; set; } = null!;
 
     public ICollection<Caregiver> Caregivers { get; set; } = new List<Caregiver>();
+    public ICollection<AgencyManager> AgencyManagers { get; set; } = new List<AgencyManager>();
 }
