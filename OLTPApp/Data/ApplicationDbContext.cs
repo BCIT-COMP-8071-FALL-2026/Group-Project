@@ -21,6 +21,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<VisitNote> VisitNote => Set<VisitNote>();
     public DbSet<CaregiverAssignment> CaregiverAssignment => Set<CaregiverAssignment>();
     public DbSet<CaregiverAvailability> CaregiverAvailability => Set<CaregiverAvailability>();
+    public DbSet<Medication> Medication => Set<Medication>();
+    public DbSet<SeniorFamilyMember> SeniorFamilyMember => Set<SeniorFamilyMember>();
+    public DbSet<AuditLog> AuditLog => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -99,6 +102,23 @@ public class ApplicationDbContext : IdentityDbContext
         {
             e.HasKey(a => a.AvailabilityID);
             e.HasOne(a => a.Caregiver).WithMany().HasForeignKey(a => a.CaregiverID).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Medication>(e =>
+        {
+            e.HasOne(m => m.Senior).WithMany().HasForeignKey(m => m.SeniorID).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<SeniorFamilyMember>(e =>
+        {
+            e.HasKey(sf => new { sf.SeniorID, sf.FamilyMemberID });
+            e.HasOne(sf => sf.Senior).WithMany().HasForeignKey(sf => sf.SeniorID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(sf => sf.FamilyMember).WithMany().HasForeignKey(sf => sf.FamilyMemberID).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AuditLog>(e =>
+        {
+            e.HasOne(a => a.UserAccount).WithMany().HasForeignKey(a => a.UserAccountID).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
