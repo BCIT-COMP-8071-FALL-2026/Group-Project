@@ -18,6 +18,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<AgencyManager> AgencyManager => Set<AgencyManager>();
     public DbSet<Service> Service => Set<Service>();
     public DbSet<Visit> Visit => Set<Visit>();
+    public DbSet<VisitNote> VisitNote => Set<VisitNote>();
+    public DbSet<CaregiverAssignment> CaregiverAssignment => Set<CaregiverAssignment>();
+    public DbSet<CaregiverAvailability> CaregiverAvailability => Set<CaregiverAvailability>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -76,6 +79,26 @@ public class ApplicationDbContext : IdentityDbContext
             e.HasOne(v => v.Agency).WithMany().HasForeignKey(v => v.AgencyID).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(v => v.CreatedByUser).WithMany().HasForeignKey(v => v.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
             e.Property(v => v.Status).HasConversion<string>().HasMaxLength(20);
+        });
+
+        builder.Entity<VisitNote>(e =>
+        {
+            e.HasKey(n => n.NoteID);
+            e.HasOne(n => n.Visit).WithMany().HasForeignKey(n => n.VisitID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(n => n.Caregiver).WithMany().HasForeignKey(n => n.CaregiverID).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<CaregiverAssignment>(e =>
+        {
+            e.HasKey(a => a.AssignmentID);
+            e.HasOne(a => a.Senior).WithMany().HasForeignKey(a => a.SeniorID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(a => a.Caregiver).WithMany().HasForeignKey(a => a.CaregiverID).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<CaregiverAvailability>(e =>
+        {
+            e.HasKey(a => a.AvailabilityID);
+            e.HasOne(a => a.Caregiver).WithMany().HasForeignKey(a => a.CaregiverID).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
