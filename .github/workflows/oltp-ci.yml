@@ -13,10 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
-      - name: Scaffold sample app (remove once Assignment 1b code lands)
-        run: dotnet new mvc -n OltpApp --no-restore
-      - run: dotnet restore OltpApp/OltpApp.csproj
-      - run: dotnet build OltpApp/OltpApp.csproj --no-restore
+          dotnet-version: "9.0.x"
+      - run: dotnet restore GroupProject.sln
+      - run: dotnet build GroupProject.sln --no-restore -c Release
       - name: Placeholder test (no test project yet)
         run: echo "dotnet test will run once a test project is added"
