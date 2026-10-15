@@ -1,6 +1,6 @@
 # Test Cases: Senior Profile (OLTP-6, 7, 8)
 
-Manual test cases for creating, viewing, and updating a senior profile. Log failures with the **Bug report** template (see [Bug Severity & Workflow](bug-severity-workflow.md)).
+Manual test cases for creating, viewing, and updating a senior profile. Log failures with the **Bug report** template (see [Bug Severity & Workflow](../bug-severity-workflow.md)).
 
 **Build tested:** ____  **Tester:** ____  **Date:** ____
 
