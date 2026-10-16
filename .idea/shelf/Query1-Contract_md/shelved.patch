@@ -1,0 +1,352 @@
+Index: .idea/indexLayout.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/indexLayout.xml b/.idea/indexLayout.xml
+new file mode 100644
+--- /dev/null	(date 1792169770309)
++++ b/.idea/indexLayout.xml	(date 1792169770309)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="UserContentModel">
++    <attachedFolders />
++    <explicitIncludes />
++    <explicitExcludes />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+new file mode 100644
+--- /dev/null	(date 1792175358699)
++++ b/.idea/workspace.xml	(date 1792175358699)
+@@ -0,0 +1,185 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
++  <component name="CMakeProjectFlavorService">
++    <option name="flavorId" value="CMakePlainProjectFlavor" />
++  </component>
++  <component name="CMakeSettings">
++    <configurations />
++  </component>
++  <component name="ChangeListManager">
++    <list default="true" id="e5a870a4-33d5-4c33-86e5-dc9045d38f02" name="Changes" comment="">
++      <change afterPath="$PROJECT_DIR$/.idea/indexLayout.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/projectSettingsUpdater.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/docs/Query1-Contract.md" afterDir="false" />
++    </list>
++    <option name="SHOW_DIALOG" value="false" />
++    <option name="HIGHLIGHT_CONFLICTS" value="true" />
++    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++    <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="feature/database-setup" />
++      </map>
++    </option>
++    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
++  </component>
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;Spoonzio&quot;
++  }
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/BCIT-COMP-8071-FALL-2026/Group-Project.git&quot;,
++    &quot;accountId&quot;: &quot;a954cb3d-c54c-4e11-84af-22deb12c7b31&quot;
++  }
++}</component>
++  <component name="McpProjectServerCommands">
++    <commands />
++    <urls />
++  </component>
++  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
++  <component name="NextEditCompletionFeaturesState">
++    <decayedCancelled>
++      <entry key="MS100" value="1.9333281508848126" />
++      <entry key="MS500" value="2.8774646809876594" />
++      <entry key="S2" value="5.717465935429787" />
++      <entry key="S5" value="8.330553496275728" />
++      <entry key="S10" value="9.84917518455039" />
++      <entry key="S30" value="11.193124102414371" />
++      <entry key="S60" value="11.583757487420977" />
++      <entry key="M2" value="11.788544975485268" />
++      <entry key="M5" value="11.914755197471525" />
++      <entry key="M10" value="12.018234580551022" />
++      <entry key="M15" value="12.431065215823152" />
++      <entry key="M30" value="15.48834290641918" />
++      <entry key="H1" value="21.70425033041442" />
++      <entry key="H2" value="28.183818160755607" />
++      <entry key="H4" value="32.90244969397196" />
++      <entry key="D1" value="37.87213253635049" />
++      <entry key="W1" value="38.835908744777434" />
++    </decayedCancelled>
++    <decayedSelected>
++      <entry key="MS100" value="0.0" />
++      <entry key="MS500" value="0.0" />
++      <entry key="S2" value="0.0" />
++      <entry key="S5" value="0.0" />
++      <entry key="S10" value="4.509175780104662E-166" />
++      <entry key="S30" value="7.668299296555742E-56" />
++      <entry key="S60" value="2.7691694235917965E-28" />
++      <entry key="M2" value="1.664082156503037E-14" />
++      <entry key="M5" value="3.079426944915326E-6" />
++      <entry key="M10" value="0.0017548296056641311" />
++      <entry key="M15" value="0.014548670292413713" />
++      <entry key="M30" value="0.12061786887693594" />
++      <entry key="H1" value="0.34730083339510726" />
++      <entry key="H2" value="0.589322351005888" />
++      <entry key="H4" value="0.7676733361306015" />
++      <entry key="D1" value="0.9568916012111879" />
++      <entry key="W1" value="0.9937247488179807" />
++    </decayedSelected>
++    <decayedShown>
++      <entry key="MS100" value="1.8760285331455675" />
++      <entry key="MS500" value="2.8572384616440134" />
++      <entry key="S2" value="5.694875992830947" />
++      <entry key="S5" value="8.314655442942389" />
++      <entry key="S10" value="9.8392353959385" />
++      <entry key="S30" value="11.189224535128098" />
++      <entry key="S60" value="11.581722551930326" />
++      <entry key="M2" value="11.787505191028258" />
++      <entry key="M5" value="11.914336718399849" />
++      <entry key="M10" value="12.019753384582684" />
++      <entry key="M15" value="12.445358409082399" />
++      <entry key="M30" value="15.608484038639283" />
++      <entry key="H1" value="22.050971697327263" />
++      <entry key="H2" value="28.77267686863374" />
++      <entry key="H4" value="33.66982860557052" />
++      <entry key="D1" value="38.82896415671168" />
++      <entry key="W1" value="39.829624623771274" />
++    </decayedShown>
++  </component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 2,
++  &quot;fromUser&quot;: false
++}</component>
++  <component name="ProjectId" id="3KmjhyTLxlehUIWYcE6Qg3yrGAm" />
++  <component name="ProjectViewState">
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++  </component>
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "ModuleVcsDetector.initialDetectionPerformed": "true",
++    "RunOnceActivity.MCP Project settings loaded": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "RunOnceActivity.cidr.known.project.marker": "true",
++    "RunOnceActivity.git.unshallow": "true",
++    "RunOnceActivity.readMode.enableVisualFormatting": "true",
++    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
++    "cidr.known.project.marker": "true",
++    "codeWithMe.voiceChat.enabledByDefault": "false",
++    "git-widget-placeholder": "feature/query1-contract",
++    "last_opened_file_path": "/Users/jasonpan/BCIT/COMP_8071_Warehouse/team-project/Group-Project",
++    "node.js.detected.package.eslint": "true",
++    "node.js.detected.package.tslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm"
++  }
++}]]></component>
++  <component name="TaskManager">
++    <task active="true" id="Default" summary="Default task">
++      <changelist id="e5a870a4-33d5-4c33-86e5-dc9045d38f02" name="Changes" comment="" />
++      <created>1792169761339</created>
++      <option name="number" value="Default" />
++      <option name="presentableId" value="Default" />
++      <updated>1792169761339</updated>
++    </task>
++    <servers />
++  </component>
++  <component name="TypeScriptGeneratedFilesManager">
++    <option name="version" value="3" />
++  </component>
++  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
++  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="TAB_STATES">
++      <map>
++        <entry key="MAIN">
++          <value>
++            <State />
++          </value>
++        </entry>
++      </map>
++    </option>
++  </component>
++  <component name="VcsManagerConfiguration">
++    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
++  </component>
++  <component name="XDebuggerManager">
++    <breakpoint-manager>
++      <breakpoints>
++        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
++          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
++          <option name="timeStamp" value="1" />
++        </breakpoint>
++        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
++          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
++          <option name="timeStamp" value="2" />
++        </breakpoint>
++        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
++          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
++          <option name="timeStamp" value="3" />
++        </breakpoint>
++      </breakpoints>
++    </breakpoint-manager>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1792169819500)
++++ b/.idea/vcs.xml	(date 1792169819500)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: docs/Query1-Contract.md
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docs/Query1-Contract.md b/docs/Query1-Contract.md
+new file mode 100644
+--- /dev/null	(date 1792175220642)
++++ b/docs/Query1-Contract.md	(date 1792175220642)
+@@ -0,0 +1,91 @@
++# Query 1 contract: missed visits by month
++
++Version 1.0, 2026-10-16. Owner: Jason. Story: OLAP-1. Query: Query 1 in [OLAP_Queries.md](OLAP_Queries.md).
++
++Amal's procedure, Cadan's endpoint and Leon's Postman tests all build against this file. Any change to it needs a PR and a post in #dev.
++
++## Procedure (Amal)
++
++| Item | Value |
++|---|---|
++| Name | `dbo.usp_MissedVisitsByMonth` |
++| Parameters | None. Covers all agencies and all months. |
++| Source | OLAP warehouse (FactVisit and DimDate). Internals are up to Amal as long as the output matches this file. |
++| Sort | `Month` ascending |
++
++| Column | SQL type | Rule |
++|---|---|---|
++| `Month` | `char(7)` | Month of ScheduledStart (UTC), formatted `YYYY-MM` |
++| `VisitCount` | `int` | Visits in the month, excluding cancelled and not yet due |
++| `MissedCount` | `int` | Visits counted in `VisitCount` that are Missed |
++| `MissedPercent` | `decimal(5,1)` | `MissedCount * 100.0 / VisitCount`, rounded to 1 decimal place with `ROUND` |
++
++## Endpoint (Cadan)
++
++| Item | Value |
++|---|---|
++| Method and path | `GET /api/reports/missed-visits-by-month` |
++| Request | No parameters, no body |
++| Success | `200 OK`, `Content-Type: application/json`, a JSON array of rows |
++| No data | `200 OK` with `[]` |
++| Database unavailable or query fails | `500` with the ASP.NET Core default problem details body |
++
++| JSON field | Type | From column |
++|---|---|---|
++| `month` | string, `YYYY-MM` | `Month` |
++| `visitCount` | integer | `VisitCount` |
++| `missedCount` | integer | `MissedCount` |
++| `missedPercent` | number, 1 decimal place | `MissedPercent` |
++
++Field names are camelCase (the ASP.NET Core default). The API returns no other fields. The chart works out Success as `visitCount - missedCount` (OLAP-1).
++
++## Rules
++
++These follow the Definitions table in [OLAP_Queries.md](OLAP_Queries.md).
++
++| Term | Rule |
++|---|---|
++| Missed | No check-in within 60 minutes of ScheduledStart (60 minutes counts as within), once ScheduledStart + 60 minutes has passed, and not Cancelled. A check-in after 60 minutes does not clear it. |
++| Missed source | Computed from ScheduledStart and ActualCheckIn only. Visit.Status is never Missed. |
++| Cancelled | Status = Cancelled. Excluded from both counts. |
++| Not yet due | ScheduledStart + 60 minutes has not passed. Excluded from both counts. |
++| Months with no counted visits | Left out of the result |
++| Time | All times are UTC; cutoffs compare exact timestamps to the second |
++
++## Worked example
++
++Sample visits, with the query run on 2026-10-16:
++
++| VisitID | ScheduledStart (UTC) | ActualCheckIn (UTC) | Status | Counted? | Missed? | Why |
++|---|---|---|---|---|---|---|
++| 1 | 2025-01-06 09:00:00 | 2025-01-06 09:05:00 | Completed | Yes | No | Checked in 5 minutes after start |
++| 2 | 2025-01-10 14:00:00 | 2025-01-10 15:00:00 | Completed | Yes | No | Exactly 60 minutes counts as within |
++| 3 | 2025-01-15 10:00:00 | none | Scheduled | Yes | Yes | No check-in |
++| 4 | 2025-01-20 11:00:00 | none | Cancelled | No | No | Cancelled |
++| 5 | 2025-02-03 09:00:00 | 2025-02-03 10:00:01 | Completed | Yes | Yes | Checked in 1 second after the cutoff |
++| 6 | 2025-02-12 13:00:00 | 2025-02-12 13:02:00 | Completed | Yes | No | Checked in 2 minutes after start |
++| 7 | 2025-02-20 08:00:00 | none | Scheduled | Yes | Yes | No check-in |
++| 8 | 2026-10-30 09:00:00 | none | Scheduled | No | No | Not yet due, so 2026-10 is left out |
++
++Procedure output:
++
++| Month | VisitCount | MissedCount | MissedPercent |
++|---|---|---|---|
++| 2025-01 | 3 | 1 | 33.3 |
++| 2025-02 | 3 | 2 | 66.7 |
++
++Endpoint response:
++
++```json
++[
++  { "month": "2025-01", "visitCount": 3, "missedCount": 1, "missedPercent": 33.3 },
++  { "month": "2025-02", "visitCount": 3, "missedCount": 2, "missedPercent": 66.7 }
++]
++```
++
++## Sign-off
++
++- [ ] Shayan (analyst)
++- [ ] Amal (procedure)
++- [ ] Cadan (endpoint)
++- [ ] Leon (Postman tests)
+Index: .idea/projectSettingsUpdater.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/projectSettingsUpdater.xml b/.idea/projectSettingsUpdater.xml
+new file mode 100644
+--- /dev/null	(date 1792169763162)
++++ b/.idea/projectSettingsUpdater.xml	(date 1792169763162)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="RiderProjectSettingsUpdater">
++    <option name="singleClickDiffPreview" value="1" />
++    <option name="unhandledExceptionsIgnoreList" value="1" />
++    <option name="vcsConfiguration" value="3" />
++  </component>
++</project>
+\ No newline at end of file

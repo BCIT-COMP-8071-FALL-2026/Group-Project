@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e5a870a4-33d5-4c33-86e5-dc9045d38f02" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/docs/OLAP_Queries.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/OLAP_Queries.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="feature/query1-contract" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Spoonzio&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/BCIT-COMP-8071-FALL-2026/Group-Project.git&quot;,
+    &quot;accountId&quot;: &quot;a954cb3d-c54c-4e11-84af-22deb12c7b31&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.8636717812747783" />
+      <entry key="MS500" value="3.7304828450460454" />
+      <entry key="S2" value="7.967441983825651" />
+      <entry key="S5" value="10.286120669551176" />
+      <entry key="S10" value="12.918355043280133" />
+      <entry key="S30" value="21.902589331988086" />
+      <entry key="S60" value="27.995062988069716" />
+      <entry key="M2" value="32.365927353634625" />
+      <entry key="M5" value="35.57150632996768" />
+      <entry key="M10" value="36.811809197670804" />
+      <entry key="M15" value="37.60399233396002" />
+      <entry key="M30" value="41.01078735559987" />
+      <entry key="H1" value="47.40253998443731" />
+      <entry key="H2" value="54.00027710093017" />
+      <entry key="H4" value="58.798780372911516" />
+      <entry key="D1" value="63.852765229521566" />
+      <entry key="W1" value="64.83308409895956" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="1.2269630868292566E-167" />
+      <entry key="S30" value="2.306448874794756E-56" />
+      <entry key="S60" value="1.5186997316108101E-28" />
+      <entry key="M2" value="1.2323553593062396E-14" />
+      <entry key="M5" value="2.730828226901281E-6" />
+      <entry key="M10" value="0.0016525217780414521" />
+      <entry key="M15" value="0.013977563086330575" />
+      <entry key="M30" value="0.11822674437846357" />
+      <entry key="H1" value="0.3438411615535053" />
+      <entry key="H2" value="0.5863797076583614" />
+      <entry key="H4" value="0.7657543389745567" />
+      <entry key="D1" value="0.9564925191841889" />
+      <entry key="W1" value="0.9936655319911397" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.786718522893258" />
+      <entry key="MS500" value="3.688869073718471" />
+      <entry key="S2" value="7.937768820965255" />
+      <entry key="S5" value="10.270092472416994" />
+      <entry key="S10" value="12.907919205611202" />
+      <entry key="S30" value="21.896230513190275" />
+      <entry key="S60" value="27.990879968569562" />
+      <entry key="M2" value="32.3634718038016" />
+      <entry key="M5" value="35.57041924917327" />
+      <entry key="M10" value="36.81287401799748" />
+      <entry key="M15" value="37.617479131134" />
+      <entry key="M30" value="41.12842329893057" />
+      <entry key="H1" value="47.74574547838542" />
+      <entry key="H2" value="54.58616443957129" />
+      <entry key="H4" value="59.56422548926969" />
+      <entry key="D1" value="64.80919520197011" />
+      <entry key="W1" value="65.8267403914801" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3KmjhyTLxlehUIWYcE6Qg3yrGAm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "jason/query1-contract",
+    "last_opened_file_path": "/Users/jasonpan/BCIT/COMP_8071_Warehouse/team-project/Group-Project",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e5a870a4-33d5-4c33-86e5-dc9045d38f02" name="Changes" comment="" />
+      <created>1792169761339</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1792169761339</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
