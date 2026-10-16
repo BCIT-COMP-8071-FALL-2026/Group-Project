@@ -8,9 +8,10 @@ Defines what each role can see and do in the OLTP app (OLTP-5). Built from the u
 - A Senior sees only their own data
 - A Family Member sees only seniors linked to them by Admin (OLTP-11)
 - A Caregiver sees only visits assigned to them
-- An Agency Manager sees only visits of their own agency (OLTP-18)
+- An Agency Manager sees only visits of their own agency and schedules visits only with their own agency's caregivers (OLTP-16, OLTP-18)
+- An Agency Manager can read all active seniors' names to schedule visits, since seniors are not linked to an agency (OLTP-16)
 - A Staff account has no role and only sees the home page until Admin assigns a role (OLTP-2, OLTP-4)
-- The Admin account is created by the seed script
+- The Admin account, and one Agency Manager and one Caregiver per agency, are created by the seed script
 
 ## Permissions
 
@@ -26,7 +27,8 @@ R = read, W = write, blank = denied
 | Deactivate a senior | OLTP-9 | | | | | W |
 | Linked senior's read-only tab (profile, medical conditions, medication, caregiver notes) | OLTP-11 | | R | | | |
 | Admin page: user list, role + agency, family link | OLTP-4, OLTP-11, OLTP-18 | | | | | W |
-| Schedule a visit | OLTP-16 | | | | | W |
+| Schedule a visit with an own-agency caregiver | OLTP-16 | | | | W | |
+| Active senior names (scheduling dropdown) | OLTP-16 | | | | R | |
 | Own visit list (senior name, address, visit details) | OLTP-12 | | | R | | |
 | Check in, check out | OLTP-14 | | | W | | |
 | Notes for the senior on the visit page | OLTP-12, OLTP-15 | | | R/W | | |
