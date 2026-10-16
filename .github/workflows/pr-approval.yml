@@ -39,6 +39,16 @@ jobs:
           team: devops # replace with your DevOps team slug
           token: ${{ secrets.CI_PAT }}
 
+  twice-approved:
+    name: Completed Review from 2 Approvers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require 2 Approvers
+        uses: op5dev/require-team-approval@v1
+        with:
+          approvals: 2
+          token: ${{ secrets.CI_PAT }}
+
   no-blocking-reviews:
     name: No outstanding change requests
     runs-on: ubuntu-latest
