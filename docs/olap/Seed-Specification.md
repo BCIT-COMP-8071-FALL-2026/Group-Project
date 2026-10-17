@@ -36,10 +36,10 @@ Source: `Senior Care Management - Seed Specification.xlsx`
 
 | Visit category | Count | Percent | Status / timestamp rule | OLAP definition compliance |
 |---|---|---|---|---|
-| Completed on time | 2250 | 75% | VisitStatus not Cancelled; check-in and check-out present; check-in <= scheduled start + 10 minutes. | Completed when both check-in and check-out recorded; on-time is proposed test classification. |
-| Completed late | 360 | 12% | VisitStatus not Cancelled; both timestamps present; check-in > scheduled start + 10 minutes. | LateCheckInCount = 1 only when delay >10 minutes; LateMinutes is positive. |
-| Missed | 240 | 8% | Non-cancelled; explicit VisitStatus = Missed OR no check-in by 60 minutes after scheduled start once cutoff has elapsed. | A late check-in after 60 minutes does not clear missed. Future/pending visits are not marked missed prematurely. |
-| Cancelled | 150 | 5% | VisitStatus = Cancelled; no fabricated check-in or check-out timestamps. | Cancelled visits excluded from missed percentage denominator, pending Query 1 contract confirmation. |
+| Completed on time | 2250 | 75% | Status not Cancelled; check-in and check-out present; check-in <= scheduled start + 10 minutes. | Completed when both check-in and check-out recorded; on-time is proposed test classification. |
+| Completed late | 360 | 12% | Status not Cancelled; both timestamps present; check-in > scheduled start + 10 minutes. | LateCheckInCount = 1 only when delay >10 minutes; LateMinutes is positive. |
+| Missed | 240 | 8% | Non-cancelled; explicit Status = Missed OR no check-in by 60 minutes after scheduled start once cutoff has elapsed. | A late check-in after 60 minutes does not clear missed. Future/pending visits are not marked missed prematurely. |
+| Cancelled | 150 | 5% | Status = Cancelled; no fabricated check-in or check-out timestamps. | Cancelled visits excluded from missed percentage denominator, pending Query 1 contract confirmation. |
 | Total | 3000 | 100% | Counts sum to 3,000. | Synthetic distribution; confirm status vocabulary against OLTP. |
 
 ## Monthly Volume
@@ -99,4 +99,3 @@ Source: `Senior Care Management - Seed Specification.xlsx`
 | Query 4 positive cases | At least five seniors have >=3 missed visits within a rolling 90-day window. | S001–S005 qualify. | Error |
 | Query 4 negative cases | At least some seniors have <3 missed visits in every rolling 90-day window. | S006–S007 excluded. | Error |
 | Time of day | Every scheduled time maps to one proposed category; boundaries require approval. | No unmapped times after approval. | Review |
-| Service category | ServiceCategory populated only from an approved mapping, never inferred automatically from Description. | No unapproved category inference. | Review |
