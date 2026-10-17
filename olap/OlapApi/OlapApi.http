@@ -1,0 +1,6 @@
+@OlapApi_HostAddress = http://localhost:5298
+
+GET {{OlapApi_HostAddress}}/api/senior-visits
+Accept: application/json
+
+###
