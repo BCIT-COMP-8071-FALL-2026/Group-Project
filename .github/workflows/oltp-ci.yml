@@ -16,5 +16,17 @@ jobs:
           dotnet-version: "9.0.x"
       - run: dotnet restore GroupProject.sln
       - run: dotnet build GroupProject.sln --no-restore -c Release
-      - name: Placeholder test (no test project yet)
-        run: echo "dotnet test will run once a test project is added"
+      - name: Run tests
+        run: |
+          tests=$(find . -name '*.Tests.csproj' -not -path '*/obj/*' -not -path '*/bin/*')
+          if [ -z "$tests" ]; then
+            echo "::notice title=No tests::No *.Tests.csproj found. Skipping dotnet test."
+            exit 0
+          fi
+          dotnet test GroupProject.sln --no-build -c Release --logger "trx" --results-directory TestResults
+      - name: Upload test results
+        if: always() && hashFiles('TestResults/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
