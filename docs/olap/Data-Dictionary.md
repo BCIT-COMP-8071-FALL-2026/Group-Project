@@ -1,6 +1,6 @@
 # Senior Care Management - Data Dictionary
 
-Draft, 2026-10-16. Table and field names now match the merged ERD. Rule fixes are still open. Where it conflicts, [Query1-Contract.md](../Query1-Contract.md) and [OLAP_Queries.md](../OLAP_Queries.md) win. Fixes are tracked in a GitHub issue assigned to Shayan.
+Draft, 2026-10-16. Aligned with the merged ERD, [OLAP_Queries.md](../OLAP_Queries.md) and [Query1-Contract.md](../Query1-Contract.md). Where it conflicts, the user stories, ERD, OLAP_Queries.md and Query1-Contract.md win.
 
 Source: `Senior Care Management - Data Dictionary.xlsx`
 
@@ -20,10 +20,10 @@ Source: `Senior Care Management - Data Dictionary.xlsx`
 | Status | VARCHAR(20) | Yes | Scheduled, InProgress, Completed, Cancelled | No |
 | DestinationAddress | VARCHAR(300) | No | Optional, e.g. for doctor visits | Yes |
 | Rule | Definition |  |  |  |
-| Missed Visit | Status = Missed OR no check-in within 60 minutes after scheduled start |  |  |  |
-| Late Visit | Check-in is more than 10 minutes after scheduled start |  |  |  |
-| Completed Visit | Status = Completed |  |  |  |
-| Cancelled Visit | Status = Cancelled; excluded from missed counts |  |  |  |
+| Missed Visit | No check-in within 60 minutes of scheduled start (60 minutes counts as within), once scheduled start + 60 minutes has passed, and not Cancelled. Computed, never a Status value |  |  |  |
+| Late Visit | Check-in is more than 10 minutes after scheduled start, and not Missed |  |  |  |
+| Completed Visit | Check-in and check-out both recorded, and not Missed |  |  |  |
+| Cancelled Visit | Status = Cancelled; excluded from VisitCount and MissedCount |  |  |  |
 | Visit Duration | Difference between ActualCheckOut and ActualCheckIn in minutes |  |  |  |
 
 ## Person
@@ -60,9 +60,9 @@ Source: `Senior Care Management - Data Dictionary.xlsx`
 | Status | VARCHAR(30) | Yes | Active, Deactivated | No |
 | DeactivatedAt | DATETIME | No | Set when Status becomes Deactivated | No |
 | Rule | Definition |  |  |  |
-| Age Calculation | Calculate age using DateOfBirth and the visit date |  |  |  |
+| Age Calculation | Calculate age using DateOfBirth at the anchor date (OLAP_Queries.md) |  |  |  |
 | IsLivingAlone | TRUE = lives alone; FALSE = does not live alone |  |  |  |
-| Age Group | Calculated during ETL using age at the visit date |  |  |  |
+| Age Group | Under 65, 65-74, 75-84, 85+, calculated at the anchor date |  |  |  |
 | Personal Information | Senior personal and medical information must be protected |  |  |  |
 
 ## Caregiver
