@@ -57,8 +57,11 @@ TestResult.xml
 nunit-*.xml
 
 # Visual Studio
+bin/
+obj/
 .vs/
 *.user
+*.suo
 
 # Project: IDE and tool folders (whole folders; the JetBrains template
 # only ignores some .idea files, which let vcs.xml and others through)
