@@ -4,7 +4,7 @@ using OLTPApp.Models;
 
 namespace OLTPApp.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -24,6 +24,14 @@ public class ApplicationDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<ApplicationUser>(e =>
+        {
+            e.HasOne(u => u.Person)
+             .WithOne()
+             .HasForeignKey<ApplicationUser>(u => u.PersonID)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
 
         builder.Entity<Senior>(e =>
         {

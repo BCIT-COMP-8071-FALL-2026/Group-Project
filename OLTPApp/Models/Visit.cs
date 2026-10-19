@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
 
 namespace OLTPApp.Models;
 
@@ -21,8 +20,8 @@ public class Visit
     public int AgencyID { get; set; }               // snapshot of Caregiver.AgencyID at scheduling
     public Agency Agency { get; set; } = null!;
 
-    [MaxLength(450)] public string CreatedByUserID { get; set; } = null!;   // admin who scheduled
-    public IdentityUser CreatedByUser { get; set; } = null!;
+    [MaxLength(450)] public string CreatedByUserID { get; set; } = null!;   // agency manager who scheduled
+    public ApplicationUser CreatedByUser { get; set; } = null!;
 
     public DateTime ScheduledStart { get; set; }
     public DateTime ScheduledEnd { get; set; }
