@@ -12,5 +12,4 @@ public class VisitNote
 
     public string NoteText { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
-    public bool IsArchived { get; set; }
 }

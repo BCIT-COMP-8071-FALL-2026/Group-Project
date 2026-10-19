@@ -9,7 +9,6 @@ public class Person
     [MaxLength(100)] public string FirstName { get; set; } = null!;
     [MaxLength(100)] public string? MiddleName { get; set; }
     [MaxLength(100)] public string LastName { get; set; } = null!;
-    [MaxLength(256)] public string? ContactEmail { get; set; }
     [MaxLength(200)] public string Street { get; set; } = null!;
     [MaxLength(100)] public string City { get; set; } = null!;
     [MaxLength(100)] public string Province { get; set; } = null!;
