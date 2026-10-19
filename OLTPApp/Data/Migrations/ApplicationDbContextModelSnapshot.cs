@@ -74,71 +74,6 @@ namespace OLTPApp.Data.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -224,6 +159,402 @@ namespace OLTPApp.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OLTPApp.Models.Agency", b =>
+                {
+                    b.Property<int>("AgencyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgencyID"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("AgencyID");
+
+                    b.ToTable("Agency");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.AgencyManager", b =>
+                {
+                    b.Property<int>("AgencyManagerID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AgencyID")
+                        .HasColumnType("int");
+
+                    b.HasKey("AgencyManagerID");
+
+                    b.HasIndex("AgencyID");
+
+                    b.ToTable("AgencyManager");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PersonID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("PersonID")
+                        .IsUnique()
+                        .HasFilter("[PersonID] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Caregiver", b =>
+                {
+                    b.Property<int>("CaregiverID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AgencyID")
+                        .HasColumnType("int");
+
+                    b.HasKey("CaregiverID");
+
+                    b.HasIndex("AgencyID");
+
+                    b.ToTable("Caregiver");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.FamilyMember", b =>
+                {
+                    b.Property<int>("FamilyMemberID")
+                        .HasColumnType("int");
+
+                    b.HasKey("FamilyMemberID");
+
+                    b.ToTable("FamilyMember");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Person", b =>
+                {
+                    b.Property<int>("PersonID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonID"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("PersonID");
+
+                    b.ToTable("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Senior", b =>
+                {
+                    b.Property<int>("SeniorID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CurrentDoctorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("CurrentDoctorPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("CurrentMedication")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("DeactivatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmergencyContactName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("EmergencyContactPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("EmergencyContactRelationship")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsLivingAlone")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MedicalConditions")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("SeniorID");
+
+                    b.ToTable("Senior");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.SeniorFamilyMember", b =>
+                {
+                    b.Property<int>("SeniorID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FamilyMemberID")
+                        .HasColumnType("int");
+
+                    b.HasKey("SeniorID", "FamilyMemberID");
+
+                    b.HasIndex("FamilyMemberID");
+
+                    b.ToTable("SeniorFamilyMember");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Service", b =>
+                {
+                    b.Property<int>("ServiceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceID"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("ServiceID");
+
+                    b.ToTable("Service");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Visit", b =>
+                {
+                    b.Property<int>("VisitID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VisitID"));
+
+                    b.Property<DateTime?>("ActualCheckIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ActualCheckOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AgencyID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CaregiverID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByUserID")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DestinationAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime>("ScheduledStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeniorID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("VisitID");
+
+                    b.HasIndex("AgencyID");
+
+                    b.HasIndex("CaregiverID");
+
+                    b.HasIndex("CreatedByUserID");
+
+                    b.HasIndex("SeniorID");
+
+                    b.HasIndex("ServiceID");
+
+                    b.ToTable("Visit");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.VisitNote", b =>
+                {
+                    b.Property<int>("NoteID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NoteID"));
+
+                    b.Property<int>("CaregiverID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VisitID")
+                        .HasColumnType("int");
+
+                    b.HasKey("NoteID");
+
+                    b.HasIndex("CaregiverID");
+
+                    b.HasIndex("VisitID");
+
+                    b.ToTable("VisitNote");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -235,7 +566,7 @@ namespace OLTPApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("OLTPApp.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -244,7 +575,7 @@ namespace OLTPApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("OLTPApp.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -259,7 +590,7 @@ namespace OLTPApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("OLTPApp.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -268,11 +599,202 @@ namespace OLTPApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("OLTPApp.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.AgencyManager", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Agency", "Agency")
+                        .WithMany("AgencyManagers")
+                        .HasForeignKey("AgencyID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Person", "Person")
+                        .WithOne("AgencyManager")
+                        .HasForeignKey("OLTPApp.Models.AgencyManager", "AgencyManagerID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Agency");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Person", "Person")
+                        .WithOne()
+                        .HasForeignKey("OLTPApp.Models.ApplicationUser", "PersonID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Caregiver", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Agency", "Agency")
+                        .WithMany("Caregivers")
+                        .HasForeignKey("AgencyID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Person", "Person")
+                        .WithOne("Caregiver")
+                        .HasForeignKey("OLTPApp.Models.Caregiver", "CaregiverID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Agency");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.FamilyMember", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Person", "Person")
+                        .WithOne("FamilyMember")
+                        .HasForeignKey("OLTPApp.Models.FamilyMember", "FamilyMemberID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Senior", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Person", "Person")
+                        .WithOne("Senior")
+                        .HasForeignKey("OLTPApp.Models.Senior", "SeniorID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.SeniorFamilyMember", b =>
+                {
+                    b.HasOne("OLTPApp.Models.FamilyMember", "FamilyMember")
+                        .WithMany("SeniorFamilyMembers")
+                        .HasForeignKey("FamilyMemberID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Senior", "Senior")
+                        .WithMany("SeniorFamilyMembers")
+                        .HasForeignKey("SeniorID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FamilyMember");
+
+                    b.Navigation("Senior");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Visit", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Agency", "Agency")
+                        .WithMany()
+                        .HasForeignKey("AgencyID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Caregiver", "Caregiver")
+                        .WithMany("Visits")
+                        .HasForeignKey("CaregiverID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Senior", "Senior")
+                        .WithMany("Visits")
+                        .HasForeignKey("SeniorID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Agency");
+
+                    b.Navigation("Caregiver");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Senior");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.VisitNote", b =>
+                {
+                    b.HasOne("OLTPApp.Models.Caregiver", "Caregiver")
+                        .WithMany()
+                        .HasForeignKey("CaregiverID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OLTPApp.Models.Visit", "Visit")
+                        .WithMany("Notes")
+                        .HasForeignKey("VisitID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Caregiver");
+
+                    b.Navigation("Visit");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Agency", b =>
+                {
+                    b.Navigation("AgencyManagers");
+
+                    b.Navigation("Caregivers");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Caregiver", b =>
+                {
+                    b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.FamilyMember", b =>
+                {
+                    b.Navigation("SeniorFamilyMembers");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Person", b =>
+                {
+                    b.Navigation("AgencyManager");
+
+                    b.Navigation("Caregiver");
+
+                    b.Navigation("FamilyMember");
+
+                    b.Navigation("Senior");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Senior", b =>
+                {
+                    b.Navigation("SeniorFamilyMembers");
+
+                    b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("OLTPApp.Models.Visit", b =>
+                {
+                    b.Navigation("Notes");
                 });
 #pragma warning restore 612, 618
         }
