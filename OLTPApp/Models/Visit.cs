@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OLTPApp.Models;
 
-public enum VisitStatus { Scheduled, InProgress, Completed, Missed, Cancelled }
+public enum VisitStatus { Scheduled, InProgress, Completed, Cancelled }
 
 public class Visit
 {
@@ -24,11 +24,9 @@ public class Visit
     public ApplicationUser CreatedByUser { get; set; } = null!;
 
     public DateTime ScheduledStart { get; set; }
-    public DateTime ScheduledEnd { get; set; }
     public DateTime? ActualCheckIn { get; set; }
     public DateTime? ActualCheckOut { get; set; }
 
     public VisitStatus Status { get; set; } = VisitStatus.Scheduled;
-    [MaxLength(500)] public string? CancelReason { get; set; }
     [MaxLength(300)] public string? DestinationAddress { get; set; }
 }
