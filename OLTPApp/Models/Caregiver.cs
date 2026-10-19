@@ -7,4 +7,6 @@ public class Caregiver
 
     public int AgencyID { get; set; }               // exactly one agency
     public Agency Agency { get; set; } = null!;
+
+    public ICollection<Visit> Visits { get; set; } = new List<Visit>();
 }

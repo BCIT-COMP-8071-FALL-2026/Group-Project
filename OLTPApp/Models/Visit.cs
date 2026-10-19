@@ -29,4 +29,6 @@ public class Visit
 
     public VisitStatus Status { get; set; } = VisitStatus.Scheduled;
     [MaxLength(300)] public string? DestinationAddress { get; set; }
+
+    public ICollection<VisitNote> Notes { get; set; } = new List<VisitNote>();
 }

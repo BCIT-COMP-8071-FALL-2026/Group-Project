@@ -80,9 +80,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Visit>(e =>
         {
-            e.HasOne(v => v.Senior).WithMany().HasForeignKey(v => v.SeniorID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(v => v.Senior).WithMany(s => s.Visits).HasForeignKey(v => v.SeniorID).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(v => v.Service).WithMany().HasForeignKey(v => v.ServiceID).OnDelete(DeleteBehavior.Restrict);
-            e.HasOne(v => v.Caregiver).WithMany().HasForeignKey(v => v.CaregiverID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(v => v.Caregiver).WithMany(c => c.Visits).HasForeignKey(v => v.CaregiverID).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(v => v.Agency).WithMany().HasForeignKey(v => v.AgencyID).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(v => v.CreatedByUser).WithMany().HasForeignKey(v => v.CreatedByUserID).OnDelete(DeleteBehavior.Restrict);
             e.Property(v => v.Status).HasConversion<string>().HasMaxLength(20);
@@ -91,15 +91,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<VisitNote>(e =>
         {
             e.HasKey(n => n.NoteID);
-            e.HasOne(n => n.Visit).WithMany().HasForeignKey(n => n.VisitID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(n => n.Visit).WithMany(v => v.Notes).HasForeignKey(n => n.VisitID).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(n => n.Caregiver).WithMany().HasForeignKey(n => n.CaregiverID).OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<SeniorFamilyMember>(e =>
         {
             e.HasKey(sf => new { sf.SeniorID, sf.FamilyMemberID });
-            e.HasOne(sf => sf.Senior).WithMany().HasForeignKey(sf => sf.SeniorID).OnDelete(DeleteBehavior.Restrict);
-            e.HasOne(sf => sf.FamilyMember).WithMany().HasForeignKey(sf => sf.FamilyMemberID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(sf => sf.Senior).WithMany(s => s.SeniorFamilyMembers).HasForeignKey(sf => sf.SeniorID).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(sf => sf.FamilyMember).WithMany(f => f.SeniorFamilyMembers).HasForeignKey(sf => sf.FamilyMemberID).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

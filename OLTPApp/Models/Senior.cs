@@ -21,4 +21,7 @@ public class Senior
 
     public SeniorStatus Status { get; set; } = SeniorStatus.Active;
     public DateTime? DeactivatedAt { get; set; }
+
+    public ICollection<Visit> Visits { get; set; } = new List<Visit>();
+    public ICollection<SeniorFamilyMember> SeniorFamilyMembers { get; set; } = new List<SeniorFamilyMember>();
 }
