@@ -7,14 +7,14 @@ The API currently returns hardcoded rows that mirror the `SeniorVisits` seed dat
 
 | Path | What it is |
 |---|---|
-| `OlapApi/` | ASP.NET Core Web API (.NET 10) exposing `GET /api/senior-visits` |
+| `OlapApi/` | ASP.NET Core Web API (.NET 9) exposing `GET /api/senior-visits` |
 | `OlapApi.Tests/` | xUnit integration tests for the API (`WebApplicationFactory`) |
 | `olap-client/` | React + TypeScript + Vite app with the Chart.js chart |
 | `Olap.slnx` | Solution containing the two .NET projects |
 
 ## Prerequisites
 
-- .NET 10 SDK
+- .NET 9 SDK
 - Node.js 22.13+ or 24+ (LTS) and npm
 
 ## Run it
