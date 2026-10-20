@@ -45,7 +45,3 @@ When the new login page lands:
 1. Merge or check out that branch. The fixture starts whatever `OLTPApp` is in the checkout. Or set `OLTP_E2E_APP_PROJECT` to point at another worktree.
 2. Update the selectors, `Path` and `LockoutPath` in `Pages/LoginPage.cs`, and the expected messages in `LoginTests.cs` if the wording changes.
 3. Swap the stock IDs (`Input_Email`, `Input_Password`, `login-submit`) for the stable IDs agreed with Mikko.
-
-## Known result on `develop`
-
-`FiveFailedAttempts_LockAccount_EvenForCorrectPassword` **fails**. `Login.cshtml.cs` calls `PasswordSignInAsync(..., lockoutOnFailure: false)`, so failed attempts are never counted. The 5th wrong password shows "Invalid login attempt." again instead of the Lockout page. OLTP-1 requires the account to lock after 5 failures. This is an app bug for the devs, not a test problem.
