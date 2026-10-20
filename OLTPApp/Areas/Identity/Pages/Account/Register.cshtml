@@ -20,7 +20,9 @@
                     </div>
                 </div>
                 
-                <form>
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div id="registerErrors" asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
                     @* Step 1 *@
                     <div class="form-step" data-step="1">
                         <div class="text-center mb-4">
@@ -30,15 +32,31 @@
 
                         <div class="d-flex gap-3 mb-3">
                             <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="roleRadio" id="rolePatient"
-                                       value="Patient" checked>
-                                Patient
+                                <input type="radio"
+                                    class="form-check-input mt-0"
+                                    id="roleSenior"
+                                    value="Senior"
+                                    asp-for="Input.AccountType"
+                                    checked>
+                                Senior
                             </label>
 
                             <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="roleRadio" id="roleFamily"
-                                       value="Family">
+                                <input type="radio" 
+                                    class="form-check-input mt-0" 
+                                    id="roleFamily"
+                                    value="Family"
+                                    asp-for="Input.AccountType">
                                 Family member
+                            </label>
+
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input type="radio" 
+                                    class="form-check-input mt-0" 
+                                    id="roleStaff"
+                                    value="Staff"
+                                    asp-for="Input.AccountType">
+                                Staff
                             </label>
                         </div>
 
@@ -49,6 +67,7 @@
                                     placeholder="Email"
                                     aria-label="Email"
                                     autocomplete="email"
+                                    asp-for="Input.Email"
                                     required>
                             <hr class="m-0 mx-3 opacity-25">
                             <input type="password"
@@ -56,8 +75,25 @@
                                     id="password"
                                     placeholder="Password"
                                     aria-label="Password"
-                                    autocomplete="current-password"
+                                    autocomplete="new-password"
+                                    asp-for="Input.Password"
                                     required>
+                            <hr class="m-0 mx-3 opacity-25">
+                            <input type="password"
+                                    class="register-input"
+                                    id="confirmPassword"
+                                    placeholder="Confirm Password"
+                                    aria-label="Confirm Password"
+                                    autocomplete="new-password"
+                                    asp-for="Input.ConfirmPassword"
+                                    required>
+                            
+                            <div class="px-1">
+                                <span asp-validation-for="Input.Email" class="text-danger small d-block"></span>
+                                <span asp-validation-for="Input.Password" class="text-danger small d-block"></span>
+                                <span asp-validation-for="Input.ConfirmPassword"
+                                      class="text-danger small d-block"></span>
+                            </div>
                         </div>
 
                         <button type="button" class="btn btn-primary custom-rounded w-100" onclick="nextStep()">
@@ -76,10 +112,10 @@
                             <input type="text"
                                     class="register-input"
                                     id="firstName"
-                                    name="FirstName"
                                     placeholder="First name"
                                     aria-label="First name"
                                     autocomplete="given-name"
+                                    asp-for="Input.FirstName"
                                     required>
 
                             <hr class="m-0 mx-3 opacity-25">
@@ -87,35 +123,72 @@
                             <input type="text"
                                     class="register-input"
                                     id="middleName"
-                                    name="MiddleName"
                                     placeholder="Middle name (optional)"
                                     aria-label="Middle name"
-                                    autocomplete="additional-name">
+                                    autocomplete="additional-name"
+                                    asp-for="Input.MiddleName">
 
                             <hr class="m-0 mx-3 opacity-25">
 
                             <input type="text"
                                     class="register-input"
                                     id="lastName"
-                                    name="LastName"
                                     placeholder="Last name"
                                     aria-label="Last name"
                                     autocomplete="family-name"
+                                    asp-for="Input.LastName"
                                     required>
 
                             <hr class="m-0 mx-3 opacity-25">
 
                             <input type="tel"
-                                    class="register-inpu
-                                    "
+                                    class="register-input"
                                     id="phoneNumber"
-                                    name="PhoneNumber"
-                                    placeholder="Phone number (604-123-4567)"
+                                    placeholder="Phone number"
                                     aria-label="Phone number"
                                     autocomplete="tel"
-                                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" 
-                                    title="Use the format 604-123-4567"
+                                    asp-for="Input.Phone"
                                     required>
+                            
+                            <div id="seniorFields">
+                                <hr class="m-0 mx-3 opacity-25">
+
+                                <input type="date"
+                                        class="register-input"
+                                        id="birthday"
+                                        placeholder="Birthday"
+                                        aria-label="Birthday"
+                                        autocomplete="bday"
+                                        asp-for="Input.Birthday"
+                                        required>
+                                
+                                <hr class="m-0 mx-3 opacity-25">
+
+                                <div class="px-3 py-3">
+                                    <p id="livingAloneLabel" class="mb-2 text-muted">Do you live alone?</p>
+                                    <div class="d-flex gap-4" role="radiogroup" aria-labelledby="livingAloneLabel">
+                                        <label class="d-flex align-items-center gap-2">
+                                            <input type="radio" class="form-check-input mt-0" id="livingAloneYes"
+                                                value="true" asp-for="Input.IsLivingAlone" required>
+                                            Yes
+                                        </label>
+
+                                        <label class="d-flex align-items-center gap-2">
+                                            <input type="radio" class="form-check-input mt-0" id="livingAloneNo"
+                                                value="false" asp-for="Input.IsLivingAlone">
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-1 mb-3">
+                            <span asp-validation-for="Input.FirstName" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.LastName" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Phone" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Birthday" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.IsLivingAlone" class="text-danger small d-block"></span>
                         </div>
 
                         <div class="d-flex gap-3">
@@ -142,9 +215,9 @@
                             <input type="text"
                                     class="register-input"
                                     id="streetAddress"
-                                    name="StreetAddress"
                                     placeholder="Street address"
                                     autocomplete="address-line1"
+                                    asp-for="Input.Street"
                                     required>
 
                             <hr class="m-0 mx-3 opacity-25">
@@ -152,9 +225,9 @@
                             <input type="text"
                                     class="register-input"
                                     id="city"
-                                    name="City"
                                     placeholder="City"
                                     autocomplete="address-level2"
+                                    asp-for="Input.City"
                                     required>
 
                             <hr class="m-0 mx-3 opacity-25">
@@ -162,9 +235,9 @@
                             <input type="text"
                                     class="register-input"
                                     id="province"
-                                    name="Province"
                                     placeholder="Province / State / Region"
                                     autocomplete="address-level1"
+                                    asp-for="Input.Province"
                                     required>
 
                             <hr class="m-0 mx-3 opacity-25">
@@ -172,19 +245,28 @@
                             <input type="text"
                                     class="register-input"
                                     id="postalCode"
-                                    name="PostalCode"
-                                    placeholder="Postal / ZIP code (optional)"
-                                    autocomplete="postal-code">
+                                    placeholder="Postal Code"
+                                    autocomplete="postal-code"
+                                    asp-for="Input.PostalCode"
+                                    required>
 
                             <hr class="m-0 mx-3 opacity-25">
 
                             <input type="text"
                                     class="register-input"
                                     id="country"
-                                    name="Country"
                                     placeholder="Country"
                                     autocomplete="country-name"
+                                    asp-for="Input.Country"
                                     required>
+                        </div>
+
+                        <div class="px-1 mb-3">
+                            <span asp-validation-for="Input.Street" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.City" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Province" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.PostalCode" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Country" class="text-danger small d-block"></span>
                         </div>
 
                         <div class="d-flex gap-3">
@@ -203,27 +285,21 @@
                     <div class="form-step d-none" data-step="4">
                         <div class="text-center mb-4">
                             <h1 class="fw-bold fs-2 mb-1">Insurance</h1>
-                            <p class="text-muted mb-0">Optional. You can add this later.</p>
+                            <p class="text-muted mb-0">
+                                Not implemented yet. This feature will be available in a future update.
+                            </p>
                         </div>
 
                         <div class="card border-0 custom-rounded overflow-hidden mb-3">
-                            <input type="text"
-                                    class="register-input"
-                                    id="insuranceCompany"
-                                    name="InsuranceCompany"
-                                    placeholder="Insurance company (optional)"
-                                    aria-label="Insurance company"
-                                    autocomplete="organization">
+                            <input type="text" class="register-input" id="insuranceCompany" name="InsuranceCompany"
+                                   placeholder="Insurance company (optional)" aria-label="Insurance company"
+                                   autocomplete="organization" disabled>
 
                             <hr class="m-0 mx-3 opacity-25">
 
-                            <input type="text"
-                                    class="register-input"
-                                    id="insuranceAccountNumber"
-                                    name="InsuranceAccountNumber"
-                                    placeholder="Insurance account number (optional)"
-                                    aria-label="Insurance account number"
-                                    autocomplete="off">
+                            <input type="text" class="register-input" id="insuranceAccountNumber"
+                                   name="InsuranceAccountNumber" placeholder="Insurance account number (optional)"
+                                   aria-label="Insurance account number" autocomplete="off" disabled>
                         </div>
 
                         <div class="d-flex gap-3">
@@ -242,59 +318,79 @@
             </div>
         </div>
     </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-            let currentStep = 1;
-            const totalSteps = 4;
+        let currentStep = 1;
+        const totalSteps = 4;
 
-            function showStep(step) {
-                document.querySelectorAll('.form-step').forEach(element => {
-                    element.classList.toggle(
-                        'd-none',
-                        Number(element.dataset.step) !== step
-                    );
-                });
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach(element => {
+                element.classList.toggle(
+                    'd-none',
+                    Number(element.dataset.step) !== step
+                );
+            });
 
-                document.querySelector('.progress-bar').style.width =
-                    `${(step / totalSteps) * 100}%`;
+            document.querySelector('.progress-bar').style.width =
+                `${(step / totalSteps) * 100}%`;
 
-                document.querySelector('.progress-bar').parentElement
-                    .setAttribute('aria-valuenow', (step / totalSteps) * 100);
+            document.querySelector('.progress-bar').parentElement
+                .setAttribute('aria-valuenow', (step / totalSteps) * 100);
 
-                document.querySelector('p.text-start').textContent =
-                    `Step ${step} of ${totalSteps}`;
+            document.querySelector('p.text-start').textContent =
+                `Step ${step} of ${totalSteps}`;
 
-                currentStep = step;
-            }
+            currentStep = step;
+        }
 
-                function nextStep() {
-                    const currentStepElement = document.querySelector(
-                        `.form-step[data-step="${currentStep}"]`
-                    );
+        function nextStep() {
+            const currentStepElement = document.querySelector(
+                `.form-step[data-step="${currentStep}"]`
+            );
 
-                    const inputs = currentStepElement.querySelectorAll(
-                        'input, select, textarea'
-                    );
+            const inputs = currentStepElement.querySelectorAll(
+                'input, select, textarea'
+            );
 
-                    for (const input of inputs) {
-                        if (!input.checkValidity()) {
-                            input.reportValidity();
-                            return;
-                        }
-                    }
-
-                    if (currentStep < totalSteps) {
-                        showStep(currentStep + 1);
-                    }
+            for (const input of inputs) {
+                if (!$(input).valid()) {
+                    input.focus();
+                    return;
                 }
 
-            function previousStep() {
-                if (currentStep > 1) {
-                    showStep(currentStep - 1);
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    return;
                 }
             }
+
+            if (currentStep < totalSteps) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function updateAccountType() {
+            const selected = document.querySelector('input[name="Input.AccountType"]:checked');
+            const isSenior = selected?.value === 'Senior';
+            const seniorFields = document.getElementById('seniorFields');
+
+            seniorFields.classList.toggle('d-none', !isSenior);
+            seniorFields.querySelectorAll('input').forEach(input => input.disabled = !isSenior);
+        }
+
+        document.querySelectorAll('input[name="Input.AccountType"]')
+            .forEach(radio => radio.addEventListener('change', updateAccountType));
+
+        updateAccountType();
     </script>
 }

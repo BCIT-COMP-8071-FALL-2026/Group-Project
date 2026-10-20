@@ -86,6 +86,8 @@ namespace OLTPApp.Areas.Identity.Pages.Account
             /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$",
+                ErrorMessage = "The password must include an uppercase letter, a lowercase letter, a number and a symbol.")]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
@@ -94,10 +96,69 @@ namespace OLTPApp.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            // Account type chosen in step 1: Senior, Family or Staff.
+            // The pattern stops a crafted request from posting a value like "Admin".
+            [Required]
+            [RegularExpression("^(Senior|Family|Staff)$", ErrorMessage = "Choose Senior, Family or Staff.")]
+            [Display(Name = "Account type")]
+            public string AccountType { get; set; } = "Senior";
+
+            // Person fields (names match the Person entity)
+            [Required]
+            [MaxLength(100)]
+            [Display(Name = "First name")]
+            public string FirstName { get; set; }
+
+            [MaxLength(100)]
+            [Display(Name = "Middle name")]
+            public string MiddleName { get; set; }
+
+            [Required]
+            [MaxLength(100)]
+            [Display(Name = "Last name")]
+            public string LastName { get; set; }
+
+            [Required]
+            [MaxLength(20)]
+            [Display(Name = "Phone number")]
+            public string Phone { get; set; }
+
+            [Required]
+            [MaxLength(200)]
+            [Display(Name = "Street address")]
+            public string Street { get; set; }
+
+            [Required]
+            [MaxLength(100)]
+            public string City { get; set; }
+
+            [Required]
+            [MaxLength(100)]
+            [Display(Name = "Province / State / Region")]
+            public string Province { get; set; }
+
+            [Required]
+            [MaxLength(20)]
+            [Display(Name = "Postal / ZIP code")]
+            public string PostalCode { get; set; }
+
+            [Required]
+            [MaxLength(100)]
+            public string Country { get; set; }
+
+            // Senior only (OLTP-2): required when AccountType is "Senior".
+            // Nullable so Family and Staff can leave them out. Check them in OnPostAsync.
+            [Display(Name = "Birthday")]
+            public DateOnly? Birthday { get; set; }
+
+            [Display(Name = "Living alone")]
+            public bool? IsLivingAlone { get; set; }
         }
 
 
