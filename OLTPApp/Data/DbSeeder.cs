@@ -17,6 +17,7 @@ public static class DbSeeder
 
         await SeedRolesAsync(roleManager);
         await SeedAdminAsync(userManager);
+        await SeedAgenciesAsync(db, userManager);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -36,6 +37,57 @@ public static class DbSeeder
 
         var admin = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
         await CreateUserAsync(userManager, admin, "Admin123!", "Admin");
+    }
+
+    private static async Task SeedAgenciesAsync(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+    {
+        var seeds = new[]
+        {
+            (Slug: "sunrise", Agency: new Agency { Name = "Sunrise Home Care", Street = "100 Main St", City = "Vancouver",
+                Province = "BC", Country = "Canada", PostalCode = "V5K 0A1", Phone = "604-555-0100", Email = "info@sunrise.test" },
+             Manager: ("Maria", "Lopez"), Caregiver: ("Daniel", "Kim")),
+            (Slug: "harbour", Agency: new Agency { Name = "Harbour Care Services", Street = "200 Water St", City = "Burnaby",
+                Province = "BC", Country = "Canada", PostalCode = "V5H 0A2", Phone = "604-555-0200", Email = "info@harbour.test" },
+             Manager: ("Priya", "Singh"), Caregiver: ("Liam", "Chen")),
+        };
+
+        foreach (var s in seeds)
+        {
+            var agency = await db.Agency.FirstOrDefaultAsync(a => a.Name == s.Agency.Name);
+            if (agency == null)
+            {
+                agency = s.Agency;
+                db.Agency.Add(agency);
+                await db.SaveChangesAsync();
+            }
+
+            await SeedStaffAsync(db, userManager, agency, $"manager.{s.Slug}@seniorcare.test", "Agency Manager", s.Manager);
+            await SeedStaffAsync(db, userManager, agency, $"caregiver.{s.Slug}@seniorcare.test", "Caregiver", s.Caregiver);
+        }
+    }
+
+    // Person + AgencyManager/Caregiver row + login linked by PersonID, all or nothing
+    private static async Task SeedStaffAsync(ApplicationDbContext db, UserManager<ApplicationUser> userManager,
+        Agency agency, string email, string role, (string First, string Last) name)
+    {
+        if (await userManager.FindByEmailAsync(email) != null)
+            return;
+
+        await using var tx = await db.Database.BeginTransactionAsync();
+
+        var person = new Person { FirstName = name.First, LastName = name.Last, Street = agency.Street, City = agency.City,
+            Province = agency.Province, Country = agency.Country, PostalCode = agency.PostalCode, Phone = agency.Phone };
+
+        if (role == "Agency Manager")
+            db.AgencyManager.Add(new AgencyManager { Person = person, Agency = agency });
+        else
+            db.Caregiver.Add(new Caregiver { Person = person, Agency = agency });
+        await db.SaveChangesAsync();   // fills person.PersonID
+
+        var user = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true, PersonID = person.PersonID };
+        await CreateUserAsync(userManager, user, "Password123!", role);
+
+        await tx.CommitAsync();
     }
 
     // Shared by admin, manager and caregiver accounts
