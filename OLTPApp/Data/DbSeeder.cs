@@ -111,6 +111,8 @@ public static class DbSeeder
         if (!result.Succeeded)
             throw new InvalidOperationException($"Seeding {user.Email} failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        await userManager.AddToRoleAsync(user, role);
+        var roleResult = await userManager.AddToRoleAsync(user, role);
+        if (!roleResult.Succeeded)
+            throw new InvalidOperationException($"Adding {user.Email} to {role} failed: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
     }
 }
