@@ -18,6 +18,7 @@ public static class DbSeeder
         await SeedRolesAsync(roleManager);
         await SeedAdminAsync(userManager);
         await SeedAgenciesAsync(db, userManager);
+        await SeedServicesAsync(db);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
@@ -88,6 +89,18 @@ public static class DbSeeder
         await CreateUserAsync(userManager, user, "Password123!", role);
 
         await tx.CommitAsync();
+    }
+
+    private static async Task SeedServicesAsync(ApplicationDbContext db)
+    {
+        string[] names = { "Doctor", "Home visit", "Bathing" };   // OLTP-16
+
+        foreach (var name in names)
+        {
+            if (!await db.Service.AnyAsync(s => s.ServiceName == name))
+                db.Service.Add(new Service { ServiceName = name });
+        }
+        await db.SaveChangesAsync();
     }
 
     // Shared by admin, manager and caregiver accounts
