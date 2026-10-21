@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using OLTPApp.Data;
 using OLTPApp.Models;
 
 namespace OLTPApp.Areas.Identity.Pages.Account
@@ -30,13 +31,15 @@ namespace OLTPApp.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace OLTPApp.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -168,20 +172,83 @@ namespace OLTPApp.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+
+
+
+
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Check Senior fields are filled if account type is Senior
+            if (Input.AccountType == "Senior")
+            {
+                if (Input.Birthday is null)
+                    ModelState.AddModelError("Input.Birthday", "Enter your birthday.");
+                if (Input.IsLivingAlone is null)
+                    ModelState.AddModelError("Input.IsLivingAlone", "Select yes or no.");
+            }
+
             if (ModelState.IsValid)
             {
+                // Check duplicate email before creation
+                if (await _userManager.FindByEmailAsync(Input.Email) is not null)
+                {
+                    ModelState.AddModelError("Input.Email", "An account with this email already exists.");
+                    return Page();
+                }
+
+                // One transaction to create ApplicationUser plus Person and Senior/FamilyMember
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                // Create person
+                var person = new Person
+                {
+                    FirstName = Input.FirstName,
+                    MiddleName = Input.MiddleName,
+                    LastName = Input.LastName,
+                    Phone = Input.Phone,
+                    Street = Input.Street,
+                    City = Input.City,
+                    Province = Input.Province,
+                    PostalCode = Input.PostalCode,
+                    Country = Input.Country
+                };
+                _context.Person.Add(person);
+                await _context.SaveChangesAsync();
+
+                // Create ApplicationUser
                 var user = CreateUser();
+                user.PersonID = person.PersonID; // Fill in ApplicationUser's PersonID
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
-                {
+                {   
+                    if (Input.AccountType == "Senior") // Create Senior
+                    {
+                        _context.Senior.Add(new Senior
+                        {
+                            SeniorID = person.PersonID,
+                            DateOfBirth = Input.Birthday.Value,
+                            IsLivingAlone = Input.IsLivingAlone.Value
+                        });
+                    }
+                    else if (Input.AccountType == "Family") // Create FamilyMember
+                    {
+                        _context.FamilyMember.Add(new FamilyMember { FamilyMemberID = person.PersonID });
+                    }
+
+                    /* TODO: ADD ROLES TO SENIOR / FAMILY MEMBER HERE */
+
+                    // Complete transaction
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
@@ -208,7 +275,13 @@ namespace OLTPApp.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    var isDuplicate = error.Code is "DuplicateUserName" or "DuplicateEmail";
+                    var key = isDuplicate ? "Input.Email"
+                            : error.Code.StartsWith("Password") ? "Input.Password"
+                            : string.Empty;
+
+                    ModelState.AddModelError(key,
+                        isDuplicate ? "An account with this email already exists." : error.Description);
                 }
             }
 
