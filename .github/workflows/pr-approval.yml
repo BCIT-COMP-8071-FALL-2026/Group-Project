@@ -40,7 +40,9 @@ jobs:
           token: ${{ secrets.CI_PAT }}
 
   twice-approved:
-    name: Completed Review from 2 Approvers
+    name: Completed Review from 2 Approvers (main only)
+    # Sprint 2 (#78): develop PRs need only 1 QA/PM approval; main still needs 2.
+    if: github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
       - name: Require 2 Approvers
