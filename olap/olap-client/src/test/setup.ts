@@ -6,6 +6,7 @@ afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 
 // jsdom has no matchMedia; the chart theme hook needs it.

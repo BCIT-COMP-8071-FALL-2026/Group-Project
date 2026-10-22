@@ -1,71 +1,206 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ComponentProps } from 'react'
-import type { Bar } from 'react-chartjs-2'
-import { describe, expect, it, vi } from 'vitest'
+import { useImperativeHandle, type ComponentProps } from 'react'
+import type { Line } from 'react-chartjs-2'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import type { MissedVisitsMonth } from './api/missedVisits'
+import { CHART_PRINT_SIZE } from './chartPrintSize'
 
-// jsdom can't draw on a canvas, so capture what the chart is given instead.
-const barProps = vi.hoisted(() => ({ current: undefined as ComponentProps<typeof Bar> | undefined }))
+// jsdom can't draw on a canvas, so capture what the chart is given and stand in for the Chart.js instance.
+type LineProps = ComponentProps<typeof Line>
+const chart = vi.hoisted(() => ({
+  props: undefined as LineProps | undefined,
+  instance: { options: {} as { devicePixelRatio?: number }, resize: (() => {}) as (w?: number, h?: number) => void },
+}))
 vi.mock('react-chartjs-2', () => ({
-  Bar: (props: ComponentProps<typeof Bar>) => {
-    barProps.current = props
+  Line: (props: LineProps) => {
+    chart.props = props
+    useImperativeHandle(props.ref as never, () => chart.instance)
     return <canvas role="img" aria-label={props['aria-label']} />
   },
 }))
 
-const sampleVisits = [
-  { id: 1, seniorName: 'Mary', visitCount: 5 },
-  { id: 2, seniorName: 'John', visitCount: 8 },
-  { id: 3, seniorName: 'Sara', visitCount: 1 },
+const months: MissedVisitsMonth[] = [
+  { month: '2025-10', visitCount: 120, missedCount: 9, missedPercent: 7.5 },
+  { month: '2025-11', visitCount: 131, missedCount: 12, missedPercent: 9.2 },
+  { month: '2025-12', visitCount: 1250, missedCount: 210, missedPercent: 16.8 },
 ]
 
-function mockApi(...responses: Response[]) {
+function mockApi(...responses: (Response | Error)[]) {
   const fetchMock = vi.fn<typeof fetch>()
-  for (const response of responses) fetchMock.mockResolvedValueOnce(response)
+  for (const response of responses) {
+    if (response instanceof Error) fetchMock.mockRejectedValueOnce(response)
+    else fetchMock.mockResolvedValueOnce(response)
+  }
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
 }
 
+async function renderReport() {
+  render(<App />)
+  return screen.findByRole('img', { name: /line chart of successful and missed visits/i })
+}
+
 describe('App', () => {
-  it('charts the visits returned by the Web API', async () => {
-    const fetchMock = mockApi(Response.json(sampleVisits))
+  beforeEach(() => {
+    // Only Date is faked, so the "current month" is fixed while promises and user events run normally.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 13, 10, 30))
+    chart.instance.options = {}
+    chart.instance.resize = vi.fn()
+  })
 
-    render(<App />)
+  afterEach(() => {
+    vi.useRealTimers()
+  })
 
-    const chart = await screen.findByRole('img', { name: /bar chart of visits per senior/i })
-    expect(chart).toHaveAccessibleName(
-      'Bar chart of visits per senior. Mary: 5 visits, John: 8 visits, Sara: 1 visit.',
+  it('loads Query 1 from the configured OlapApi URL', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'http://api.test/')
+    const fetchMock = mockApi(Response.json(months))
+
+    await renderReport()
+
+    expect(fetchMock).toHaveBeenCalledWith('http://api.test/api/reports/missed-visits-by-month', expect.anything())
+  })
+
+  it('calls the API on its own origin when no URL is configured', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', undefined)
+    const fetchMock = mockApi(Response.json(months))
+
+    await renderReport()
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/reports/missed-visits-by-month', expect.anything())
+  })
+
+  it('charts successful and missed visits per month', async () => {
+    mockApi(Response.json(months))
+
+    const chartImage = await renderReport()
+
+    expect(chart.props?.data.labels).toEqual(['2025-10', '2025-11', '2025-12'])
+    expect(chart.props?.data.datasets.map((dataset) => [dataset.label, dataset.data])).toEqual([
+      ['Successful', [111, 119, 1040]],
+      ['Missed', [9, 12, 210]],
+    ])
+    expect(chartImage).toHaveAccessibleName(
+      'Line chart of successful and missed visits per month, October 2025 to December 2025. ' +
+        'Between 7.5% and 16.8% of visits were missed each month. The table below lists every month.',
     )
-    expect(fetchMock).toHaveBeenCalledWith('/api/senior-visits', expect.anything())
-    expect(barProps.current?.data.labels).toEqual(['Mary', 'John', 'Sara'])
-    expect(barProps.current?.data.datasets[0].data).toEqual([5, 8, 1])
   })
 
-  it('shows the same rows in the table view', async () => {
-    mockApi(Response.json(sampleVisits))
+  it('lists the same months in the table', async () => {
+    mockApi(Response.json(months))
+    await renderReport()
+
+    const table = screen.getByRole('table', { name: 'Visits, successful visits and missed visits per month' })
+    const [header, ...rows] = within(table).getAllByRole('row')
+
+    expect(within(header).getAllByRole('columnheader').map((cell) => cell.textContent)).toEqual([
+      'Month',
+      'Visits',
+      'Successful',
+      'Missed',
+      'Missed %',
+    ])
+    expect(rows.map((row) => [...(row as HTMLTableRowElement).cells].map((cell) => cell.textContent))).toEqual([
+      ['October 2025', '120', '111', '9', '7.5%'],
+      ['November 2025', '131', '119', '12', '9.2%'],
+      ['December 2025', '1,250', '1,040', '210', '16.8%'],
+    ])
+  })
+
+  it('uses short month names in the table on a phone', async () => {
+    const matchMedia = window.matchMedia
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+      ...matchMedia(query),
+      matches: query === '(max-width: 600px)',
+    }))
+    mockApi(Response.json(months))
+    await renderReport()
+
+    expect(screen.getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual([
+      'Oct 2025',
+      'Nov 2025',
+      'Dec 2025',
+    ])
+  })
+
+  it('marks the current month as still in progress', async () => {
+    mockApi(Response.json([...months, { month: '2026-10', visitCount: 45, missedCount: 2, missedPercent: 4.4 }]))
+    await renderReport()
+
+    expect(screen.getByRole('rowheader', { name: 'October 2026 (to date)' })).toBeInTheDocument()
+    expect(screen.getByRole('rowheader', { name: 'October 2025' })).toBeInTheDocument()
+  })
+
+  it('shows the period the report covers and when it was generated', async () => {
+    mockApi(Response.json(months))
+    await renderReport()
+
+    expect(screen.getByText(/^October 2025 to December 2025/)).toHaveTextContent(
+      'October 2025 to December 2025 · Generated Oct 13, 2026, 10:30 a.m.',
+    )
+  })
+
+  it('prints the report', async () => {
+    const print = vi.spyOn(window, 'print').mockImplementation(() => {})
+    mockApi(Response.json(months))
+    await renderReport()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Print' }))
+
+    expect(print).toHaveBeenCalledOnce()
+  })
+
+  it('redraws the chart at print size while printing, then restores it', async () => {
+    mockApi(Response.json(months))
+    await renderReport()
+
+    act(() => {
+      window.dispatchEvent(new Event('beforeprint'))
+    })
+    expect(chart.instance.resize).toHaveBeenLastCalledWith(CHART_PRINT_SIZE.width, CHART_PRINT_SIZE.height)
+    expect(chart.instance.options.devicePixelRatio).toBe(CHART_PRINT_SIZE.devicePixelRatio)
+
+    act(() => {
+      window.dispatchEvent(new Event('afterprint'))
+    })
+    expect(chart.instance.resize).toHaveBeenLastCalledWith()
+    expect(chart.instance.options.devicePixelRatio).toBeUndefined()
+  })
+
+  it('only allows printing once there is a report to print', async () => {
+    mockApi(Response.json(months))
     render(<App />)
-    await screen.findByRole('img', { name: /bar chart/i })
 
-    await userEvent.click(screen.getByRole('button', { name: 'Table' }))
+    expect(screen.getByRole('status')).toHaveTextContent('Loading report...')
+    expect(screen.getByRole('button', { name: 'Print' })).toBeDisabled()
 
-    expect(screen.getByRole('button', { name: 'Table' })).toHaveAttribute('aria-pressed', 'true')
-    const rows = screen.getAllByRole('row').slice(1)
-    expect(rows.map((row) => row.textContent)).toEqual(['Mary5', 'John8', 'Sara1'])
+    await screen.findByRole('img', { name: /line chart/i })
+    expect(screen.getByRole('button', { name: 'Print' })).toBeEnabled()
   })
 
-  it('reports an API failure and recovers on retry', async () => {
-    mockApi(new Response(null, { status: 500 }), Response.json(sampleVisits))
+  it('reports an API error and recovers on retry', async () => {
+    mockApi(new Response(null, { status: 500 }), Response.json(months))
     render(<App />)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Couldn't load visitsGET /api/senior-visits failed with status 500",
+      "Couldn't load the reportThe report service returned an error (HTTP 500). Try again in a moment.",
     )
+    expect(screen.getByRole('button', { name: 'Print' })).toBeDisabled()
 
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
 
-    expect(await screen.findByRole('img', { name: /bar chart/i })).toBeInTheDocument()
+    expect(await screen.findByRole('img', { name: /line chart/i })).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('says so when the API is unreachable', async () => {
+    mockApi(new TypeError('Failed to fetch'))
+    render(<App />)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent("The report service can't be reached.")
   })
 
   it('says so when there are no visits yet', async () => {
@@ -73,5 +208,6 @@ describe('App', () => {
     render(<App />)
 
     expect(await screen.findByText('No visits recorded yet.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Print' })).toBeDisabled()
   })
 })
