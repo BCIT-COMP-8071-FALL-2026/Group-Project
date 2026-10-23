@@ -42,8 +42,8 @@ services:
       sqlserver:
         condition: service_healthy
 
-  # One-shot: builds OlapDW from olap/sql, then exits. Skips the DDL when OlapDW.dbo.FactVisit
-  # already exists, because the DDL scripts drop and recreate the tables.
+  # One-shot: builds OlapDW from olap/sql, then exits. Skips the DDL and seed when OlapDW.dbo.FactVisit
+  # already exists, because the DDL scripts drop and recreate the tables. olap/sql/seed may be empty (#69).
   olap-db-init:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
@@ -54,12 +54,14 @@ services:
     command:
       - |
         set -euo pipefail
+        shopt -s nullglob
         sqlcmd() { /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -C -b "$$@"; }
         built=$$(sqlcmd -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN OBJECT_ID(N'OlapDW.dbo.FactVisit') IS NULL THEN 0 ELSE 1 END")
         if [ "$$built" = "1" ]; then
-          echo "OlapDW already built, skipping DDL"
+          echo "OlapDW already built, skipping DDL and seed"
         else
           for f in /sql/ddl/*.sql; do echo "Running $$f"; sqlcmd -i "$$f"; done
+          for f in /sql/seed/*.sql; do echo "Running $$f"; sqlcmd -i "$$f"; done
         fi
         for f in /sql/procs/*.sql; do echo "Running $$f"; sqlcmd -i "$$f"; done
     depends_on:
