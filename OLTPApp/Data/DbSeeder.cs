@@ -31,8 +31,18 @@ public static class DbSeeder
     private static async Task SeedAdminAsync(UserManager<ApplicationUser> userManager)
     {
         const string email = "admin@seniorcare.test";
-        if (await userManager.FindByEmailAsync(email) != null)
+        var existing = await userManager.FindByEmailAsync(email);
+        if (existing != null)
+        {
+            // Heals a partial seed where the user was created but the role add failed
+            if (!await userManager.IsInRoleAsync(existing, RoleNames.Admin))
+            {
+                var roleResult = await userManager.AddToRoleAsync(existing, RoleNames.Admin);
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException($"Adding {email} to {RoleNames.Admin} failed: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+            }
             return;
+        }
 
         var admin = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
         await CreateUserAsync(userManager, admin, "Admin123!", RoleNames.Admin);
