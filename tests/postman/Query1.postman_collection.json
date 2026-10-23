@@ -1,0 +1,285 @@
+{
+  "info": {
+    "_postman_id": "09ffd65e-0b60-4e00-a9d1-91acd348f78a",
+    "name": "Query 1: Missed visits by month",
+    "description": "Tests GET /api/reports/missed-visits-by-month against docs/Query1-Contract.md (v1.2).\n\nNormal run: run the collection with the \"Empty database\" and \"Database unavailable\" folders unticked. The main GET must run before \"GET with query string (ignored)\" because it saves the response body for comparison.\n\nRun \"Empty database\" and \"Database unavailable\" on their own, with the API set up as described in each folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "38255182"
+  },
+  "item": [
+    {
+      "name": "GET missed visits by month",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "let rows = [];",
+              "try { rows = pm.response.json(); } catch (e) {}",
+              "",
+              "pm.test(\"Status is 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Content-Type is JSON\", () => {",
+              "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"Body is a non-empty array\", () => {",
+              "  pm.expect(rows).to.be.an(\"array\").that.is.not.empty;",
+              "});",
+              "",
+              "pm.test(\"Each row has exactly month, visitCount, missedCount, missedPercent\", () => {",
+              "  rows.forEach(r => {",
+              "    pm.expect(Object.keys(r)).to.have.members([\"month\", \"visitCount\", \"missedCount\", \"missedPercent\"]);",
+              "  });",
+              "});",
+              "",
+              "pm.test(\"Field types match the contract\", () => {",
+              "  rows.forEach(r => {",
+              "    pm.expect(r.month).to.be.a(\"string\").and.match(/^\\d{4}-(0[1-9]|1[0-2])$/);",
+              "    pm.expect(Number.isInteger(r.visitCount), `visitCount ${r.visitCount} is an integer`).to.be.true;",
+              "    pm.expect(Number.isInteger(r.missedCount), `missedCount ${r.missedCount} is an integer`).to.be.true;",
+              "    pm.expect(r.missedPercent).to.be.a(\"number\");",
+              "  });",
+              "});",
+              "",
+              "pm.test(\"visitCount > 0 and 0 <= missedCount <= visitCount\", () => {",
+              "  rows.forEach(r => {",
+              "    pm.expect(r.visitCount, r.month).to.be.above(0);",
+              "    pm.expect(r.missedCount, r.month).to.be.within(0, r.visitCount);",
+              "  });",
+              "});",
+              "",
+              "pm.test(\"missedPercent = missedCount * 100 / visitCount, 1 decimal place\", () => {",
+              "  rows.forEach(r => {",
+              "    const exact = r.missedCount * 100 / r.visitCount;",
+              "    pm.expect(r.missedPercent, r.month).to.be.closeTo(exact, 0.0501);",
+              "    pm.expect(Math.abs(r.missedPercent * 10 - Math.round(r.missedPercent * 10)), `${r.month} has 1 dp`).to.be.below(1e-9);",
+              "  });",
+              "});",
+              "",
+              "pm.test(\"Months are unique and ascending\", () => {",
+              "  for (let i = 1; i < rows.length; i++) {",
+              "    pm.expect(rows[i].month > rows[i - 1].month, `${rows[i - 1].month} then ${rows[i].month}`).to.be.true;",
+              "  }",
+              "});",
+              "",
+              "// Saved so \"GET with query string (ignored)\" can compare against it",
+              "pm.collectionVariables.set(\"q1Body\", pm.response.text());"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/reports/missed-visits-by-month",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "reports", "missed-visits-by-month"]
+        },
+        "description": "Happy path. Checks status, Content-Type, field names, field types and values against the contract. Needs a database with at least one counted visit."
+      },
+      "response": [
+        {
+          "name": "Worked example (contract v1.2)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/missed-visits-by-month",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "missed-visits-by-month"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n  { \"month\": \"2025-01\", \"visitCount\": 4, \"missedCount\": 1, \"missedPercent\": 25.0 },\n  { \"month\": \"2025-02\", \"visitCount\": 3, \"missedCount\": 2, \"missedPercent\": 66.7 }\n]"
+        }
+      ]
+    },
+    {
+      "name": "GET with query string (ignored)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Same body as without a query string\", () => {",
+              "  pm.expect(pm.response.json()).to.eql(JSON.parse(pm.collectionVariables.get(\"q1Body\")));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/reports/missed-visits-by-month?agency=1&foo=bar",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "reports", "missed-visits-by-month"],
+          "query": [
+            { "key": "agency", "value": "1" },
+            { "key": "foo", "value": "bar" }
+          ]
+        },
+        "description": "Contract: query string parameters are ignored and still return 200 with the same body. Run after \"GET missed visits by month\"."
+      },
+      "response": []
+    },
+    {
+      "name": "Negative cases",
+      "description": "Bad input checks. Run with the API up and any data.\n\nMissing parameters: N/A. The endpoint takes no parameters (Query 1 contract v1.2). \"GET missed visits by month\" already covers the no-parameter call.",
+      "item": [
+        {
+          "name": "Bad input: wrong method (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST is rejected with 405\", () => {",
+                  "  pm.response.to.have.status(405);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/missed-visits-by-month",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "missed-visits-by-month"]
+            },
+            "description": "Contract: other methods return 405 Method Not Allowed."
+          },
+          "response": []
+        },
+        {
+          "name": "Bad input: wrong path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Unknown path returns 404\", () => {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/missed-visits-by-mnth",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "missed-visits-by-mnth"]
+            },
+            "description": "Misspelled path on purpose. Not in contract v1.2 yet; raised in the contract review."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Empty database",
+      "description": "Run this folder on its own, with the API pointed at a database that has no counted visits.",
+      "item": [
+        {
+          "name": "Empty result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Empty database returns 200 with []\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.eql([]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/missed-visits-by-month",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "missed-visits-by-month"]
+            },
+            "description": "Contract: no data returns 200 OK with []."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Database unavailable",
+      "description": "Run this folder on its own, with SQL Server stopped or the API's connection string pointing at a server that does not exist.",
+      "item": [
+        {
+          "name": "Database unavailable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Database down returns 500\", () => {",
+                  "  pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Error does not leak internals\", () => {",
+                  "  const body = pm.response.text();",
+                  "  pm.expect(body).to.not.match(/at OlapApi\\.|StackTrace|Server=|Password=|SqlException|OdbcException/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/missed-visits-by-month",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reports", "missed-visits-by-month"]
+            },
+            "description": "Contract: database unavailable or query fails returns 500. The body is not in the contract, so this only checks it does not leak a stack trace or connection string."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "q1Body",
+      "value": ""
+    }
+  ]
+}
