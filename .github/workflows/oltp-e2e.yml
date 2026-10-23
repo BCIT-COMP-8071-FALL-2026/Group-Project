@@ -1,0 +1,47 @@
+name: OLTP E2E
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "E2e_Test_Pass1!"   # throwaway CI container, not a real secret
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'E2e_Test_Pass1!' -Q 'SELECT 1'"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+
+    env:
+      OLTP_E2E_CONNECTION_STRING: "Server=localhost,1433;Database=OLTPAppDb_E2E;User Id=sa;Password=E2e_Test_Pass1!;TrustServerCertificate=True;MultipleActiveResultSets=true"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - run: dotnet build OLTPApp.E2E.Tests -c Release
+
+      - name: Install Playwright Chromium
+        run: pwsh OLTPApp.E2E.Tests/bin/Release/net9.0/playwright.ps1 install --with-deps chromium
+
+      - name: Run E2E tests
+        run: dotnet test OLTPApp.E2E.Tests --no-build -c Release --logger "trx;LogFileName=e2e.trx" --logger "console;verbosity=normal" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: TestResults
