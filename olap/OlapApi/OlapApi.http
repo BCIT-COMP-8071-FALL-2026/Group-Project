@@ -1,6 +1,6 @@
 @OlapApi_HostAddress = http://localhost:5298
 
-GET {{OlapApi_HostAddress}}/api/senior-visits
+GET {{OlapApi_HostAddress}}/api/reports/missed-visits-by-month
 Accept: application/json
 
 ###

@@ -1,76 +1,104 @@
-import { useState } from 'react'
-import { SENIOR_VISITS_URL } from './api/seniorVisits'
-import { VisitsChart } from './components/VisitsChart'
-import { VisitsTable } from './components/VisitsTable'
-import { useSeniorVisits, type SeniorVisitsState } from './hooks/useSeniorVisits'
-
-type View = 'chart' | 'table'
+import { ChartLegend } from './components/ChartLegend'
+import { AlertIcon, ChartIcon, PrinterIcon } from './components/Icons'
+import { MissedVisitsChart } from './components/MissedVisitsChart'
+import { MissedVisitsTable } from './components/MissedVisitsTable'
+import { formatDateTime, formatMonthRange } from './format'
+import { useMissedVisitsByMonth, type MissedVisitsState } from './hooks/useMissedVisitsByMonth'
 
 export default function App() {
-  const { state, retry } = useSeniorVisits()
-  const [view, setView] = useState<View>('chart')
+  const { state, retry } = useMissedVisitsByMonth()
+  const canPrint = state.status === 'ready' && state.months.length > 0
 
   return (
-    <main className="page">
-      <header className="page-header">
-        <p className="eyebrow">OLAP sample</p>
-        <h1>Senior care analytics</h1>
-        <p className="lede">React and Chart.js reading JSON from the ASP.NET Web API.</p>
-      </header>
+    <div className="app">
+      <aside className="sidebar card">
+        <div className="brand">
+          <span className="brand-mark">
+            <ChartIcon />
+          </span>
+          <span className="brand-name">Analytics</span>
+        </div>
+        <nav aria-label="Reports">
+          <ul className="nav-list">
+            <li>
+              <a className="nav-item" href="/" aria-current="page">
+                Missed visits
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
 
-      <section className="card" aria-labelledby="visits-title">
-        <div className="card-header">
+      <main className="report card">
+        <header className="report-header">
           <div>
-            <h2 id="visits-title">Visits per senior</h2>
-            <p className="card-subtitle">
-              Total recorded visits from <code>GET {SENIOR_VISITS_URL}</code>
-            </p>
+            <p className="report-eyebrow">Senior care analytics</p>
+            <h1>Missed visits by month</h1>
+            {state.status === 'ready' && state.months.length > 0 && (
+              <p className="report-meta">
+                {formatMonthRange(state.months[0].month, state.months[state.months.length - 1].month)}
+                <span aria-hidden="true"> · </span>
+                Generated {formatDateTime(state.loadedAt)}
+              </p>
+            )}
           </div>
-          <div className="view-toggle" role="group" aria-label="Display as">
-            <button type="button" aria-pressed={view === 'chart'} onClick={() => setView('chart')}>
-              Chart
-            </button>
-            <button type="button" aria-pressed={view === 'table'} onClick={() => setView('table')}>
-              Table
-            </button>
-          </div>
-        </div>
+          <button type="button" className="button button-primary" onClick={() => window.print()} disabled={!canPrint}>
+            <PrinterIcon />
+            Print
+          </button>
+        </header>
 
-        <div className="card-body">
-          <VisitsBody state={state} view={view} onRetry={retry} />
-        </div>
-      </section>
-    </main>
+        <ReportBody state={state} onRetry={retry} />
+      </main>
+    </div>
   )
 }
 
-function VisitsBody({ state, view, onRetry }: { state: SeniorVisitsState; view: View; onRetry: () => void }) {
+function ReportBody({ state, onRetry }: { state: MissedVisitsState; onRetry: () => void }) {
   switch (state.status) {
     case 'loading':
       return (
         <p className="status" role="status">
-          Loading visits...
+          Loading report...
         </p>
       )
     case 'error':
       return (
         <div className="status" role="alert">
           <p className="status-title">
-            <svg className="status-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM7.25 4.5h1.5v4.5h-1.5Zm0 6h1.5V12h-1.5Z" />
-            </svg>
-            Couldn't load visits
+            <AlertIcon />
+            Couldn't load the report
           </p>
-          <p className="status-detail">{state.message}. Check that OlapApi is running.</p>
-          <button type="button" className="button" onClick={onRetry}>
+          <p className="status-detail">{state.message} Try again in a moment.</p>
+          <button type="button" className="button button-secondary" onClick={onRetry}>
             Try again
           </button>
         </div>
       )
     case 'ready':
-      if (state.visits.length === 0) {
+      if (state.months.length === 0) {
         return <p className="status">No visits recorded yet.</p>
       }
-      return view === 'chart' ? <VisitsChart visits={state.visits} /> : <VisitsTable visits={state.visits} />
+      return (
+        <>
+          <section className="report-section" aria-labelledby="chart-heading">
+            <div className="section-header">
+              <h2 id="chart-heading">Visits per month</h2>
+              <ChartLegend />
+            </div>
+            <MissedVisitsChart months={state.months} />
+          </section>
+
+          <section className="report-section" aria-labelledby="table-heading">
+            <h2 id="table-heading">Monthly breakdown</h2>
+            <MissedVisitsTable months={state.months} />
+          </section>
+
+          <p className="report-note">
+            A visit is missed when nobody checked in within 60 minutes of its scheduled start. Cancelled visits, and
+            visits whose 60 minutes haven't passed yet, are not counted.
+          </p>
+        </>
+      )
   }
 }
