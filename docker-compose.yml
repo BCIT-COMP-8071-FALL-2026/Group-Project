@@ -42,6 +42,30 @@ services:
       sqlserver:
         condition: service_healthy
 
+  # One-shot: builds OlapDW from olap/sql, then exits. Skips the DDL when OlapDW.dbo.FactVisit
+  # already exists, because the DDL scripts drop and recreate the tables.
+  olap-db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SQLCMDPASSWORD: ${SA_PASSWORD}
+    volumes:
+      - ./olap/sql:/sql:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -euo pipefail
+        sqlcmd() { /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -C -b "$$@"; }
+        built=$$(sqlcmd -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN OBJECT_ID(N'OlapDW.dbo.FactVisit') IS NULL THEN 0 ELSE 1 END")
+        if [ "$$built" = "1" ]; then
+          echo "OlapDW already built, skipping DDL"
+        else
+          for f in /sql/ddl/*.sql; do echo "Running $$f"; sqlcmd -i "$$f"; done
+        fi
+        for f in /sql/procs/*.sql; do echo "Running $$f"; sqlcmd -i "$$f"; done
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
   olap-api:
     build:
       context: ./olap/OlapApi
@@ -53,8 +77,8 @@ services:
     ports:
       - "8081:8080"
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      olap-db-init:
+        condition: service_completed_successfully
 
   olap-client:
     build:
