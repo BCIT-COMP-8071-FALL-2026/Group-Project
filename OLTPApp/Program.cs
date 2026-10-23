@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
 
@@ -28,6 +30,17 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
+});
+
+// Roles-and-Permissions.md: least privilege, every page needs login unless marked [AllowAnonymous]
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    options.AddPolicy(Policies.Senior, p => p.RequireRole(RoleNames.Senior));
+    options.AddPolicy(Policies.FamilyMember, p => p.RequireRole(RoleNames.FamilyMember));
+    options.AddPolicy(Policies.Caregiver, p => p.RequireRole(RoleNames.Caregiver));
+    options.AddPolicy(Policies.AgencyManager, p => p.RequireRole(RoleNames.AgencyManager));
+    options.AddPolicy(Policies.Admin, p => p.RequireRole(RoleNames.Admin));
 });
 builder.Services.AddControllersWithViews();
 
@@ -60,7 +73,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// CSS/JS must load on the Login page before sign-in
+app.MapStaticAssets().AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",
