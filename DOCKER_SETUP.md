@@ -21,27 +21,10 @@ docker compose build
 ```
 
 ### 2. Start All Containers
-If this is your first time running the project, start SQL Server and run these scripts to set up the OLAP database. Make sure `.env` has `SQL_DATABASE=OlapDW`.
-
-Only run this setup on a new report database. Running it again will recreate the tables and delete existing report data. The OLTP app sets up its own tables through migrations.
-
-```powershell
-docker compose up -d --wait sqlserver
-$sqlFiles = @(
-    'olap/sql/ddl/00_create_database.sql',
-    'olap/sql/ddl/01_dimensions.sql',
-    'olap/sql/ddl/02_fact_visit.sql',
-    'olap/sql/procs/MissedVisitsByMonth.sql'
-)
-foreach ($sqlFile in $sqlFiles) {
-    Get-Content -Raw -LiteralPath $sqlFile -ErrorAction Stop | docker compose exec -T sqlserver bash -c 'SQLCMDPASSWORD="$MSSQL_SA_PASSWORD" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -b'
-    if ($LASTEXITCODE -ne 0) { throw "SQL initialization failed: $sqlFile" }
-}
-```
+On the first start, the `olap-db-init` service creates the OLAP database (`OlapDW`) from the scripts in `olap/sql`, then exits. Later starts keep the existing tables and data. The OLTP app sets up its own tables through migrations.
 
 The report will be empty until visit data is added.
 
-Once that's done, start everything with the command below. Next time you run the project, skip the database setup and just use this command.
 ```powershell
 docker compose up --build
 ```
