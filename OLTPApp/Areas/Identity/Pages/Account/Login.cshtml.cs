@@ -18,6 +18,7 @@ using OLTPApp.Models;
 
 namespace OLTPApp.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

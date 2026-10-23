@@ -1,11 +1,11 @@
 # OLTPApp.E2E.Tests
 
-Browser tests for OLTPApp, using Playwright + xUnit. The first spike covers OLTP-1 login: valid login, invalid login (wrong password and unknown email), and lockout after 5 failed attempts.
+Browser tests for OLTPApp, using Playwright + xUnit. The first spike covers OLTP-1 login: valid login, invalid login (wrong password and unknown email), and lockout after 5 failed attempts. `AuthorizationTests` covers #57: anonymous users are sent to Login, static assets load before sign-in, and a user with no role sees "Waiting for Admin to assign a role".
 
 ## How it works
 
 - `OltpAppFixture` starts OLTPApp once with `dotnet run` on a free port, pointed at a separate **`OLTPAppDb_E2E`** database, so your dev `OLTPAppDb` is never touched. The app creates and migrates that database on startup.
-- Each test seeds its own throwaway account through Identity's `UserManager`, so tests don't depend on the Register page, and a locked account can't affect other tests. The accounts are deleted when the run ends.
+- Each test seeds its own throwaway account through Identity's `UserManager`, so tests don't depend on the Register page, and a locked account can't affect other tests. `CreateUserAsync(role)` can add a role; roles come from the app's startup seed, which only runs in Development. The accounts are deleted when the run ends.
 - All login selectors are in `Pages/LoginPage.cs`. The tests only use that page object.
 
 ## Running locally
