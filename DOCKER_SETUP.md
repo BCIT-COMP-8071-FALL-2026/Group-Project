@@ -2,6 +2,19 @@
 
 Run the following commands from the folder containing `docker-compose.yml`.
 
+### 0. Create the `.env` file
+Compose reads two settings from a `.env` file next to `docker-compose.yml`. Copy the example and set your own password:
+```powershell
+Copy-Item .env.example .env
+```
+
+| Variable | Used by | Value |
+|---|---|---|
+| `SA_PASSWORD` | SQL Server, OLTP app, OLAP API | Password for the `sa` login. Must meet SQL Server's complexity rules. |
+| `SQL_DATABASE` | OLAP API | `OlapDW` |
+
+`.env` is gitignored, so never commit it. Compose stops with `Set SA_PASSWORD in .env` if the password is missing.
+
 ### 1. Build Docker Images
 ```powershell
 docker compose build
@@ -24,11 +37,11 @@ Once the containers are running, access the applications using these URLs:
 | Application | URL | Port |
 |---|---|---|
 | OLTP Web Application | http://localhost:8080 | 8080 |
-| OLAP API | http://localhost:8081/api/senior-visits | 8081 |
+| OLAP API | http://localhost:8081/api/reports/missed-visits-by-month | 8081 |
 | React Frontend | http://localhost:3000 | 3000 |
 | SQL Server | `localhost,14331` | 14331 |
 
-**Note:** SQL Server is accessed through a database client such as SQL Server Management Studio (SSMS), not a web browser. Use the `sa` login and the password configured in `docker-compose.yml`.
+**Note:** SQL Server is accessed through a database client such as SQL Server Management Studio (SSMS), not a web browser. Use the `sa` login and the `SA_PASSWORD` from your `.env`.
 
 ### 5. View Container Logs
 ```powershell
