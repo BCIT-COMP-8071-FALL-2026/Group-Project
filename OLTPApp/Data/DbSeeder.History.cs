@@ -17,9 +17,12 @@ public static partial class DbSeeder
         if (await userManager.FindByEmailAsync(HistoryGuardEmail) != null)
             return;
 
+        var now = DateTime.UtcNow;
+        var random = new Random(56);   // fixed seed: same relative data on every fresh database
         await using var tx = await db.Database.BeginTransactionAsync();
 
         await SeedHistoryStaffAsync(db, userManager);
+        await SeedHistorySeniorsAsync(db, random, now);
 
         await tx.CommitAsync();
     }
@@ -83,6 +86,97 @@ public static partial class DbSeeder
         await db.SaveChangesAsync();
         return caregivers;
     }
+
+    // + 6 demo seniors = the spec's 150; demo seniors (S145-S150 in the spec) get no history visits
+    private const int HistorySeniorCount = 144;
+
+    // Spec scenario seniors: S001-S005 are the Query 4 positives with the Query 2 bands and living alone values,
+    // S006 and S007 the Query 4 negatives. Age is at seed time.
+    private static readonly (string First, string Last, int Age, bool IsLivingAlone)[] ScenarioSeniors =
+    {
+        ("Dorothy", "Fleming", 62, true),     // S001 Under 65
+        ("Arthur", "Lambert", 70, false),     // S002 65-74
+        ("Beatrice", "Holloway", 80, true),   // S003 75-84
+        ("Frank", "Whitaker", 89, false),     // S004 85+
+        ("Irene", "Caldwell", 78, true),      // S005 75-84
+        ("Leonard", "Price", 74, true),       // S006
+        ("Mabel", "Sutton", 83, false),       // S007
+    };
+
+    private static readonly string[] HistoryFirstNames =
+    {
+        "Agnes", "Albert", "Alice", "Barbara", "Bernard", "Carol", "Charles", "Doris", "Edward", "Eleanor",
+        "Ernest", "Florence", "Gerald", "Gladys", "Henry", "Ida", "Jack", "Joan", "Kenneth", "Lillian",
+        "Louis", "Marion", "Norman", "Patricia", "Raymond", "Shirley", "Stanley", "Thelma", "Vera", "Wallace",
+    };
+
+    private static readonly string[] HistoryLastNames =
+    {
+        "Anderson", "Bishop", "Campbell", "Chow", "Dhillon", "Edwards", "Ferguson", "Gagnon", "Grant", "Harper",
+        "Ito", "Jensen", "Kowalski", "Leblanc", "MacDonald", "Morrison", "Nakamura", "Olsen", "Parker", "Quinn",
+        "Robertson", "Sandhu", "Stewart", "Tremblay", "Turner", "Vasquez", "Walsh", "Yamamoto", "Young", "Zhang",
+    };
+
+    private static readonly string[] HistoryStreets =
+    {
+        "Main St", "Oak St", "Cambie St", "Kingsway", "Hastings St", "Marine Dr", "Granville St", "Victoria Dr",
+    };
+
+    private static readonly (string City, string PostalCode)[] HistoryCities =
+    {
+        ("Vancouver", "V5V 3N2"), ("Burnaby", "V5H 2A9"), ("Richmond", "V6X 1A4"), ("North Vancouver", "V7L 1B3"),
+        ("Coquitlam", "V3J 4G2"), ("Surrey", "V3W 1H7"), ("New Westminster", "V3L 3C6"),
+    };
+
+    // Under 65, 65-74, 75-84 and 85+ at seed time
+    private static readonly (int Min, int Max)[] HistoryAgeBands = { (58, 64), (65, 74), (75, 84), (85, 96) };
+
+    // 144 seniors without logins, keyed by spec code S001-S144; about 40% live alone
+    private static async Task<Dictionary<string, Senior>> SeedHistorySeniorsAsync(ApplicationDbContext db, Random random, DateTime now)
+    {
+        var usedNames = ScenarioSeniors.Select(s => (s.First, s.Last)).ToHashSet();
+        var seniors = new Dictionary<string, Senior>();
+
+        for (var i = 1; i <= HistorySeniorCount; i++)
+        {
+            var (first, last, age, isLivingAlone) = i <= ScenarioSeniors.Length
+                ? ScenarioSeniors[i - 1]
+                : NextHistorySenior(random, usedNames);
+
+            var (city, postalCode) = HistoryCities[random.Next(HistoryCities.Length)];
+            var street = $"{random.Next(100, 9999)} {HistoryStreets[random.Next(HistoryStreets.Length)]}";
+            var senior = new Senior
+            {
+                Person = NewPerson(first, last, street, city, postalCode, $"604-555-{2000 + i}"),
+                DateOfBirth = HistoryDateOfBirth(now, age, random),
+                IsLivingAlone = isLivingAlone,
+            };
+            db.Senior.Add(senior);
+            seniors[$"S{i:D3}"] = senior;
+        }
+
+        await db.SaveChangesAsync();
+        return seniors;
+    }
+
+    // Random name not used yet, with an age from an evenly picked band
+    private static (string First, string Last, int Age, bool IsLivingAlone) NextHistorySenior(Random random,
+        HashSet<(string, string)> usedNames)
+    {
+        string first, last;
+        do
+        {
+            first = HistoryFirstNames[random.Next(HistoryFirstNames.Length)];
+            last = HistoryLastNames[random.Next(HistoryLastNames.Length)];
+        } while (!usedNames.Add((first, last)));
+
+        var (min, max) = HistoryAgeBands[random.Next(HistoryAgeBands.Length)];
+        return (first, last, random.Next(min, max + 1), random.NextDouble() < 0.4);
+    }
+
+    // Last birthday 60 to 300 days before seed time, so the age band holds while the anchor moves (up to about +12 days)
+    private static DateOnly HistoryDateOfBirth(DateTime now, int age, Random random) =>
+        DateOnly.FromDateTime(now.AddYears(-age).AddDays(-random.Next(60, 301)));
 
     // Caregivers share their agency's address and phone, like SeedStaffAsync
     private static void AddCaregivers(ApplicationDbContext db, Agency agency, (string Code, string First, string Last)[] names,
