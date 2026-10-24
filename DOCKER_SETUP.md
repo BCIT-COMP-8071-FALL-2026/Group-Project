@@ -66,3 +66,11 @@ docker compose down
 ```powershell
 docker compose up --build
 ```
+
+### 9. Reset the Databases (Refresh Seed Data)
+The OLTP seed (#56) sets visit times relative to when it first runs and never reseeds, so the in-progress and upcoming visits go stale (they pass or turn Missed) after a few days. Remove the volume to start over:
+```powershell
+docker compose down -v
+docker compose up --build
+```
+**Note:** `-v` deletes all data in both OLTPAppDb and OlapDW, including visits and notes created in the app. Both databases are rebuilt and reseeded on the next start. Reset before every demo.
