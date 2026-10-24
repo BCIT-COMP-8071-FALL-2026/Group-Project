@@ -39,6 +39,9 @@
                         @if (User.IsInRole(RoleNames.AgencyManager))
                         {
                             @* Agency Manager: schedule visit (#61), agency visits (#65) *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Visits" asp-action="Schedule">Schedule visit</a>
+                            </li>
                         }
                         @if (User.IsInRole(RoleNames.Admin))
                         {

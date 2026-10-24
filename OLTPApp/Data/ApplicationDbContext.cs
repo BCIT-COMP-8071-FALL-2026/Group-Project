@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OLTPApp.Models;
 
 namespace OLTPApp.Data;
@@ -20,6 +21,20 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Visit> Visit => Set<Visit>();
     public DbSet<VisitNote> VisitNote => Set<VisitNote>();
     public DbSet<SeniorFamilyMember> SeniorFamilyMember => Set<SeniorFamilyMember>();
+
+    // All DateTime columns hold UTC. SQL Server datetime2 has no kind, so mark values as UTC on read.
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+    }
+
+    private class UtcDateTimeConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcDateTimeConverter()
+            : base(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
+        {
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
