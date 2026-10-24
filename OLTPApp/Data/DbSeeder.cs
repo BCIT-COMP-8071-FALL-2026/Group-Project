@@ -5,7 +5,8 @@ using OLTPApp.Models;
 
 namespace OLTPApp.Data;
 
-public static class DbSeeder
+// Partial so the history seed (DbSeeder.History.cs) shares the private helpers below
+public static partial class DbSeeder
 {
     public static async Task SeedAsync(IServiceProvider services)
     {
@@ -18,6 +19,7 @@ public static class DbSeeder
         await SeedAgenciesAsync(db, userManager);
         await SeedServicesAsync(db);
         await SeedDemoDataAsync(db, userManager);
+        await SeedHistoryAsync(db, userManager);
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
