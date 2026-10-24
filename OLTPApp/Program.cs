@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
 
@@ -15,9 +17,32 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.User.RequireUniqueEmail = true;
+    // OLTP-1: 5 failed attempts lock the account for 5 minutes; a successful login resets the count
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.AllowedForNewUsers = true;
 })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// OLTP-3: session expires after 30 minutes of inactivity.
+// Remember me only keeps the cookie across a browser restart; the 30 minute limit still applies.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
+
+// Roles-and-Permissions.md: least privilege, every page needs login unless marked [AllowAnonymous]
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    options.AddPolicy(Policies.Senior, p => p.RequireRole(RoleNames.Senior));
+    options.AddPolicy(Policies.FamilyMember, p => p.RequireRole(RoleNames.FamilyMember));
+    options.AddPolicy(Policies.Caregiver, p => p.RequireRole(RoleNames.Caregiver));
+    options.AddPolicy(Policies.AgencyManager, p => p.RequireRole(RoleNames.AgencyManager));
+    options.AddPolicy(Policies.Admin, p => p.RequireRole(RoleNames.Admin));
+});
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -25,6 +50,11 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+
+    // Seed accounts use known passwords, so only seed in Development (docker-compose and E2E run as Development).
+    // A seeding error stops startup on purpose rather than running with missing roles.
+    if (app.Environment.IsDevelopment())
+        await DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
@@ -44,7 +74,8 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// CSS/JS must load on the Login page before sign-in
+app.MapStaticAssets().AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",

@@ -2,17 +2,14 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// Where `npm run dev` forwards /api requests. Matches the http profile in
-// OlapApi/Properties/launchSettings.json.
-const apiUrl = process.env.OLAP_API_URL ?? 'http://localhost:5298'
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api': apiUrl,
-    },
+    // OlapApi only allows the origins listed in Cors:AllowedOrigins (http://localhost:5173 in
+    // development), so don't silently move to another port.
+    port: 5173,
+    strictPort: true,
   },
   test: {
     environment: 'jsdom',

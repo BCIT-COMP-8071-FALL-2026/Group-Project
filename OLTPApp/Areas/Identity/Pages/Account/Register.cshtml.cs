@@ -23,6 +23,7 @@ using OLTPApp.Models;
 
 namespace OLTPApp.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

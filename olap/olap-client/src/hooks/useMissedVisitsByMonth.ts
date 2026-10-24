@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchSeniorVisits, type SeniorVisit } from '../api/seniorVisits'
+import { fetchMissedVisitsByMonth, type MissedVisitsMonth } from '../api/missedVisits'
 
-export type SeniorVisitsState =
+export type MissedVisitsState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; visits: SeniorVisit[] }
+  | { status: 'ready'; months: MissedVisitsMonth[]; loadedAt: Date }
 
-export function useSeniorVisits() {
-  const [state, setState] = useState<SeniorVisitsState>({ status: 'loading' })
+export function useMissedVisitsByMonth() {
+  const [state, setState] = useState<MissedVisitsState>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
 
-    fetchSeniorVisits(controller.signal)
-      .then((visits) => setState({ status: 'ready', visits }))
+    fetchMissedVisitsByMonth(controller.signal)
+      .then((months) => setState({ status: 'ready', months, loadedAt: new Date() }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
         setState({ status: 'error', message: error instanceof Error ? error.message : String(error) })

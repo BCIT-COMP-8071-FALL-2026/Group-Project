@@ -13,6 +13,7 @@ using OLTPApp.Models;
 
 namespace OLTPApp.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

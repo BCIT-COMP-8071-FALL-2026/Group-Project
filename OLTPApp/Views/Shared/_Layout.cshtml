@@ -23,9 +23,30 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @* Nav links by role (#57). Page owners add their links in their role's block after #57 merges. *@
+                        @if (User.IsInRole(RoleNames.Senior))
+                        {
+                            @* Senior: profile (#60) *@
+                        }
+                        @if (User.IsInRole(RoleNames.FamilyMember))
+                        {
+                            @* Family Member: linked senior tab lives on Home (#66) *@
+                        }
+                        @if (User.IsInRole(RoleNames.Caregiver))
+                        {
+                            @* Caregiver: visit list (#62) *@
+                        }
+                        @if (User.IsInRole(RoleNames.AgencyManager))
+                        {
+                            @* Agency Manager: schedule visit (#61), agency visits (#65) *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Visits" asp-action="Schedule">Schedule visit</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(RoleNames.Admin))
+                        {
+                            @* Admin: users (#64) *@
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
