@@ -6,7 +6,7 @@ namespace OLTPApp.Models;
 
 public class ScheduleVisitViewModel
 {
-    [Required(ErrorMessage = "Choose a currentsenior.")]
+    [Required(ErrorMessage = "Choose a senior.")]
     [Display(Name = "Senior")]
     public int? SeniorID { get; set; }
 
