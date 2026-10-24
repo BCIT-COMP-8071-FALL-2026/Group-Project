@@ -357,6 +357,7 @@ public static partial class DbSeeder
         private readonly List<DateTime> _slots;
         private readonly string[] _allCodes;
         private readonly string[] _codesWithLate;     // every caregiver but C030
+        private readonly string[] _normalLateCodes;   // every caregiver but C001-C005 and C030
         private readonly string[] _weightedLateCodes; // C001-C005 three times each
         private readonly Senior[] _allSeniors;
         private readonly Senior[] _otherSeniors;      // S008-S144, the only seniors with random misses
@@ -377,6 +378,7 @@ public static partial class DbSeeder
             _slots = HistorySlots(random, now);
             _allCodes = caregivers.Keys.Order().ToArray();
             _codesWithLate = _allCodes.Where(c => c != NoLateCaregiver).ToArray();
+            _normalLateCodes = _codesWithLate.Where(c => !HighLateCaregivers.Contains(c)).ToArray();
             _weightedLateCodes = _codesWithLate.SelectMany(c => Enumerable.Repeat(c, HighLateCaregivers.Contains(c) ? 3 : 1)).ToArray();
             _allSeniors = Enumerable.Range(1, HistorySeniorCount).Select(i => seniors[$"S{i:D3}"]).ToArray();
             _otherSeniors = _allSeniors.Skip(ScenarioSeniors.Length).ToArray();
@@ -400,10 +402,11 @@ public static partial class DbSeeder
             var slot = TakeSlot();
             Add(NoLateCaregiver, SeniorForMiss(slot), RandomService(), slot, VisitStatus.Completed, Seconds(3660, 7200));
 
-            // Timestamp boundaries: +10:00 on time, +10:01 and +60:00 Late, +60:00.4 Missed
+            // Timestamp boundaries: +10:00 on time, +10:01 and +60:00 Late, +60:00.4 Missed.
+            // Each Late one stays inside its caregiver's late range: +10:01 for others, +60:00 for C001-C005.
             Add(RandomCode(_codesWithLate), RandomSenior(), RandomService(), TakeSlot(), VisitStatus.Completed, TimeSpan.FromMinutes(10));
-            Add(RandomCode(_codesWithLate), RandomSenior(), RandomService(), TakeSlot(), VisitStatus.Completed, TimeSpan.FromSeconds(601));
-            Add(RandomCode(_codesWithLate), RandomSenior(), RandomService(), TakeSlot(), VisitStatus.Completed, TimeSpan.FromMinutes(60));
+            Add(RandomCode(_normalLateCodes), RandomSenior(), RandomService(), TakeSlot(), VisitStatus.Completed, TimeSpan.FromSeconds(601));
+            Add(RandomCode(HighLateCaregivers), RandomSenior(), RandomService(), TakeSlot(), VisitStatus.Completed, TimeSpan.FromMinutes(60));
             slot = TakeSlot();
             Add(RandomCode(_codesWithLate), SeniorForMiss(slot), RandomService(), slot, VisitStatus.Completed,
                 TimeSpan.FromMinutes(60).Add(TimeSpan.FromMilliseconds(400)));
@@ -431,9 +434,10 @@ public static partial class DbSeeder
                         break;
                     case HistoryKind.Late:
                         var code = lateFirst.Count > 0 ? lateFirst.Dequeue() : RandomCode(_weightedLateCodes);
-                        // C001-C005 run later too (+40 to +59:59), so they top Query 3's AvgMinutesLate
-                        var lateFrom = HighLateCaregivers.Contains(code) ? 2400 : 660;
-                        Add(code, RandomSenior(), RandomService(), start, VisitStatus.Completed, Seconds(lateFrom, 3599));
+                        // C001-C005 at +45 to +59:59, everyone else at +11 to +44:59: the ranges never overlap,
+                        // so C001-C005 top Query 3's AvgMinutesLate on any seed date
+                        var lateOffset = HighLateCaregivers.Contains(code) ? Seconds(2700, 3599) : Seconds(660, 2699);
+                        Add(code, RandomSenior(), RandomService(), start, VisitStatus.Completed, lateOffset);
                         break;
                     case HistoryKind.Missed:
                         AddMissed(RandomCode(_codesWithLate), SeniorForMiss(start), RandomService(), start);
