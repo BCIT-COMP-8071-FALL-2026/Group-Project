@@ -102,6 +102,15 @@ public class VisitsController : Controller
                       select (int?)manager.AgencyID).SingleOrDefaultAsync();
     }
 
+    private async Task<int?> GetCaregiverIdAsync()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return await _db.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.PersonID)
+            .SingleOrDefaultAsync();
+    }
+
     private async Task LoadScheduleOptionsAsync(ScheduleVisitViewModel model, int agencyId)
     {
         model.Seniors = await _db.Senior
@@ -118,4 +127,54 @@ public class VisitsController : Controller
             .Select(s => new SelectListItem { Value = s.ServiceID.ToString(), Text = s.ServiceName })
             .ToListAsync();
     }
+
+    [HttpGet]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> Details(int id)
+    {
+        var model = await BuildDetailsAsync(id);
+        if (model == null)
+            return NotFound();
+        return View(model);
+    }
+
+    private async Task<VisitDetailsViewModel?> BuildDetailsAsync(int visitId)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return null;
+        
+        var visit = await _db.Visit
+            .Include(v => v.Senior).ThenInclude(s => s.Person)
+            .Include(v => v.Service)
+            .SingleOrDefaultAsync(v => v.VisitID == visitId && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return null;
+
+        var p = visit.Senior.Person;
+        var notes = await _db.VisitNote
+            .Where(n => n.Visit.SeniorID == visit.SeniorID)
+            .OrderByDescending(n => n.CreatedAt)
+            .Select(n => new VisitDetailsViewModel.NoteItem(
+                n.CreatedAt,
+                n.Caregiver.Person.FirstName + " " + n.Caregiver.Person.LastName,
+                n.NoteText))
+            .ToListAsync();
+        
+        return new VisitDetailsViewModel
+        {
+            VisitID = visit.VisitID,
+            SeniorName = p.FirstName + " " + p.LastName,
+            ResidentAddress = $"{p.Street}, {p.City}, {p.Country}",
+            ServiceName = visit.Service.ServiceName,
+            DestinationAddress = visit.DestinationAddress,
+            ScheduledStart = visit.ScheduledStart,
+            ActualCheckIn = visit.ActualCheckIn,
+            ActualCheckOut = visit.ActualCheckOut,
+            Status = visit.Status,
+            IsMissed = visit.Status == VisitStatus.Scheduled
+                        && DateTime.UtcNow > visit.ScheduledStart.AddMinutes(60),
+            Notes = notes
+        };
+    }   
 }
