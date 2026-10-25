@@ -97,11 +97,7 @@ public class VisitsController : Controller
     [Authorize(Policy = Policies.Caregiver)]
     public async Task<IActionResult> MyVisits()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var caregiverId = await (from user in _db.Users
-                                 join caregiver in _db.Caregiver on user.PersonID equals caregiver.CaregiverID
-                                 where user.Id == userId
-                                 select (int?)caregiver.CaregiverID).SingleOrDefaultAsync();
+        var caregiverId = await GetCaregiverIdAsync();
         if (caregiverId == null)
             return Forbid();
 
@@ -109,7 +105,7 @@ public class VisitsController : Controller
         var visits = await _db.Visit
             .Where(v => v.CaregiverID == caregiverId.Value
                         && v.Status != VisitStatus.Completed && v.Status != VisitStatus.Cancelled)
-            .OrderBy(v => v.ScheduledStart)
+            .OrderBy(v => v.ScheduledStart).ThenBy(v => v.VisitID)
             .Select(v => new CaregiverVisitListItem
             {
                 VisitID = v.VisitID,
@@ -128,6 +124,16 @@ public class VisitsController : Controller
             visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), timeZone);
 
         return View(visits);
+    }
+
+    // Shared by the visit list (#62) and visit page (#63); null when the user has no Caregiver row
+    private async Task<int?> GetCaregiverIdAsync()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return await (from user in _db.Users
+                      join caregiver in _db.Caregiver on user.PersonID equals caregiver.CaregiverID
+                      where user.Id == userId
+                      select (int?)caregiver.CaregiverID).SingleOrDefaultAsync();
     }
 
     private async Task<int?> GetManagerAgencyIdAsync()
