@@ -1,0 +1,59 @@
+name: OLAP CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "olap/**"
+      - ".github/workflows/olap-ci.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "olap/**"
+      - ".github/workflows/olap-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  olap-api:
+    name: OLAP API build + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - run: dotnet restore olap/Olap.slnx
+      - run: dotnet build olap/Olap.slnx -c Release --no-restore
+      - name: Run tests
+        run: dotnet test olap/Olap.slnx -c Release --no-build --logger "trx" --results-directory olap/TestResults
+      - name: Upload test results
+        if: always() && hashFiles('olap/TestResults/**') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: olap-api-test-results
+          path: olap/TestResults
+
+  olap-client:
+    name: OLAP client build + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: olap/olap-client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: olap/olap-client/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test -- --run
