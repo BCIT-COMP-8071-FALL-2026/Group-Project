@@ -1,0 +1,16 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5 text-center">
+    <h2>Error</h2>
+
+    <p class="text-danger">@Model</p>
+
+    <a href="@ViewBag.ReturnUrl"
+       class="btn btn-primary">
+        Back to Profile
+    </a>
+</div>

@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using NuGet.Protocol.Plugins;
 using OLTPApp.Data;
 using OLTPApp.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -51,8 +53,8 @@ namespace OLTPApp.Controllers
 						.FirstOrDefaultAsync(s => s.SeniorID == seniorID);
 		}
 
-        [HttpGet]
-        public async Task<IActionResult> Index(int? seniorID)
+		[HttpGet]
+		public async Task<IActionResult> Index(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -60,22 +62,22 @@ namespace OLTPApp.Controllers
 			}
 
 			var senior = await GetCurrentSeniorAsync(seniorID);
-            if (senior == null)
+			if (senior == null)
 			{
 				return View("~/Views/Profile/Senior/CreateSenior.cshtml");
 			}
 
-            ViewBag.CurrentSenior = senior;
-            var seniorUser = await _userManager.Users.FirstOrDefaultAsync(u => u.PersonID == senior.Person.PersonID);
-            ViewBag.SeniorEmail = seniorUser?.Email;
-            ViewBag.OriginalSeniorEmail = seniorUser?.Email;
+			ViewBag.CurrentSenior = senior;
+			var seniorUser = await _userManager.Users.FirstOrDefaultAsync(u => u.PersonID == senior.Person.PersonID);
+			ViewBag.SeniorEmail = seniorUser?.Email;
+			ViewBag.OriginalSeniorEmail = seniorUser?.Email;
 
-            return View("~/Views/Profile/Senior/Index.cshtml", senior);
+			return View("~/Views/Profile/Senior/Index.cshtml", senior);
 		}
 
 
-        [HttpGet]
-        public async Task<IActionResult> EmergencyContacts(int? seniorID)
+		[HttpGet]
+		public async Task<IActionResult> EmergencyContacts(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -92,8 +94,8 @@ namespace OLTPApp.Controllers
 			return View("~/Views/Profile/EmergencyContact/EmergencyContacts.cshtml", senior);
 		}
 
-        [HttpGet]
-        public async Task<IActionResult> Medications(int? seniorID)
+		[HttpGet]
+		public async Task<IActionResult> Medications(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -110,8 +112,8 @@ namespace OLTPApp.Controllers
 			return View("~/Views/Profile/Medicine/Medications.cshtml", senior);
 		}
 
-        [HttpGet]
-        public async Task<IActionResult> Conditions(int? seniorID)
+		[HttpGet]
+		public async Task<IActionResult> Conditions(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -146,51 +148,51 @@ namespace OLTPApp.Controllers
 			}
 			return View("~/Views/Profile/Condition/AddCondition.cshtml", new MedicalConditionItem());
 		}
-       
+	   
 		[HttpGet]
-        public async Task<IActionResult> EditCondition(string id, int? seniorID)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-                return BadRequest();
+		public async Task<IActionResult> EditCondition(string id, int? seniorID)
+		{
+			if (string.IsNullOrWhiteSpace(id))
+				return BadRequest();
 
-            if (User.IsInRole("Admin") && seniorID == null)
-                return Forbid();
+			if (User.IsInRole("Admin") && seniorID == null)
+				return Forbid();
 
-            var senior = await GetCurrentSeniorAsync(seniorID);
+			var senior = await GetCurrentSeniorAsync(seniorID);
 
-            if (senior == null)
-                return NotFound();
+			if (senior == null)
+				return NotFound();
 
-            ViewBag.CurrentSenior = senior;
+			ViewBag.CurrentSenior = senior;
 
-            var conditions = new List<MedicalConditionItem>();
+			var conditions = new List<MedicalConditionItem>();
 
-            if (!string.IsNullOrWhiteSpace(senior.MedicalConditions))
-            {
-                try
-                {
-                    conditions = JsonSerializer.Deserialize<List<MedicalConditionItem>>(
-                        senior.MedicalConditions,
-                        ConditionJsonOptions
-                    ) ?? new List<MedicalConditionItem>();
-                }
-                catch (JsonException)
-                {
-                    return BadRequest("Unable to read the saved medical conditions.");
-                }
-            }
+			if (!string.IsNullOrWhiteSpace(senior.MedicalConditions))
+			{
+				try
+				{
+					conditions = JsonSerializer.Deserialize<List<MedicalConditionItem>>(
+						senior.MedicalConditions,
+						ConditionJsonOptions
+					) ?? new List<MedicalConditionItem>();
+				}
+				catch (JsonException)
+				{
+					return BadRequest("Unable to read the saved medical conditions.");
+				}
+			}
 
-            var condition = conditions.FirstOrDefault(c => c.ID == id);
+			var condition = conditions.FirstOrDefault(c => c.ID == id);
 
-            if (condition == null)
-                return NotFound();
+			if (condition == null)
+				return NotFound();
 
-            return View(
-                "~/Views/Profile/Condition/EditCondition.cshtml",
-                condition);
-        }
+			return View(
+				"~/Views/Profile/Condition/EditCondition.cshtml",
+				condition);
+		}
 
-        public async Task<IActionResult> EditMedicine(int? seniorID)
+		public async Task<IActionResult> EditMedicine(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -244,8 +246,8 @@ namespace OLTPApp.Controllers
 			);
 		}
 
-        [HttpGet]
-        public async Task<IActionResult> AddEmergencyContact(int? seniorID)
+		[HttpGet]
+		public async Task<IActionResult> AddEmergencyContact(int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 			{
@@ -328,149 +330,180 @@ namespace OLTPApp.Controllers
 		}
 
 
-        [Authorize(Roles = "Senior,Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPersonalInformation(int? seniorID)
-        {
-            bool isAdmin = User.IsInRole("Admin");
+		[Authorize(Roles = "Senior,Admin")]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EditPersonalInformation(int? seniorID)
+		{
+			bool isAdmin = User.IsInRole("Admin");
 
-            if (isAdmin && seniorID == null)
-                return Forbid();
+			if (isAdmin && seniorID == null)
+				return Forbid();
 
-            var senior = await GetCurrentSeniorAsync(seniorID);
+			var senior = await GetCurrentSeniorAsync(seniorID);
 
-            if (senior?.Person == null)
-                return NotFound();
+			if (senior?.Person == null)
+				return NotFound();
 
-            var seniorUser = await _userManager.Users
-                .FirstOrDefaultAsync(
-                    u => u.PersonID == senior.Person.PersonID);
+			var seniorUser = await _userManager.Users
+				.FirstOrDefaultAsync(
+					u => u.PersonID == senior.Person.PersonID);
 
-            if (seniorUser == null)
-                return NotFound();
+			bool canChangeEmail = true;
+			if (seniorUser == null)
+			{
+				canChangeEmail = false;
+				
+			}
 
-            string? originalEmail = seniorUser.Email;
-            string newEmail = originalEmail ?? "";
+			string? originalEmail = seniorUser?.Email;
+			string newEmail = originalEmail ?? "";
 
-            ViewBag.CurrentSenior = senior;
-            ViewBag.OriginalSeniorEmail = originalEmail;
-            ViewBag.SeniorEmail = originalEmail;
-            ViewBag.KeepEditingPersonalInformation = false;
+			ViewBag.CurrentSenior = senior;
+			ViewBag.OriginalSeniorEmail = originalEmail;
+			ViewBag.SeniorEmail = originalEmail;
+			ViewBag.KeepEditingPersonalInformation = false;
 
-            // 1. Read and validate the email, but don't return yet.
-            if (isAdmin)
-            {
-                newEmail = Request.Form["Email"].ToString().Trim();
+			if (isAdmin)
+			{
+				newEmail = Request.Form["Email"].ToString().Trim();
+				if (string.IsNullOrWhiteSpace(newEmail) && originalEmail != null)
+				{
+					ModelState.AddModelError(
+						"Email",
+						"Email is required.");
+				}
+				else
+				{
+					if (!new EmailAddressAttribute().IsValid(newEmail))
+					{
+                        ModelState.AddModelError("Email", "Please enter a valid email address.");
+                    } else
+					{
+						if (originalEmail != null)
+						{
+							var existingUser =
+								await _userManager.FindByEmailAsync(newEmail);
 
-                if (string.IsNullOrWhiteSpace(newEmail))
-                {
-                    ModelState.AddModelError(
-                        "Email",
-                        "Email is required.");
-                }
-                else
-                {
-                    var existingUser =
-                        await _userManager.FindByEmailAsync(newEmail);
+							if (existingUser != null &&
+								existingUser.Id != seniorUser?.Id)
+							{
+								ModelState.AddModelError(
+									"Email",
+									"This email is already used by another account.");
+							}
+						} else
+						{
+							if (!canChangeEmail && !string.IsNullOrWhiteSpace(newEmail))
+							{
+								ViewBag.ReturnUrl = Url.Action(
+								"Index",
+								"SeniorProfile",
+								new { seniorID = senior.SeniorID }
+							);
 
-                    if (existingUser != null &&
-                        existingUser.Id != seniorUser.Id)
-                    {
-                        ModelState.AddModelError(
-                            "Email",
-                            "This email is already used by another account.");
-                    }
-                }
-            }
+								return View(
+									"~/Views/Shared/ErrorMessage.cshtml",
+									"The current senior user doesn't have a login account, so you cannot change email."
+								);
+							}
+						}
+					}
+				}
+			}
 
-            bool updated;
+			bool updated;
 
-            if (isAdmin)
-            {
-                updated = await TryUpdateModelAsync(
-                    senior.Person,
-                    "Person",
-                    p => p.FirstName,
-                    p => p.MiddleName,
-                    p => p.LastName,
-                    p => p.Phone,
-                    p => p.Street,
-                    p => p.City,
-                    p => p.Province,
-                    p => p.PostalCode,
-                    p => p.Country
-                );
-            }
-            else
-            {
-                updated = await TryUpdateModelAsync(
-                    senior.Person,
-                    "Person",
-                    p => p.Phone,
-                    p => p.Street,
-                    p => p.City,
-                    p => p.Province,
-                    p => p.PostalCode,
-                    p => p.Country
-                );
-            }
+			if (isAdmin)
+			{
+				updated = await TryUpdateModelAsync(
+					senior.Person,
+					"Person",
+					p => p.FirstName,
+					p => p.MiddleName,
+					p => p.LastName,
+					p => p.Phone,
+					p => p.Street,
+					p => p.City,
+					p => p.Province,
+					p => p.PostalCode,
+					p => p.Country
+				);
+			}
+			else
+			{
+				updated = await TryUpdateModelAsync(
+					senior.Person,
+					"Person",
+					p => p.Phone,
+					p => p.Street,
+					p => p.City,
+					p => p.Province,
+					p => p.PostalCode,
+					p => p.Country
+				);
+			}
 
-            if (!updated || !ModelState.IsValid)
-            {
-                ViewBag.CurrentSenior = senior;
-                ViewBag.SeniorEmail = newEmail;
-                ViewBag.OriginalSeniorEmail = originalEmail;
-                ViewBag.KeepEditingPersonalInformation = true;
+			if (!updated || !ModelState.IsValid)
+			{
+				ViewBag.CurrentSenior = senior;
+				ViewBag.SeniorEmail = newEmail;
+				ViewBag.OriginalSeniorEmail = originalEmail;
+				ViewBag.KeepEditingPersonalInformation = true;
 
-                return View("~/Views/Profile/Senior/Index.cshtml", senior);
-            }
+				return View("~/Views/Profile/Senior/Index.cshtml", senior);
+			}
 
-            if (isAdmin &&
-                !string.Equals(
-                    originalEmail,
-                    newEmail,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                var emailResult = await _userManager.SetEmailAsync(
-                    seniorUser, newEmail);
+			if (isAdmin &&
+				!string.Equals(
+					originalEmail,
+					newEmail,
+					StringComparison.OrdinalIgnoreCase))
+			{
+				if (canChangeEmail)
+				{
+					var emailResult = await _userManager.SetEmailAsync(
+						seniorUser, newEmail);
+					var usernameRes = await _userManager.SetUserNameAsync(seniorUser, newEmail);
 
-                if (!emailResult.Succeeded)
-                {
-                    ModelState.AddModelError(
-                        "Email",
-                        string.Join(
-                            " ",
-                            emailResult.Errors.Select(e => e.Description)));
 
-                    ViewBag.CurrentSenior = senior;
-                    ViewBag.SeniorEmail = newEmail;
-                    ViewBag.OriginalSeniorEmail = originalEmail;
-                    ViewBag.KeepEditingPersonalInformation = true;
+                    if (!emailResult.Succeeded || !usernameRes.Succeeded)
+					{
+						ModelState.AddModelError(
+							"Email",
+							string.Join(
+								" ",
+								emailResult.Errors.Select(e => e.Description)));
 
-                    return View("~/Views/Profile/Senior/Index.cshtml", senior);
-                }
-            }
+						ViewBag.CurrentSenior = senior;
+						ViewBag.SeniorEmail = newEmail;
+						ViewBag.OriginalSeniorEmail = originalEmail;
+						ViewBag.KeepEditingPersonalInformation = true;
 
-            await _context.SaveChangesAsync();
+						return View("~/Views/Profile/Senior/Index.cshtml", senior);
+					}
+				}
+			}
 
-            if (isAdmin)
-            {
-                return RedirectToAction(
-                    nameof(Index),
-                    new { seniorID = senior.SeniorID });
-            }
+			await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
-        }
+			if (isAdmin)
+			{
+				return RedirectToAction(
+					nameof(Index),
+					new { seniorID = senior.SeniorID });
+			}
 
-        [HttpPost]
+			return RedirectToAction(nameof(Index));
+		}
+
+		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> EditSeniorInformation(int? seniorID)
 		{
-            ViewBag.KeepEditingSeniorInformation = true;
+			ViewBag.KeepEditingSeniorInformation = true;
 
-            if (User.IsInRole("Admin") && seniorID == null)
+			if (User.IsInRole("Admin") && seniorID == null)
 				return Forbid();
 
 			var senior = await GetCurrentSeniorAsync(seniorID);
@@ -490,7 +523,7 @@ namespace OLTPApp.Controllers
 					s => s.IsLivingAlone,
 					s => s.CurrentDoctorName,
 					s => s.CurrentDoctorPhone
-                );
+				);
 			}
 			else
 			{
@@ -500,7 +533,7 @@ namespace OLTPApp.Controllers
 					s => s.IsLivingAlone,
 					s => s.CurrentDoctorName,
 					s => s.CurrentDoctorPhone
-                );
+				);
 			}
 
 			if (!updated || !ModelState.IsValid)
@@ -517,9 +550,9 @@ namespace OLTPApp.Controllers
 			}
 
 			await _context.SaveChangesAsync();
-            ViewBag.KeepEditingSeniorInformation = false;
+			ViewBag.KeepEditingSeniorInformation = false;
 
-            if (isAdmin)
+			if (isAdmin)
 			{
 				return RedirectToAction(
 					nameof(Index),
@@ -531,137 +564,137 @@ namespace OLTPApp.Controllers
 		}
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddEmergencyContact( Senior model, int? seniorID)
-        {
-            if (User.IsInRole("Admin") && seniorID == null)
-                return Forbid();
-
-            var senior = await GetCurrentSeniorAsync(seniorID);
-
-            if (senior == null)
-                return NotFound();
-
-            ViewBag.CurrentSenior = senior;
-
-            // Validate only the emergency contact fields.
-            ModelState.Remove(nameof(Senior.SeniorID));
-            ModelState.Remove(nameof(Senior.Person));
-
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactName))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactName),
-                    "Contact name is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactPhone))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactPhone),
-                    "Phone number is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactRelationship))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactRelationship),
-                    "Relationship is required.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                // Preserve the senior ID and display the submitted values.
-                model.SeniorID = senior.SeniorID;
-
-                return View(
-                    "~/Views/Profile/EmergencyContact/AddEmergencyContact.cshtml",
-                    model);
-            }
-
-            // Update the existing Senior record only.
-            senior.EmergencyContactName = model.EmergencyContactName;
-            senior.EmergencyContactPhone = model.EmergencyContactPhone;
-            senior.EmergencyContactRelationship =
-                model.EmergencyContactRelationship;
-
-            await _context.SaveChangesAsync();
-
-            if (User.IsInRole("Admin"))
-            {
-                return RedirectToAction(
-                    nameof(EmergencyContacts),
-                    new { seniorID = senior.SeniorID });
-            }
-
-            return RedirectToAction(nameof(EmergencyContacts));
-        }
-
-        [HttpPost]
+		[HttpPost]
 		[ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditEmergencyContact(Senior model, int? seniorID)
-        {
-            if (User.IsInRole("Admin") && seniorID == null)
-                return Forbid();
+		public async Task<IActionResult> AddEmergencyContact( Senior model, int? seniorID)
+		{
+			if (User.IsInRole("Admin") && seniorID == null)
+				return Forbid();
 
-            var senior = await GetCurrentSeniorAsync(seniorID);
+			var senior = await GetCurrentSeniorAsync(seniorID);
 
-            if (senior == null)
-                return NotFound();
+			if (senior == null)
+				return NotFound();
 
-            ViewBag.CurrentSenior = senior;
+			ViewBag.CurrentSenior = senior;
 
-            ModelState.Remove(nameof(Senior.SeniorID));
-            ModelState.Remove(nameof(Senior.Person));
+			// Validate only the emergency contact fields.
+			ModelState.Remove(nameof(Senior.SeniorID));
+			ModelState.Remove(nameof(Senior.Person));
 
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactName))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactName),
-                    "Contact name is required.");
-            }
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactName))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactName),
+					"Contact name is required.");
+			}
 
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactPhone))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactPhone),
-                    "Phone number is required.");
-            }
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactPhone))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactPhone),
+					"Phone number is required.");
+			}
 
-            if (string.IsNullOrWhiteSpace(model.EmergencyContactRelationship))
-            {
-                ModelState.AddModelError(
-                    nameof(Senior.EmergencyContactRelationship),
-                    "Relationship is required.");
-            }
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactRelationship))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactRelationship),
+					"Relationship is required.");
+			}
 
-            if (!ModelState.IsValid)
-            {
-                model.SeniorID = senior.SeniorID;
+			if (!ModelState.IsValid)
+			{
+				// Preserve the senior ID and display the submitted values.
+				model.SeniorID = senior.SeniorID;
 
-                return View(
-                    "~/Views/Profile/EmergencyContact/EditEmergencyContact.cshtml",
-                    model);
-            }
+				return View(
+					"~/Views/Profile/EmergencyContact/AddEmergencyContact.cshtml",
+					model);
+			}
 
-            senior.EmergencyContactName = model.EmergencyContactName;
-            senior.EmergencyContactPhone = model.EmergencyContactPhone;
-            senior.EmergencyContactRelationship = model.EmergencyContactRelationship;
+			// Update the existing Senior record only.
+			senior.EmergencyContactName = model.EmergencyContactName;
+			senior.EmergencyContactPhone = model.EmergencyContactPhone;
+			senior.EmergencyContactRelationship =
+				model.EmergencyContactRelationship;
 
-            await _context.SaveChangesAsync();
+			await _context.SaveChangesAsync();
 
-            if (User.IsInRole("Admin"))
-            {
-                return RedirectToAction(
-                    nameof(EmergencyContacts),
-                    new { seniorID = senior.SeniorID });
-            }
+			if (User.IsInRole("Admin"))
+			{
+				return RedirectToAction(
+					nameof(EmergencyContacts),
+					new { seniorID = senior.SeniorID });
+			}
 
-            return RedirectToAction(nameof(EmergencyContacts));
-        }
+			return RedirectToAction(nameof(EmergencyContacts));
+		}
 
-        [HttpPost]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EditEmergencyContact(Senior model, int? seniorID)
+		{
+			if (User.IsInRole("Admin") && seniorID == null)
+				return Forbid();
+
+			var senior = await GetCurrentSeniorAsync(seniorID);
+
+			if (senior == null)
+				return NotFound();
+
+			ViewBag.CurrentSenior = senior;
+
+			ModelState.Remove(nameof(Senior.SeniorID));
+			ModelState.Remove(nameof(Senior.Person));
+
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactName))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactName),
+					"Contact name is required.");
+			}
+
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactPhone))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactPhone),
+					"Phone number is required.");
+			}
+
+			if (string.IsNullOrWhiteSpace(model.EmergencyContactRelationship))
+			{
+				ModelState.AddModelError(
+					nameof(Senior.EmergencyContactRelationship),
+					"Relationship is required.");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				model.SeniorID = senior.SeniorID;
+
+				return View(
+					"~/Views/Profile/EmergencyContact/EditEmergencyContact.cshtml",
+					model);
+			}
+
+			senior.EmergencyContactName = model.EmergencyContactName;
+			senior.EmergencyContactPhone = model.EmergencyContactPhone;
+			senior.EmergencyContactRelationship = model.EmergencyContactRelationship;
+
+			await _context.SaveChangesAsync();
+
+			if (User.IsInRole("Admin"))
+			{
+				return RedirectToAction(
+					nameof(EmergencyContacts),
+					new { seniorID = senior.SeniorID });
+			}
+
+			return RedirectToAction(nameof(EmergencyContacts));
+		}
+
+		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AddMedicine(MedicationItem medication, int? seniorID)
 		{

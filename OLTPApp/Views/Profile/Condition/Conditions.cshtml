@@ -73,8 +73,8 @@
 									@condition.Name
 								</span>
 
-								<span class="note">
-									Status: @(condition.Status?.ToString() ?? "Not specified")
+								<span class="note @(condition.Status?.ToString().ToLowerInvariant() +"-m" ?? "not-specified")">
+									@(condition.Status?.ToString() ?? "Not specified")
 								</span>
 							</div>
 						</div>
