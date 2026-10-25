@@ -1,0 +1,71 @@
+﻿
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-overlay .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #dbeafe;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+}
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+.loading-overlay .success-message {
+    color: var(--active);
+    background-color: transparent;
+    display: none;
+}
+
+.loading-overlay .loading-content {
+    padding: 20px;
+    display: flex;
+    min-width: 150px;
+    height: 200px;
+    background-color: #fff;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading-overlay .error-message {
+    display: none;
+}
+
+.loading-overlay .icon-message-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading-overlay .icon-message {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.loading-overlay .active {
+    display: flex;
+}
+
+.loading-overlay .icon-message-container #message {
+    color: var(--primary-text);
+}

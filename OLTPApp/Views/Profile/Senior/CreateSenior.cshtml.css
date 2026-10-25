@@ -1,0 +1,30 @@
+/* CSS for CreateSenior view */
+.create-profile-wrapper, .create-profile {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.create-title {
+	padding-bottom: 20px;
+	font-weight: 700;
+}
+
+.note {
+	padding-bottom: 10px;
+}
+
+.form-input {
+	width: 340px !important;
+}
+
+.form-group-btn {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.create-profile-wrapper {
+	min-height: calc(100vh - 60px);
+}

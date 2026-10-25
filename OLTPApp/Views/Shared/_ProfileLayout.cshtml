@@ -1,0 +1,73 @@
+﻿@using OLTPApp.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OLTPApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.1/build/css/intlTelInput.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.1/build/js/intlTelInput.min.js"></script>
+</head>
+<body>
+	@{
+		var currentUser = await UserManager.GetUserAsync(User);
+		var personID = currentUser?.PersonID;
+		var senior = ViewBag.currentSenior;
+	}
+	<div class="profile-wrapper">
+		@if (personID != null){
+			<div class="d-flex flex-column flex-shrink-0 p-3 bg-1 left-menu profile-page-div"
+				 style="width: 280px">
+				<a class="d-flex align-items-center mb-3 md:mb-0 md:me-auto theme-inverse text-decoration-none">
+					<span class="initial-name" data-name="@($"{senior.Person.FirstName}{senior.Person.LastName}")">@senior.Person.FirstName[0]@senior.Person.LastName[0]</span>
+					<span class="name">@senior.Person.FirstName @senior.Person.LastName</span>
+				</a>
+				<ul class="nav flex-column align-items-start mb-auto">
+					<li class="nav-item">
+						<a aria-current="page" asp-area="" asp-controller="SeniorProfile" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+							Profile
+						</a>
+					</li>
+					<li>
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="EmergencyContacts" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "EmergencyContacts" ? "active" : "")">
+							Emergency Contacts
+						</a>
+					</li>
+					<li>
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="Medications" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Medications" ? "active" : "")">
+							Medications
+						</a>
+					</li>
+					<li>
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="Conditions" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Conditions" ? "active" : "")">
+							Conditions
+						</a>
+					</li>
+				</ul>
+			</div>
+		} else {
+
+		}
+		<main role="main" class="profile-content">
+			@await Html.PartialAsync("_Loading")
+			@RenderBody()
+		</main>
+	</div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/loading.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

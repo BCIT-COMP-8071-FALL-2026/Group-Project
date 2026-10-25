@@ -439,6 +439,10 @@ namespace OLTPApp.Data.Migrations
                     b.Property<int>("FamilyMemberID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Relationship")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.HasKey("SeniorID", "FamilyMemberID");
 
                     b.HasIndex("FamilyMemberID");

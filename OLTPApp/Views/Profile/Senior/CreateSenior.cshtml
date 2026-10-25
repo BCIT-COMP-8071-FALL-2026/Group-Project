@@ -1,0 +1,73 @@
+﻿@model OLTPApp.Models.Senior
+@{
+	ViewData["Title"] = "Create Profile";
+}
+<div class="create-profile-wrapper">
+	<div class="create-profile">
+		<h2 class="create-title">About You</h2>
+		<span class="note">Tell us about you</span>
+		<form asp-action="CreateSenior" method="post" enctype="multipart/form-data" class="profile-detail-form personal-detail-form create-profile-form">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="form-input">
+				<input asp-for="Person.FirstName" class="form-control" placeholder="First name" />
+				<span asp-validation-for="Person.FirstName" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.MiddleName" class="form-control" placeholder="Middle name (optional)" />
+				<span asp-validation-for="Person.MiddleName" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.LastName" class="form-control" placeholder="Last name" />
+				<span asp-validation-for="Person.LastName" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="DateOfBirth" class="form-control" type="date" />
+				<span asp-validation-for="DateOfBirth" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.Phone" class="form-control" type="tel" id="phoneInput1" placeholder="Phone number" />
+				<span asp-validation-for="Person.Phone" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.Street" class="form-control" placeholder="Street" />
+				<span asp-validation-for="Person.Street" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.City" class="form-control" placeholder="City" />
+				<span asp-validation-for="Person.City" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.Province" class="form-control" placeholder="Province" />
+				<span asp-validation-for="Person.Province" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.PostalCode" class="form-control" placeholder="Postal Code" />
+				<span asp-validation-for="Person.PostalCode" class="text-danger"></span>
+			</div>
+			<div class="form-input">
+				<input asp-for="Person.Country" class="form-control" placeholder="Country" />
+				<span asp-validation-for="Person.Country" class="text-danger"></span>
+			</div>
+			<div class="form-input radio-input">
+				<label asp-for="IsLivingAlone" class="control-label">Living Alone: </label>
+				<div>
+					<input asp-for="IsLivingAlone" type="radio" value="true" id="yes"/>
+					<label for="yes">Yes</label>
+					<input asp-for="IsLivingAlone" type="radio" value="false" id="no" checked="checked"/>
+					<label for="no">No</label>
+				</div>
+			</div>
+			<div class="form-group-btn">
+				<button type="submit" class="primary-btn">Save</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

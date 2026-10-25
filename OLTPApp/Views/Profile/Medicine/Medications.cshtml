@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Medications";
+}
+
+
+<div class="personal-detail-wrapper profile-page-div">
+	<div class="profile-detail-title">
+		<span class="detail-title">Personal details</span>
+		<button type="button" class="secondary-btn" onclick="window.location.href='@Url.Action("AddMedicine", "SeniorProfile", new { id = "" })'">+ Medication</button>
+	</div>
+
+	<div class="m-list-wrapper">
+		<div class="m-list">
+			<div class="m-data">
+				<div class="m-detail">
+					<div class="m-info">
+						<span class="prescribed-by note">Prescribed by Dr. Amira Khan (GP) · Started May 1, 2022</span>
+						<span class="m-name">Lisinopril</span>
+					</div>
+					<div>
+						<span class="active-m">Active</span>
+						<span class="important-note note">Refill Oct 9, 2026 (in 4 days)</span>
+					</div>
+				</div>
+				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditMedicine", "SeniorProfile", new { id = "" })'">Edit</button>
+			</div>
+			<div class="m-data">
+				<div class="m-detail">
+					<div class="m-info">
+						<span class="prescribed-by note">Prescribed by Dr. Amira Khan (GP) · Started Feb 10, 2021</span>
+						<span class="m-name">Metformin</span>
+					</div>
+					<div>
+						<span class="active-m">Active</span>
+						<span class="regular-note">Refill Oct 9, 2026 (in 4 days)</span>
+					</div>
+				</div>
+				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditMedicine", "SeniorProfile", new { id = "" })'">Edit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

@@ -1,0 +1,41 @@
+﻿@model OLTPApp.Models.Senior
+@{
+	ViewData["Title"] = "Conditions";
+}	
+<div class="personal-detail-wrapper profile-page-div">
+	<div class="profile-detail-title">
+		<span class="detail-title">Medical Conditions</span>
+		<button type="button" class="secondary-btn" onclick="window.location.href='@Url.Action("AddCondition", "SeniorProfile", new { id = "" })'">+ Cndition Type</button>
+	</div>
+
+	<div class="m-list-wrapper">
+		<div class="m-list">
+			<div class="m-data">
+				<div class="m-detail">
+					<div class="m-info">
+						<span class="prescribed-by note">Diagnosed Jun 1, 2019 · Persistently high blood pressure.</span>
+						<span class="m-name">Hypertension</span>
+					</div>
+				</div>
+				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = "" })'">Edit</button>
+			</div>
+			<div class="m-data">
+				<div class="m-detail">
+					<div class="m-info">
+						<span class="prescribed-by note">Diagnosed Feb 10, 2021 · Impaired blood sugar regulation.</span>
+						<span class="m-name">Type 2 diabetes</span>
+					</div>
+					
+				</div>
+				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = "" })'">Edit</button>
+			</div>
+		</div>
+	</div>
+
+</div>
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

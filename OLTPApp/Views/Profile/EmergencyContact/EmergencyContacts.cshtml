@@ -1,0 +1,62 @@
+﻿@model OLTPApp.Models.Senior
+
+@{
+    ViewData["Title"] = "Emergency Contact";
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Emergency Contacts</span>
+
+        <button type="button" class="secondary-btn"
+                onclick="window.location.href='@Url.Action("AddEmergencyContact", "SeniorProfile")'">
+            + New Emergency Contact
+        </button>
+    </div>
+
+    <div class="m-list-wrapper">
+        @if (Model.SeniorFamilyMembers != null &&
+             Model.SeniorFamilyMembers.Any())
+        {
+            <div class="m-list">
+                @foreach (var contact in Model.SeniorFamilyMembers)
+                {
+                    <div class="m-data">
+                        <div class="m-detail">
+                            <span class="m-name">
+                                @contact.FamilyMember.Person.FirstName
+                                @contact.FamilyMember.Person.LastName
+                            </span>
+
+                            <div>
+                                <span class="attoney note">
+                                    @contact.Relationship
+                                </span>
+
+                                <span class="phone-number note">
+                                    @contact.FamilyMember.Person.Phone
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="primary-btn"
+                                onclick="window.location.href='@Url.Action("EditEmergencyContact", "SeniorProfile", new { memberID = contact.FamilyMemberID })'">
+                            Edit
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>No emergency contacts have been added yet.</p>
+        }
+    </div>
+</div>
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}

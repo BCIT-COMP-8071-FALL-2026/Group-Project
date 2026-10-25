@@ -1,0 +1,130 @@
+﻿@model OLTPApp.Models.Senior
+@{
+	ViewData["Title"] = "Index";
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+			<div class="profile-detail-title">
+				<span class="detail-title">Personal details</span>
+				<button type="button" id="editPersonalDetailBtn" class="primary-btn">Edit</button>
+			</div>
+			<form asp-action="EditPersonalInformation" method="post" enctype="multipart/form-data" class="profile-detail-form personal-detail-form" id="personalDetailForm">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<div class="form-input">
+					<label asp-for="Person.FirstName" class="control-label">First Name</label>
+					<input asp-for="Person.FirstName" class="form-control" readonly/>
+					<span asp-validation-for="Person.FirstName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.MiddleName" class="control-label">Middle Name</label>
+					<input asp-for="Person.MiddleName" class="form-control" readonly/>
+					<span asp-validation-for="Person.MiddleName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.LastName" class="control-label">Last Name</label>
+					<input asp-for="Person.LastName" class="form-control" readonly/>
+					<span asp-validation-for="Person.LastName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.Phone" class="control-label">Phone Number</label>
+					<input asp-for="Person.Phone" class="form-control"type="tel" id="phoneInput" />
+					<span asp-validation-for="Person.Phone" class="text-danger"></span>
+				</div>
+				<div class="form-input" id="addressInput">
+					<label class="control-label">Address</label>
+					<input class="form-control" value="@($"{Model?.Person.Street}{(!string.IsNullOrWhiteSpace(Model?.Person?.Street) && !string.IsNullOrWhiteSpace(Model?.Person?.City) ? ", " : "")} {Model?.Person.City}{(!string.IsNullOrWhiteSpace(Model?.Person?.City) && !string.IsNullOrWhiteSpace(Model?.Person?.Province) ? ", " : "")} {Model?.Person.Province} {Model?.Person.PostalCode}")" />
+				</div>
+				
+				<div class="d-none" id="addressInputDetail">
+					<div class="form-input">
+						<label asp-for="Person.Street" class="control-label">Street</label>
+						<input asp-for="Person.Street" class="form-control" />
+						<span asp-validation-for="Person.Street" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.City" class="control-label">City</label>
+						<input asp-for="Person.City" class="form-control" />
+						<span asp-validation-for="Person.City" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.Province" class="control-label">Province</label>
+						<input asp-for="Person.Province" class="form-control" />
+						<span asp-validation-for="Person.Province" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.PostalCode" class="control-label">Postal Code</label>
+						<input asp-for="Person.PostalCode" class="form-control" />
+						<span asp-validation-for="Person.PostalCode" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.Country" class="control-label">Country</label>
+						<input asp-for="Person.Country" class="form-control" />
+						<span asp-validation-for="Person.Country" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-input" id="addressInput">
+					<label class="control-label">Email</label>
+					<input class="form-control" value="@User.Identity?.Name" readonly/>
+				</div>
+				<div class="form-group-btn d-none" id="personalDetailsActionBtn">
+					<button type="submit" class="primary-btn">Save</button>
+					<button type="reset" class="secondary-btn" onclick="cancelEditPersonalInfo()">Cancel</button>
+				</div>
+			</form>
+		</div>
+	<div class="senior-detail-wrapper profile-page-div">
+	<div class="profile-detail-title">
+		<span class="detail-title">Senior details</span>
+		<button type="button" id="editSeniorDetailBtn" class="primary-btn">Edit</button>
+	</div>
+	<form asp-action="EditSeniorInformation" method="post" enctype="multipart/form-data" class="profile-detail-form senior-detail-form" id="seniorDetailForm">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<input type="hidden" asp-for="SeniorID" />
+		<div class="form-input">
+			<label asp-for="DateOfBirth" class="control-label">Date of Birth</label>
+			<input asp-for="DateOfBirth" class="form-control" readonly />
+			<span asp-validation-for="DateOfBirth" class="text-danger"></span>
+				</div>
+		<div class="form-input" id="isLivingAloneData">
+			<label asp-for="IsLivingAlone" class="control-label">Living Situation</label>
+			<input class="form-control" value="Lives alone" />
+		</div>
+		<div class="form-input d-none radio-input" id="isLivingAloneInput">
+			<label asp-for="IsLivingAlone" class="control-label">Living Alone: </label>
+			<div>
+				<input asp-for="IsLivingAlone" type="radio" value="true" id="yes"/>
+				<label for="yes">Yes</label>
+				<input asp-for="IsLivingAlone" type="radio" value="false" id="no" />
+				<label for="no">No</label>
+			</div>
+			<span asp-validation-for="IsLivingAlone" class="text-danger"></span>
+		</div>
+		<div class="form-input">
+			<label asp-for="CurrentDoctorName" class="control-label">Primary Professional</label>
+			<input asp-for="CurrentDoctorName" class="form-control" />
+			<span asp-validation-for="CurrentDoctorName" class="text-danger"></span>
+		</div>	
+		<div class="form-input">
+			<label asp-for="MedicalConditions" class="control-label">Note</label>
+			<input asp-for="MedicalConditions" class="form-control" />
+			<span asp-validation-for="MedicalConditions" class="text-danger"></span>
+		</div>
+		<div class="form-group-btn d-none" id="seniorDetailsActionBtn">
+			<button type="submit" class="primary-btn">Save</button>
+			<button type="reset" class="secondary-btn" onclick="cancelEditSeniorInfo()">Cancel</button>
+		</div>
+	</form>
+</div>
+@if (User.IsInRole(RoleNames.Admin))
+{
+<button class="deactivate-btn">Deactivate account</button>
+}
+
+
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+}
+
