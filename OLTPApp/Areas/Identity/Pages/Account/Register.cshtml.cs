@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
 
@@ -173,11 +174,6 @@ namespace OLTPApp.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-
-
-
-
-
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -244,7 +240,23 @@ namespace OLTPApp.Areas.Identity.Pages.Account
                         _context.FamilyMember.Add(new FamilyMember { FamilyMemberID = person.PersonID });
                     }
 
-                    /* TODO: ADD ROLES TO SENIOR / FAMILY MEMBER HERE */
+                    // Add role to user
+                    var role = Input.AccountType == "Senior" ? RoleNames.Senior
+                            : Input.AccountType == "Family" ? RoleNames.FamilyMember
+                            : null;
+
+                    if (role is not null)
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(user, role);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            return Page();
+                        }
+                    }
 
                     // Complete transaction
                     await _context.SaveChangesAsync();
