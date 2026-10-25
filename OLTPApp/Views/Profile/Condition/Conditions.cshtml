@@ -1,41 +1,106 @@
-﻿@model OLTPApp.Models.Senior
+﻿ @model OLTPApp.Models.Senior
+@using System.Text.Json
+@using System.Globalization
+@using OLTPApp.Models
+@using System.Text.Json.Serialization
+
 @{
 	ViewData["Title"] = "Conditions";
-}	
+
+	var conditions = new List<MedicalConditionItem>();
+
+	var jsonOptions = new JsonSerializerOptions
+	{
+		Converters = { new JsonStringEnumConverter() }
+	};
+
+	if (!string.IsNullOrWhiteSpace(Model.MedicalConditions))
+	{
+		try
+		{
+			conditions = JsonSerializer.Deserialize<List<MedicalConditionItem>>(
+				Model.MedicalConditions,
+				jsonOptions
+			) ?? new List<MedicalConditionItem>();
+		}
+		catch (JsonException)
+		{
+			<p class="text-danger">
+				Unable to read the saved medical conditions.
+			</p>
+		}
+	}
+
+	var seniorID = Model.SeniorID;
+}
+
 <div class="personal-detail-wrapper profile-page-div">
 	<div class="profile-detail-title">
 		<span class="detail-title">Medical Conditions</span>
-		<button type="button" class="secondary-btn" onclick="window.location.href='@Url.Action("AddCondition", "SeniorProfile", new { id = "" })'">+ Cndition Type</button>
+
+		<button type="button"
+				class="secondary-btn"
+				onclick="window.location.href='@Url.Action("AddCondition", "SeniorProfile", new { seniorID = seniorID })'">
+			+ Condition
+		</button>
 	</div>
 
 	<div class="m-list-wrapper">
 		<div class="m-list">
-			<div class="m-data">
-				<div class="m-detail">
-					<div class="m-info">
-						<span class="prescribed-by note">Diagnosed Jun 1, 2019 · Persistently high blood pressure.</span>
-						<span class="m-name">Hypertension</span>
+
+			@if (conditions.Count == 0)
+			{
+				<p>No medical conditions have been added.</p>
+			}
+			else
+			{
+				@foreach (var condition in conditions)
+				{
+					<div class="m-data">
+						<div class="m-detail">
+							<div class="m-info">
+								<span class="prescribed-by note">
+									Diagnosed
+									@(condition.DiagnosisDate.HasValue
+										? condition.DiagnosisDate.Value.ToString(
+											"MMM d, yyyy",
+											CultureInfo.InvariantCulture)
+										: "date not specified")
+									· @condition.Description
+								</span>
+
+								<span class="m-name">
+									@condition.Name
+								</span>
+
+								<span class="note">
+									Status: @(condition.Status?.ToString() ?? "Not specified")
+								</span>
+							</div>
+						</div>
+
+						<button type="button"
+								class="primary-btn"
+								onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = condition.ID, seniorID = seniorID })'">
+							Edit
+						</button>
 					</div>
-				</div>
-				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = "" })'">Edit</button>
-			</div>
-			<div class="m-data">
-				<div class="m-detail">
-					<div class="m-info">
-						<span class="prescribed-by note">Diagnosed Feb 10, 2021 · Impaired blood sugar regulation.</span>
-						<span class="m-name">Type 2 diabetes</span>
-					</div>
-					
-				</div>
-				<button class="primary-btn" type="button" onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = "" })'">Edit</button>
-			</div>
+				}
+			}
+
 		</div>
 	</div>
-
 </div>
+
 @section Scripts {
 	<script src="~/js/senior-profile.js"
 			asp-append-version="true"></script>
-	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	<script>
+		applyInitialNameColors();
+	</script>
 }

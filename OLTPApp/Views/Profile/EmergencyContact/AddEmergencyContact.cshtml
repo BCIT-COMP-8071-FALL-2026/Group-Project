@@ -1,82 +1,39 @@
-﻿@model OLTPApp.Models.Person
+﻿@model OLTPApp.Models.Senior
 
 @{
-    ViewData["Title"] = "Edit Emergency Contact";
+    ViewData["Title"] = "Add Emergency Contact";
 }
 
 <div class="personal-detail-wrapper profile-page-div">
     <div class="profile-detail-title">
-        <span class="detail-title">Edit Emergency Contact</span>
+        <span class="detail-title">Add Emergency Contact</span>
     </div>
 
-    <form asp-action="EditEmergencyContact"
+    <form asp-action="AddEmergencyContact"
           asp-controller="SeniorProfile"
           method="post"
           class="profile-detail-form personal-detail-form">
 
         @Html.AntiForgeryToken()
 
-        <input type="hidden" asp-for="PersonID" />
-
-        <div asp-validation-summary="All" class="text-danger"></div>
-
+        <input type="hidden" name="seniorID" value="@ViewBag.CurrentSenior?.SeniorID" />
         <div class="form-input">
-            <label asp-for="FirstName">First Name</label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
+            <label asp-for="EmergencyContactName">Name</label>
+            <input asp-for="EmergencyContactName" class="form-control"placeholder="Name" />
+            <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
         </div>
 
         <div class="form-input">
-            <label asp-for="LastName">Last Name</label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
+            <label asp-for="EmergencyContactPhone">Phone Number</label>
+            <input asp-for="EmergencyContactPhone" class="form-control" type="tel" placeholder="604-555-0190"/>
+            <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
         </div>
 
         <div class="form-input">
-            <label asp-for="Phone">Phone Number</label>
-            <input asp-for="Phone" class="form-control" type="tel" />
-            <span asp-validation-for="Phone" class="text-danger"></span>
-        </div>
+            <label for="EmergencyContactRelationship">Relationship</label>
+            <input asp-for="EmergencyContactRelationship" class="form-control" type="text" placeholder="Friend" />
+            <span asp-validation-for="EmergencyContactRelationship" class="text-danger"></span>
 
-        <div class="form-input">
-            <label for="relationship">Relationship</label>
-            <input name="relationship"
-                   id="relationship"
-                   value="@ViewBag.Relationship"
-                   class="form-control"
-                   required />
-			@Html.ValidationMessage( "relationship", "", new { @class = "text-danger" })
-
-        </div>
-
-        <div class="form-input">
-            <label asp-for="Street">Street</label>
-            <input asp-for="Street" class="form-control" />
-            <span asp-validation-for="Street" class="text-danger"></span>
-        </div>
-
-        <div class="form-input">
-            <label asp-for="City">City</label>
-            <input asp-for="City" class="form-control" />
-            <span asp-validation-for="City" class="text-danger"></span>
-        </div>
-
-        <div class="form-input">
-            <label asp-for="Province">Province</label>
-            <input asp-for="Province" class="form-control" />
-            <span asp-validation-for="Province" class="text-danger"></span>
-        </div>
-
-        <div class="form-input">
-            <label asp-for="PostalCode">Postal Code</label>
-            <input asp-for="PostalCode" class="form-control" />
-            <span asp-validation-for="PostalCode" class="text-danger"></span>
-        </div>
-
-        <div class="form-input">
-            <label asp-for="Country">Country</label>
-            <input asp-for="Country" class="form-control" />
-            <span asp-validation-for="Country" class="text-danger"></span>
         </div>
 
         <div class="form-group-btn">
@@ -84,7 +41,7 @@
 
             <button type="button"
                     class="secondary-btn"
-                    onclick="window.location.href='@Url.Action("EmergencyContacts", "SeniorProfile")'">
+                    onclick="window.location.href='@Url.Action("EmergencyContacts", "SeniorProfile", new { seniorID = ViewBag.CurrentSenior?.SeniorID })'">
                 Cancel
             </button>
         </div>
@@ -98,4 +55,31 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        applyInitialNameColors();
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInput = document.getElementById("EmergencyContactPhone");
+
+            if (!phoneInput) return;
+
+            phoneInput.addEventListener("input", function () {
+                let digits = phoneInput.value.replace(/\D/g, "").substring(0, 10);
+
+                if (digits.length > 6) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3, 6) + "-" +
+                        digits.substring(6);
+                } else if (digits.length > 3) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3);
+                } else {
+                    phoneInput.value = digits;
+                }
+            });
+        });
+    </script>
 }

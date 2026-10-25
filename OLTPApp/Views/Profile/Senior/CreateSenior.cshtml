@@ -25,7 +25,7 @@
 				<span asp-validation-for="DateOfBirth" class="text-danger"></span>
 			</div>
 			<div class="form-input">
-				<input asp-for="Person.Phone" class="form-control" type="tel" id="phoneInput1" placeholder="Phone number" />
+				<input asp-for="Person.Phone" class="form-control" type="tel" id="phone" placeholder="Phone number" />
 				<span asp-validation-for="Person.Phone" class="text-danger"></span>
 			</div>
 			<div class="form-input">
@@ -69,5 +69,28 @@
 	<script src="~/js/senior-profile.js"
 			asp-append-version="true"></script>
 	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+	<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInput = document.getElementById("phone");
 
+            if (!phoneInput) return;
+
+            phoneInput.addEventListener("input", function () {
+                let digits = phoneInput.value.replace(/\D/g, "").substring(0, 10);
+
+                if (digits.length > 6) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3, 6) + "-" +
+                        digits.substring(6);
+                } else if (digits.length > 3) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3);
+                } else {
+                    phoneInput.value = digits;
+                }
+            });
+        });
+    </script>
 }

@@ -14,43 +14,40 @@
     <link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OLTPApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-	<link rel="stylesheet"
-		  href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.1/build/css/intlTelInput.css">
-
-	<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.1/build/js/intlTelInput.min.js"></script>
 </head>
 <body>
 	@{
 		var currentUser = await UserManager.GetUserAsync(User);
 		var personID = currentUser?.PersonID;
 		var senior = ViewBag.currentSenior;
+		var selectedSeniorId = ViewBag.CurrentSenior?.SeniorID;
 	}
 	<div class="profile-wrapper">
-		@if (personID != null){
+		@if (personID != null || User.IsInRole("Admin")){
 			<div class="d-flex flex-column flex-shrink-0 p-3 bg-1 left-menu profile-page-div"
 				 style="width: 280px">
-				<a class="d-flex align-items-center mb-3 md:mb-0 md:me-auto theme-inverse text-decoration-none">
+				<a class="d-flex align-items-center mb-3 md:mb-0 md:me-auto theme-inverse text-decoration-none senior-name-home">
 					<span class="initial-name" data-name="@($"{senior.Person.FirstName}{senior.Person.LastName}")">@senior.Person.FirstName[0]@senior.Person.LastName[0]</span>
 					<span class="name">@senior.Person.FirstName @senior.Person.LastName</span>
 				</a>
 				<ul class="nav flex-column align-items-start mb-auto">
 					<li class="nav-item">
-						<a aria-current="page" asp-area="" asp-controller="SeniorProfile" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+						<a aria-current="page" asp-area="" asp-controller="SeniorProfile" asp-action="Index" asp-route-seniorID="@selectedSeniorId" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
 							Profile
 						</a>
 					</li>
 					<li>
-						<a asp-controller="SeniorProfile" asp-area="" asp-action="EmergencyContacts" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "EmergencyContacts" ? "active" : "")">
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="EmergencyContacts" asp-route-seniorID="@selectedSeniorId" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "EmergencyContacts" ? "active" : "")">
 							Emergency Contacts
 						</a>
 					</li>
 					<li>
-						<a asp-controller="SeniorProfile" asp-area="" asp-action="Medications" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Medications" ? "active" : "")">
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="Medications" asp-route-seniorID="@selectedSeniorId" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Medications" ? "active" : "")">
 							Medications
 						</a>
 					</li>
 					<li>
-						<a asp-controller="SeniorProfile" asp-area="" asp-action="Conditions" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Conditions" ? "active" : "")">
+						<a asp-controller="SeniorProfile" asp-area="" asp-action="Conditions" asp-route-seniorID="@selectedSeniorId" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Conditions" ? "active" : "")">
 							Conditions
 						</a>
 					</li>
@@ -68,6 +65,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="~/js/loading.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

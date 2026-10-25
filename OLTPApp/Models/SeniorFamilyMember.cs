@@ -9,6 +9,4 @@ public class SeniorFamilyMember
 
     public int FamilyMemberID { get; set; }
     public FamilyMember FamilyMember { get; set; } = null!;
-    [MaxLength(50)]
-    public string? Relationship { get; set; }
 }

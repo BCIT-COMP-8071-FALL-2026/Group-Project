@@ -1,14 +1,79 @@
-﻿@{
-	ViewData["Title"] = "Add Condition";
+﻿@model OLTPApp.Models.MedicalConditionItem
+
+@{
+    ViewData["Title"] = "Add Condition";
 }
 
-<div>
+@using OLTPApp.Models
 
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Add Medical Condition</span>
+    </div>
+
+    <form asp-controller="SeniorProfile"
+          asp-action="AddCondition"
+          method="post"
+          class="profile-detail-form personal-detail-form">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="seniorID"
+               value="@ViewBag.CurrentSenior.SeniorID" />
+
+        <div class="form-input">
+            <label asp-for="Name" class="control-label">Condition name</label>
+            <input asp-for="Name" class="form-control" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="DiagnosisDate" class="control-label">Date diagnosed</label>
+            <input asp-for="DiagnosisDate" type="date"
+                   class="form-control" required />
+            <span asp-validation-for="DiagnosisDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="Description" class="control-label">Description</label>
+            <textarea asp-for="Description" class="form-control"
+                      required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-input radio-input">
+            <label class="control-label">Status</label>
+            <div>
+                <input asp-for="Status" type="radio" value="Active"
+                       id="active" required />
+                <label for="active">Active</label>
+
+                <input asp-for="Status" type="radio" value="Stopped"
+                       id="stopped" />
+                <label for="stopped">Stopped</label>
+            </div>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-group-btn">
+            <button type="submit" class="primary-btn">Save</button>
+
+            <button type="button" class="secondary-btn"
+                    onclick="window.location.href='@Url.Action("Conditions", "SeniorProfile", new { seniorID = ViewBag.CurrentSenior.SeniorID })'">
+                Cancel
+            </button>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
 	<script src="~/js/senior-profile.js"
 			asp-append-version="true"></script>
-	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 
+	<script>
+		applyInitialNameColors();
+	</script>
 }

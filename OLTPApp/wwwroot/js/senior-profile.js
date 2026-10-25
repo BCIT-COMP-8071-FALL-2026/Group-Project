@@ -28,25 +28,6 @@ setFormEditable(seniorDetailForm, true);
 
 })
 
-phoneInput.addEventListener("input", function () {
-	const phoneInput = document.getElementById("phoneInput1");
-
-	if (!phoneInput) return;
-
-	const iti = window.intlTelInput(phoneInput, {
-		initialCountry: "ca",
-		separateDialCode: true,
-		nationalMode: true,
-		loadUtils: () => import(
-			"https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.1/build/js/utils.js"
-		)
-	});
-
-	phoneInput.form.addEventListener("submit", function () {
-		phoneInput.value = iti.getNumber();
-	});
-});
-
 function cancelEditPersonalInfo() {
 	personalDetailForm.querySelectorAll("input").forEach(input => {
 		input.classList.remove("edited");
@@ -112,3 +93,44 @@ function applyInitialNameColors() {
 
 // Run on initial page load
 document.addEventListener("DOMContentLoaded", applyInitialNameColors);
+document.addEventListener("DOMContentLoaded", function () {
+	const personalWrapper = document.querySelector(".personal-detail-wrapper");
+
+	if (!personalWrapper) return;
+
+	const keepEditingSenior =
+		personalWrapper.dataset.keepEditingSeniorInformation === "true";
+
+	const keepEditingPersonal =
+		personalWrapper.dataset.keepEditingPersonalInformation === "true";
+
+	if (keepEditingPersonal) {
+		const form = document.getElementById("personalDetailForm");
+
+		if (form) {
+			form.querySelectorAll("input:not([type='hidden']), textarea")
+				.forEach(field => { field.disabled = false });
+		}
+
+		document.getElementById("personalDetailsActionBtn")
+			?.classList.remove("d-none");
+
+		document.getElementById("editPersonalDetailBtn")
+			?.classList.add("d-none");
+	}
+
+	if (keepEditingSenior) {
+		const form = document.getElementById("seniorDetailForm");
+
+		if (form) {
+			form.querySelectorAll("input:not([type='hidden']), textarea")
+				.forEach(field => { field.disabled = false });
+		}
+
+		document.getElementById("seniorDetailsActionBtn")
+			?.classList.remove("d-none");
+
+		document.getElementById("editSeniorDetailBtn")
+			?.classList.add("d-none");
+	}
+});

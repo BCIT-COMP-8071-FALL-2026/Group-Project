@@ -37,6 +37,10 @@
   display: block !important;
 }
 
+.senior-name-home {
+	flex-wrap: wrap;
+}
+
 .initial-name {
 	width: 60px;
 	height: 60px;
@@ -298,4 +302,24 @@
 
 .iti.iti--allow-dropdown.iti--show-flags.iti--inline-dropdown {
 	width: 100%;
+}
+
+.activate-btn {
+	color: var(--active);
+	background: var(--active-background);
+	border-radius: 10px;
+	padding: 10px 20px 10px 20px;
+	font-size: 14px;
+	width: fit-content;
+	font-weight: 500;
+}
+
+.form-input textarea{
+	border: none;
+	border-bottom: solid 1px var(--border-color);
+	border-radius: 0px;
+}
+
+.form-input textarea:focus {
+	box-shadow: none;
 }
