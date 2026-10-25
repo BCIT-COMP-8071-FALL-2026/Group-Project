@@ -1,0 +1,591 @@
+{
+  "info": {
+    "_postman_id": "52b3fbc6-f941-41b4-b3f6-2b0ebfaeedfd",
+    "name": "Query 3 and Query 2/4: Caregiver lateness and senior outreach",
+    "description": "Tests GET /api/reports/caregiver-lateness (Query 3) and GET /api/reports/senior-outreach (Query 2/4). Field names follow the output columns of olap/sql/procs/CaregiverLateness.sql and SeniorOutreach.sql; status codes follow docs/Query1-Contract.md (v1.2).\n\nNormal run: run the collection with the \"Empty database\" and \"Database unavailable\" folders unticked. In each query folder the main GET must run before the query string request because it saves the response body for comparison.\n\nRun \"Empty database\" and \"Database unavailable\" on their own, with the API set up as described in each folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Query 3: Caregiver lateness",
+      "item": [
+        {
+          "name": "GET caregiver lateness",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let rows = [];",
+                  "try { rows = pm.response.json(); } catch (e) {}",
+                  "",
+                  "pm.test(\"Status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is JSON\", () => {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "pm.test(\"Body is a non-empty array\", () => {",
+                  "  pm.expect(rows).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// Same ordering rule as SQL Server's default case-insensitive collation",
+                  "const byName = (a, b) => a.localeCompare(b, undefined, { sensitivity: \"base\" });",
+                  "",
+                  "pm.test(\"Each row has exactly caregiverName, avgMinutesLate\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(Object.keys(r)).to.have.members([\"caregiverName\", \"avgMinutesLate\"]);",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"Field types match the procedure output\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(r.caregiverName).to.be.a(\"string\").that.is.not.empty;",
+                  "    pm.expect(r.avgMinutesLate).to.be.a(\"number\");",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"10 <= avgMinutesLate <= 60 (Late visits only, an average just over 10 rounds to 10.0), 1 decimal place\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(r.avgMinutesLate, r.caregiverName).to.be.at.least(10).and.at.most(60);",
+                  "    pm.expect(Math.abs(r.avgMinutesLate * 10 - Math.round(r.avgMinutesLate * 10)), `${r.caregiverName} has 1 dp`).to.be.below(1e-9);",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"Sorted by avgMinutesLate descending, then caregiverName\", () => {",
+                  "  for (let i = 1; i < rows.length; i++) {",
+                  "    const a = rows[i - 1], b = rows[i];",
+                  "    const ordered = a.avgMinutesLate > b.avgMinutesLate",
+                  "      || (a.avgMinutesLate === b.avgMinutesLate && byName(a.caregiverName, b.caregiverName) <= 0);",
+                  "    pm.expect(ordered, `${a.caregiverName} then ${b.caregiverName}`).to.be.true;",
+                  "  }",
+                  "});",
+                  "",
+                  "// Saved so \"GET caregiver lateness with query string (ignored)\" can compare against it",
+                  "pm.collectionVariables.set(\"q3Body\", pm.response.text());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-lateness",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-lateness"
+              ]
+            },
+            "description": "Happy path. Checks status, Content-Type, field names, field types, value ranges and sort order. Needs a star schema with at least one Late visit."
+          },
+          "response": []
+        },
+        {
+          "name": "GET caregiver lateness with query string (ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Same body as without a query string\", () => {",
+                  "  pm.expect(pm.response.json()).to.eql(JSON.parse(pm.collectionVariables.get(\"q3Body\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-lateness?caregiver=1&foo=bar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-lateness"
+              ],
+              "query": [
+                {
+                  "key": "caregiver",
+                  "value": "1"
+                },
+                {
+                  "key": "foo",
+                  "value": "bar"
+                }
+              ]
+            },
+            "description": "Query string parameters are ignored and still return 200 with the same body. Run after \"GET caregiver lateness\"."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Query 2/4: Senior outreach",
+      "item": [
+        {
+          "name": "GET senior outreach",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let rows = [];",
+                  "try { rows = pm.response.json(); } catch (e) {}",
+                  "",
+                  "pm.test(\"Status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is JSON\", () => {",
+                  "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "pm.test(\"Body is a non-empty array\", () => {",
+                  "  pm.expect(rows).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// Same ordering rule as SQL Server's default case-insensitive collation",
+                  "const byName = (a, b) => a.localeCompare(b, undefined, { sensitivity: \"base\" });",
+                  "",
+                  "const AGE_BANDS = [\"Under 65\", \"65-74\", \"75-84\", \"85+\"];",
+                  "",
+                  "pm.test(\"Each row has exactly seniorName, missedCount, serviceTypes, livesAlone, ageBand\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(Object.keys(r)).to.have.members([\"seniorName\", \"missedCount\", \"serviceTypes\", \"livesAlone\", \"ageBand\"]);",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"Field types match the procedure output\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(r.seniorName).to.be.a(\"string\").that.is.not.empty;",
+                  "    pm.expect(Number.isInteger(r.missedCount), `missedCount ${r.missedCount} is an integer`).to.be.true;",
+                  "    pm.expect(r.serviceTypes).to.be.a(\"string\").that.is.not.empty;",
+                  "    pm.expect(r.livesAlone).to.be.a(\"boolean\");",
+                  "    pm.expect(r.ageBand).to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"missedCount >= 3 and ageBand is a known band\", () => {",
+                  "  rows.forEach(r => {",
+                  "    pm.expect(r.missedCount, r.seniorName).to.be.at.least(3);",
+                  "    pm.expect(AGE_BANDS, r.seniorName).to.include(r.ageBand);",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"serviceTypes are unique and sorted\", () => {",
+                  "  rows.forEach(r => {",
+                  "    const services = r.serviceTypes.split(\", \");",
+                  "    pm.expect(new Set(services).size, `${r.seniorName} has no duplicate services`).to.equal(services.length);",
+                  "    for (let i = 1; i < services.length; i++) {",
+                  "      pm.expect(byName(services[i - 1], services[i]) < 0, `${r.seniorName}: ${services[i - 1]} then ${services[i]}`).to.be.true;",
+                  "    }",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test(\"Sorted by missedCount descending, then seniorName\", () => {",
+                  "  for (let i = 1; i < rows.length; i++) {",
+                  "    const a = rows[i - 1], b = rows[i];",
+                  "    const ordered = a.missedCount > b.missedCount",
+                  "      || (a.missedCount === b.missedCount && byName(a.seniorName, b.seniorName) <= 0);",
+                  "    pm.expect(ordered, `${a.seniorName} then ${b.seniorName}`).to.be.true;",
+                  "  }",
+                  "});",
+                  "",
+                  "// Saved so \"GET senior outreach with query string (ignored)\" can compare against it",
+                  "pm.collectionVariables.set(\"q24Body\", pm.response.text());"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outreach",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outreach"
+              ]
+            },
+            "description": "Happy path. Checks status, Content-Type, field names, field types, value ranges and sort order. Needs a star schema with at least one senior with 3+ missed visits in the 90 days before the anchor date."
+          },
+          "response": []
+        },
+        {
+          "name": "GET senior outreach with query string (ignored)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Same body as without a query string\", () => {",
+                  "  pm.expect(pm.response.json()).to.eql(JSON.parse(pm.collectionVariables.get(\"q24Body\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outreach?days=30&foo=bar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outreach"
+              ],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                },
+                {
+                  "key": "foo",
+                  "value": "bar"
+                }
+              ]
+            },
+            "description": "Query string parameters are ignored and still return 200 with the same body. Run after \"GET senior outreach\"."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative cases",
+      "description": "Bad input checks. Run with the API up and any data.\n\nMissing parameters: N/A. Neither endpoint takes parameters.",
+      "item": [
+        {
+          "name": "Bad input: caregiver lateness wrong method (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST is rejected with 405\", () => {",
+                  "  pm.response.to.have.status(405);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-lateness",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-lateness"
+              ]
+            },
+            "description": "Other methods return 405 Method Not Allowed."
+          },
+          "response": []
+        },
+        {
+          "name": "Bad input: senior outreach wrong method (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST is rejected with 405\", () => {",
+                  "  pm.response.to.have.status(405);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outreach",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outreach"
+              ]
+            },
+            "description": "Other methods return 405 Method Not Allowed."
+          },
+          "response": []
+        },
+        {
+          "name": "Bad input: caregiver lateness wrong path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Unknown path returns 404\", () => {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-latenes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-latenes"
+              ]
+            },
+            "description": "Misspelled path on purpose."
+          },
+          "response": []
+        },
+        {
+          "name": "Bad input: senior outreach wrong path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Unknown path returns 404\", () => {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outrech",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outrech"
+              ]
+            },
+            "description": "Misspelled path on purpose."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Empty database",
+      "description": "Run this folder on its own, with the API pointed at a database whose star schema has no visits.",
+      "item": [
+        {
+          "name": "Caregiver lateness empty result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Empty database returns 200 with []\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.eql([]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-lateness",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-lateness"
+              ]
+            },
+            "description": "No Late visits returns 200 OK with []."
+          },
+          "response": []
+        },
+        {
+          "name": "Senior outreach empty result",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Empty database returns 200 with []\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json()).to.eql([]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outreach",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outreach"
+              ]
+            },
+            "description": "No qualifying seniors returns 200 OK with []."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Database unavailable",
+      "description": "Run this folder on its own, with SQL Server stopped or the API's connection string pointing at a server that does not exist.",
+      "item": [
+        {
+          "name": "Caregiver lateness database unavailable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Database down returns 500\", () => {",
+                  "  pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Error does not leak internals\", () => {",
+                  "  const body = pm.response.text();",
+                  "  pm.expect(body).to.not.match(/at OlapApi\\.|StackTrace|Server=|Password=|SqlException|OdbcException/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/caregiver-lateness",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "caregiver-lateness"
+              ]
+            },
+            "description": "Database unavailable or query fails returns 500. Only checks the body does not leak a stack trace or connection string."
+          },
+          "response": []
+        },
+        {
+          "name": "Senior outreach database unavailable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Database down returns 500\", () => {",
+                  "  pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test(\"Error does not leak internals\", () => {",
+                  "  const body = pm.response.text();",
+                  "  pm.expect(body).to.not.match(/at OlapApi\\.|StackTrace|Server=|Password=|SqlException|OdbcException/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/senior-outreach",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "senior-outreach"
+              ]
+            },
+            "description": "Database unavailable or query fails returns 500. Only checks the body does not leak a stack trace or connection string."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "q3Body",
+      "value": ""
+    },
+    {
+      "key": "q24Body",
+      "value": ""
+    }
+  ]
+}
