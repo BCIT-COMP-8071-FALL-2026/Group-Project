@@ -44,3 +44,9 @@ FROM dbo.DimOrganization
 GROUP BY OrganizationID
 HAVING COUNT(*) > 1;
 GO
+-- Check duplicate dates
+SELECT DateKey, COUNT(*) AS DuplicateCount
+FROM dbo.DimDate
+GROUP BY DateKey
+HAVING COUNT(*) > 1;
+GO
