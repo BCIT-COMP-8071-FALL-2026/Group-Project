@@ -165,7 +165,7 @@ public class VisitsController : Controller
         {
             VisitID = visit.VisitID,
             SeniorName = p.FirstName + " " + p.LastName,
-            ResidentAddress = $"{p.Street}, {p.City}, {p.Country}",
+            ResidentAddress = $"{p.Street}, {p.City}, {p.Province}",
             ServiceName = visit.Service.ServiceName,
             DestinationAddress = visit.DestinationAddress,
             ScheduledStart = visit.ScheduledStart,
