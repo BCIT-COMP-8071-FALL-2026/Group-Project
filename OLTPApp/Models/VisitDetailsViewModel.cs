@@ -6,9 +6,9 @@ namespace OLTPApp.Models;
 public class VisitDetailsViewModel
 {
     [BindNever] public int VisitID { get; set; }
-    [BindNever] public string SeniorName { get; set; }
-    [BindNever] public string ResidentAddress { get; set; }
-    [BindNever] public string ServiceName { get; set; }
+    [BindNever] public string SeniorName { get; set; } = null!;
+    [BindNever] public string ResidentAddress { get; set; } = null!;
+    [BindNever] public string ServiceName { get; set; } = null!;
     [BindNever] public string? DestinationAddress { get; set; }
     [BindNever] public DateTime ScheduledStart { get; set; }
     [BindNever] public DateTime? ActualCheckIn { get; set; }
