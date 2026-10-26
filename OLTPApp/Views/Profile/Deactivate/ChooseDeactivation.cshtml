@@ -34,20 +34,6 @@
                     </div>
                 </div>
 
-                <div class="form-check mb-3">
-                    <input asp-for="ActionType" type="radio" value="Archive" id="archiveOption" class="form-check-input" />
-
-                    <div class="radio-label">
-                        <label for="archiveOption" class="form-check-label">
-                            Archive permanently
-                        </label>
-
-                        <label class="note" for="archiveOption">
-                            The account stays archived and cannot be reactivated.
-                        </label>
-                    </div>
-                </div>
-
                 <span asp-validation-for="ActionType"
                       class="text-danger"></span>
             </div>

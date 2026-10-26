@@ -13,10 +13,12 @@ namespace OLTPApp.Controllers
     public class AdminSeniorController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AdminSeniorController(ApplicationDbContext context)
+        public AdminSeniorController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
 
@@ -175,14 +177,15 @@ namespace OLTPApp.Controllers
             var senior = await _context.Senior
                 .FirstOrDefaultAsync(s => s.SeniorID == model.SeniorID);
 
+            ViewBag.senior = senior;
+
             if (senior == null)
                 return NotFound();
 
             if (senior.Status != SeniorStatus.Active)
                 return BadRequest("The senior profile is not active.");
 
-            if (model.ActionType != "Deactivate" &&
-                model.ActionType != "Archive")
+            if (model.ActionType != "Deactivate")
             {
                 ModelState.AddModelError(
                     nameof(model.ActionType),
@@ -220,8 +223,7 @@ namespace OLTPApp.Controllers
             if (senior.Status != SeniorStatus.Active)
                 return BadRequest("The senior profile is not active.");
 
-            if (actionType != "Deactivate" &&
-                actionType != "Archive")
+            if (actionType != "Deactivate")
             {
                 return BadRequest("Invalid action.");
             }
@@ -253,8 +255,7 @@ namespace OLTPApp.Controllers
             if (senior.Status != SeniorStatus.Active)
                 return BadRequest("The senior profile is not active.");
 
-            if (model.ActionType != "Deactivate" &&
-                model.ActionType != "Archive")
+            if (model.ActionType != "Deactivate")
             {
                 return BadRequest("Invalid action.");
             }
@@ -277,17 +278,28 @@ namespace OLTPApp.Controllers
             }
 
             senior.DeactivatedAt = DateTime.UtcNow;
+            senior.Status = SeniorStatus.Deactivated;
 
-            if (model.ActionType == "Deactivate")
-            {
-                senior.Status = SeniorStatus.Deactivated;
-            }
-            else
-            {
-                senior.Status = SeniorStatus.Archived;
-            }
+            // OLTP-9: future Scheduled visits are cancelled
+            var futureVisits = await _context.Visit
+                .Where(v => v.SeniorID == senior.SeniorID
+                            && v.Status == VisitStatus.Scheduled
+                            && v.ScheduledStart > DateTime.UtcNow)
+                .ToListAsync();
+            foreach (var visit in futureVisits)
+                visit.Status = VisitStatus.Cancelled;
 
             await _context.SaveChangesAsync();
+
+            // OLTP-9: a deactivated senior cannot log in (same lockout as DbSeeder)
+            var seniorUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PersonID == senior.SeniorID);
+            if (seniorUser != null)
+            {
+                var lockResult = await _userManager.SetLockoutEndDateAsync(seniorUser, DateTimeOffset.MaxValue);
+                if (!lockResult.Succeeded)
+                    return BadRequest("The senior was deactivated, but their login could not be locked.");
+            }
 
             return RedirectToAction(
                             "Index",
@@ -318,6 +330,16 @@ namespace OLTPApp.Controllers
             senior.DeactivatedAt = null;
 
             await _context.SaveChangesAsync();
+
+            // Undo the OLTP-9 lockout so the senior can log in again
+            var seniorUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PersonID == senior.SeniorID);
+            if (seniorUser != null)
+            {
+                var unlockResult = await _userManager.SetLockoutEndDateAsync(seniorUser, null);
+                if (!unlockResult.Succeeded)
+                    return BadRequest("The senior was activated, but their login could not be unlocked.");
+            }
 
             return RedirectToAction(
                             "Index",

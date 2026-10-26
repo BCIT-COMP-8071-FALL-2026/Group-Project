@@ -64,11 +64,15 @@ namespace OLTPApp.Controllers
 			var senior = await GetCurrentSeniorAsync(seniorID);
 			if (senior == null)
 			{
+				// Admins create seniors from Manage Seniors, never from this form
+				if (User.IsInRole("Admin"))
+					return NotFound();
+
 				return View("~/Views/Profile/Senior/CreateSenior.cshtml");
 			}
 
 			ViewBag.CurrentSenior = senior;
-			var seniorUser = await _userManager.Users.FirstOrDefaultAsync(u => u.PersonID == senior.Person.PersonID);
+var seniorUser = await _userManager.Users.FirstOrDefaultAsync(u => u.PersonID == senior.Person.PersonID);
 			ViewBag.SeniorEmail = seniorUser?.Email;
 			ViewBag.OriginalSeniorEmail = seniorUser?.Email;
 
@@ -287,6 +291,10 @@ namespace OLTPApp.Controllers
 			if (user == null)
 				return Challenge();
 
+			// Only a senior links their own login here; an admin would get linked to the new senior
+			if (User.IsInRole("Admin"))
+				return Forbid();
+
 			if (user.PersonID != null)
 				return RedirectToAction(nameof(Index));
 
@@ -383,7 +391,8 @@ namespace OLTPApp.Controllers
 						"Email",
 						"Email is required.");
 				}
-				else
+				// A senior added by an admin has no login, so a blank email is valid
+				else if (!string.IsNullOrWhiteSpace(newEmail))
 				{
 					if (!new EmailAddressAttribute().IsValid(newEmail))
 					{
@@ -841,7 +850,7 @@ namespace OLTPApp.Controllers
 			if (!ModelState.IsValid)
 			{
 				return View(
-					"~/Views/Profile/MedicineInvalidOperationException: The view '~/Views/Profile/Medicine/EditMedicine.cshtml' was not found. The following locations were searched:\r\n/EditMedicine.cshtml",
+					"~/Views/Profile/Medicine/EditMedicine.cshtml",
 					medication
 				);
 			}
