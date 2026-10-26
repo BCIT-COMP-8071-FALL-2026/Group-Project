@@ -30,9 +30,17 @@ describe('format', () => {
   })
 
   it('knows which month is the current one', () => {
-    const now = new Date(2026, 9, 13)
+    const now = new Date('2026-10-13T12:00:00Z')
     expect(isCurrentMonth('2026-10', now)).toBe(true)
     expect(isCurrentMonth('2026-09', now)).toBe(false)
     expect(isCurrentMonth('2025-10', now)).toBe(false)
+  })
+
+  it('uses the UTC month, like the API, near the end of a month', () => {
+    // 6 pm on Oct 31 in Vancouver is already Nov 1 in UTC.
+    expect(isCurrentMonth('2026-11', new Date('2026-10-31T18:00:00-07:00'))).toBe(true)
+    expect(isCurrentMonth('2026-10', new Date('2026-10-31T18:00:00-07:00'))).toBe(false)
+    // 12:30 am on Nov 1 in India is still Oct 31 in UTC.
+    expect(isCurrentMonth('2026-10', new Date('2026-11-01T00:30:00+05:30'))).toBe(true)
   })
 })
