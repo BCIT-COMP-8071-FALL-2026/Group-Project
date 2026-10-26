@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using OLTPApp.Services;
 
 namespace OLTPApp.Models;
 
@@ -13,11 +14,10 @@ public class VisitDetailsViewModel
     [BindNever] public DateTime ScheduledStart { get; set; }
     [BindNever] public DateTime? ActualCheckIn { get; set; }
     [BindNever] public DateTime? ActualCheckOut { get; set; }
-    [BindNever] public VisitStatus Status { get; set; }
-    [BindNever] public bool IsMissed { get; set; }
+    [BindNever] public VisitDisplayStatus Status { get; set; }
 
-    public bool CanCheckIn => Status == VisitStatus.Scheduled;
-    public bool CanCheckOut => Status == VisitStatus.InProgress;
+    public bool CanCheckIn => Status == VisitDisplayStatus.Scheduled;
+    public bool CanCheckOut => Status == VisitDisplayStatus.InProgress;
 
     [BindNever] public List<NoteItem> Notes { get; set; } = new();
 

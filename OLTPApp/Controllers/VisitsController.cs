@@ -216,8 +216,7 @@ public class VisitsController : Controller
             ActualCheckOut = visit.ActualCheckOut.HasValue
                         ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckOut.Value, DateTimeKind.Utc), VancouverTz)
                         : null,
-            Status = visit.Status,
-            IsMissed = VisitStatusHelper.GetDisplayStatus(visit) == VisitDisplayStatus.Missed,
+            Status = VisitStatusHelper.GetDisplayStatus(visit),
             Notes = notes
         };
     }

@@ -1,17 +1,17 @@
+@using OLTPApp.Services
 @model VisitDetailsViewModel
 @{
     ViewData["Title"] = "Visit Details";
 }
 
 @{
-    var (statusClass, statusLabel) = Model.IsMissed
-        ? ("status-missed", "Missed")
-        : Model.Status switch
+    var (statusClass, statusLabel) = Model.Status switch
         {
-            VisitStatus.Scheduled => ("status-scheduled", "Scheduled"),
-            VisitStatus.InProgress => ("status-inprogress", "In Progress"),
-            VisitStatus.Completed => ("status-completed", "Completed"),
-            VisitStatus.Cancelled => ("status-cancelled", "Cancelled"),
+            VisitDisplayStatus.Scheduled => ("status-scheduled", "Scheduled"),
+            VisitDisplayStatus.InProgress => ("status-inprogress", "In Progress"),
+            VisitDisplayStatus.Completed => ("status-completed", "Completed"),
+            VisitDisplayStatus.Cancelled => ("status-cancelled", "Cancelled"),
+            VisitDisplayStatus.Missed => ("status-missed", "Missed"),
             _ => ("status-scheduled", Model.Status.ToString())
         };
 }
@@ -19,10 +19,10 @@
 @{
     var checkHeading = Model.Status switch
     {
-        VisitStatus.Scheduled => "Not Checked In",
-        VisitStatus.InProgress => "Checked In",
-        VisitStatus.Completed => "Checked Out",
-        VisitStatus.Cancelled => "Visit Cancelled",
+        VisitDisplayStatus.Scheduled => "Not Checked In",
+        VisitDisplayStatus.InProgress => "Checked In",
+        VisitDisplayStatus.Completed => "Checked Out",
+        VisitDisplayStatus.Cancelled => "Visit Cancelled",
         _ => ""
     };
 }
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        @if (Model.IsMissed)
+        @if (Model.Status == VisitDisplayStatus.Missed)
         {
             <div class="text-danger fw-semibold small">
                 @(Model.ActualCheckIn == null
