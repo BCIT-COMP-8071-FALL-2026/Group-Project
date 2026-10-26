@@ -4,64 +4,440 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-5">
+            <div>
+                <div class="text-center mb-4">
+                    <h3 class="active-text">Senior Portal</h3>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
                     <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+                        <p class="text-start m-1 fw-bold">Step 1 of 4</p>
+                        <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="25"
+                                aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width: 25%"></div>
+                        </div>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
+                </div>
+                
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div id="registerErrors" asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    @* Step 1 *@
+                    <div class="form-step" data-step="1">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Create your account</h1>
+                            <p class="text-muted mb-0">Start with the basics, it takes about 2 minutes.</p>
+                        </div>
+
+                        <div class="d-flex gap-3 mb-3">
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input type="radio"
+                                    class="form-check-input mt-0"
+                                    id="roleSenior"
+                                    value="Senior"
+                                    asp-for="Input.AccountType"
+                                    checked>
+                                Senior
+                            </label>
+
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input type="radio" 
+                                    class="form-check-input mt-0" 
+                                    id="roleFamily"
+                                    value="Family"
+                                    asp-for="Input.AccountType">
+                                Family member
+                            </label>
+
+                            <label class="custom-rounded p-3 flex-fill d-flex align-items-center gap-2 bg-white">
+                                <input type="radio" 
+                                    class="form-check-input mt-0" 
+                                    id="roleStaff"
+                                    value="Staff"
+                                    asp-for="Input.AccountType">
+                                Staff
+                            </label>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="email"
+                                    class="register-input"
+                                    id="email"
+                                    placeholder="Email"
+                                    aria-label="Email"
+                                    autocomplete="email"
+                                    asp-for="Input.Email"
+                                    required>
+                            <hr class="m-0 mx-3 opacity-25">
+                            <input type="password"
+                                    class="register-input"
+                                    id="password"
+                                    placeholder="Password"
+                                    aria-label="Password"
+                                    autocomplete="new-password"
+                                    asp-for="Input.Password"
+                                    required>
+                            <hr class="m-0 mx-3 opacity-25">
+                            <input type="password"
+                                    class="register-input"
+                                    id="confirmPassword"
+                                    placeholder="Confirm Password"
+                                    aria-label="Confirm Password"
+                                    autocomplete="new-password"
+                                    asp-for="Input.ConfirmPassword"
+                                    required>
+                            
+                            <div class="px-1">
+                                <span asp-validation-for="Input.Email" class="text-danger small d-block"></span>
+                                <span asp-validation-for="Input.Password" class="text-danger small d-block"></span>
+                                <span asp-validation-for="Input.ConfirmPassword"
+                                      class="text-danger small d-block"></span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary custom-rounded w-100" id="continueBtn1" onclick="nextStep()">
+                            Continue
+                        </button>
+                    </div>
+
+                    @* Step 2 *@
+                    <div class="form-step d-none" data-step="2">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">About You</h1>
+                            <p class="text-muted mb-0">Tell us who you are.</p>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text"
+                                    class="register-input"
+                                    id="firstName"
+                                    placeholder="First name"
+                                    aria-label="First name"
+                                    autocomplete="given-name"
+                                    asp-for="Input.FirstName"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="middleName"
+                                    placeholder="Middle name (optional)"
+                                    aria-label="Middle name"
+                                    autocomplete="additional-name"
+                                    asp-for="Input.MiddleName">
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="lastName"
+                                    placeholder="Last name"
+                                    aria-label="Last name"
+                                    autocomplete="family-name"
+                                    asp-for="Input.LastName"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="tel"
+                                    class="register-input"
+                                    id="phoneNumber"
+                                    placeholder="Phone number"
+                                    aria-label="Phone number"
+                                    autocomplete="tel"
+                                    asp-for="Input.Phone"
+                                    required>
+                            
+                            <div id="seniorFields">
+                                <hr class="m-0 mx-3 opacity-25">
+
+                                <label for="birthday" class="d-block px-4 pt-3 mb-0 text-muted">Birthday</label>
+                                <input type="date"
+                                        class="register-input"
+                                        id="birthday"
+                                        autocomplete="bday"
+                                        asp-for="Input.Birthday"
+                                        required>
+                                
+                                <hr class="m-0 mx-3 opacity-25">
+
+                                <div class="px-3 py-3">
+                                    <p id="livingAloneLabel" class="mb-2 text-muted">Do you live alone?</p>
+                                    <div class="d-flex gap-4" role="radiogroup" aria-labelledby="livingAloneLabel">
+                                        <label class="d-flex align-items-center gap-2">
+                                            <input type="radio" class="form-check-input mt-0" id="livingAloneYes"
+                                                value="true" asp-for="Input.IsLivingAlone" required>
+                                            Yes
+                                        </label>
+
+                                        <label class="d-flex align-items-center gap-2">
+                                            <input type="radio" class="form-check-input mt-0" id="livingAloneNo"
+                                                value="false" asp-for="Input.IsLivingAlone">
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-1 mb-3">
+                            <span asp-validation-for="Input.FirstName" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.LastName" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Phone" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Birthday" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.IsLivingAlone" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn2"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn2"
+                                    onclick="nextStep()">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Step 3 *@
+                    <div class="form-step d-none" data-step="3">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Your Address</h1>
+                            <p class="text-muted mb-0">This helps your care team reach you.</p>
+                        </div>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text"
+                                    class="register-input"
+                                    id="streetAddress"
+                                    placeholder="Street address"
+                                    aria-label="Street address"
+                                    autocomplete="address-line1"
+                                    asp-for="Input.Street"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="city"
+                                    placeholder="City"
+                                    aria-label="City"
+                                    autocomplete="address-level2"
+                                    asp-for="Input.City"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="province"
+                                    placeholder="Province / State / Region"
+                                    aria-label="Province / State / Region"
+                                    autocomplete="address-level1"
+                                    asp-for="Input.Province"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="postalCode"
+                                    placeholder="Postal Code"
+                                    aria-label="Postal Code"
+                                    autocomplete="postal-code"
+                                    asp-for="Input.PostalCode"
+                                    required>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text"
+                                    class="register-input"
+                                    id="country"
+                                    placeholder="Country"
+                                    aria-label="Country"
+                                    autocomplete="country-name"
+                                    asp-for="Input.Country"
+                                    required>
+                        </div>
+
+                        <div class="px-1 mb-3">
+                            <span asp-validation-for="Input.Street" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.City" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Province" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.PostalCode" class="text-danger small d-block"></span>
+                            <span asp-validation-for="Input.Country" class="text-danger small d-block"></span>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn3"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn3"
+                                    onclick="nextStep()">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+
+                    @* Step 4 *@
+                    <div class="form-step d-none" data-step="4">
+                        <div class="text-center mb-4">
+                            <h1 class="fw-bold fs-2 mb-1">Insurance</h1>
+                            <p class="text-muted mb-0">
+                                Not implemented yet. This feature will be available in a future update.
                             </p>
                         </div>
-                    </form>
-                }
-            }
-        </section>
+
+                        <div class="card border-0 custom-rounded overflow-hidden mb-3">
+                            <input type="text" class="register-input" id="insuranceCompany" name="InsuranceCompany"
+                                   placeholder="Insurance company (optional)" aria-label="Insurance company"
+                                   autocomplete="organization" disabled>
+
+                            <hr class="m-0 mx-3 opacity-25">
+
+                            <input type="text" class="register-input" id="insuranceAccountNumber"
+                                   name="InsuranceAccountNumber" placeholder="Insurance account number (optional)"
+                                   aria-label="Insurance account number" autocomplete="off" disabled>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn4"
+                                    onclick="previousStep()">
+                                Back
+                            </button>
+
+                            <button type="submit" class="btn btn-primary custom-rounded py-2 w-50" id="submitBtn"
+                                    onclick="return showFirstInvalidStep()">
+                                Create account
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach(element => {
+                element.classList.toggle(
+                    'd-none',
+                    Number(element.dataset.step) !== step
+                );
+            });
+
+            document.querySelector('.progress-bar').style.width =
+                `${(step / totalSteps) * 100}%`;
+
+            document.querySelector('.progress-bar').parentElement
+                .setAttribute('aria-valuenow', (step / totalSteps) * 100);
+
+            document.querySelector('p.text-start').textContent =
+                `Step ${step} of ${totalSteps}`;
+
+            currentStep = step;
+        }
+
+        function stepElement(step) {
+            return document.querySelector(`.form-step[data-step="${step}"]`);
+        }
+
+        // Shows the message for the first invalid input on the visible step
+        function isCurrentStepValid() {
+            const inputs = stepElement(currentStep).querySelectorAll(
+                'input, select, textarea'
+            );
+
+            for (const input of inputs) {
+                if (!$(input).valid()) {
+                    input.focus();
+                    return false;
+                }
+
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function nextStep() {
+            if (isCurrentStepValid() && currentStep < totalSteps) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        // jQuery validate skips hidden steps, so check earlier steps before submitting
+        // (e.g. passwords are cleared after a server error)
+        function showFirstInvalidStep() {
+            for (let step = 1; step < totalSteps; step++) {
+                const inputs = stepElement(step).querySelectorAll('input:not(:disabled)');
+
+                if ([...inputs].some(input => !input.checkValidity())) {
+                    showStep(step);
+                    isCurrentStepValid();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function updateAccountType() {
+            const selected = document.querySelector('input[name="Input.AccountType"]:checked');
+            const isSenior = selected?.value === 'Senior';
+            const seniorFields = document.getElementById('seniorFields');
+
+            seniorFields.classList.toggle('d-none', !isSenior);
+            seniorFields.querySelectorAll('input').forEach(input => input.disabled = !isSenior);
+        }
+
+        document.querySelectorAll('input[name="Input.AccountType"]')
+            .forEach(radio => radio.addEventListener('change', updateAccountType));
+
+        updateAccountType();
+
+        // Enter moves to the next step instead of submitting the whole form early
+        document.getElementById('registerForm').addEventListener('keydown', event => {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && currentStep < totalSteps) {
+                event.preventDefault();
+                nextStep();
+            }
+        });
+
+        // After a server error, open the step that shows it
+        const serverError = document.querySelector('.form-step .field-validation-error');
+        if (serverError) {
+            showStep(Number(serverError.closest('.form-step').dataset.step));
+        }
+
+        // Clearing an error on blur moves Continue up mid-click, so the click misses.
+        // Errors still clear on Continue and on typing. Runs on ready, after unobtrusive sets up the validator.
+        $(() => {
+            $('#registerForm').validate().settings.onfocusout = false;
+        });
+    </script>
 }

@@ -1,27 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchMissedVisitsByMonth, type MissedVisitsMonth } from '../api/missedVisits'
 
-export type MissedVisitsState =
+export type ReportState<T> =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; months: MissedVisitsMonth[]; loadedAt: Date }
+  | { status: 'ready'; rows: T[]; loadedAt: Date }
 
-export function useMissedVisitsByMonth() {
-  const [state, setState] = useState<MissedVisitsState>({ status: 'loading' })
+/** Loads a report's rows, with a retry for when the API call fails. `fetchRows` must be a stable function. */
+export function useReport<T>(fetchRows: (signal: AbortSignal) => Promise<T[]>) {
+  const [state, setState] = useState<ReportState<T>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
 
-    fetchMissedVisitsByMonth(controller.signal)
-      .then((months) => setState({ status: 'ready', months, loadedAt: new Date() }))
+    fetchRows(controller.signal)
+      .then((rows) => setState({ status: 'ready', rows, loadedAt: new Date() }))
       .catch((error: unknown) => {
         if (controller.signal.aborted) return
         setState({ status: 'error', message: error instanceof Error ? error.message : String(error) })
       })
 
     return () => controller.abort()
-  }, [attempt])
+  }, [fetchRows, attempt])
 
   const retry = useCallback(() => {
     setState({ status: 'loading' })
