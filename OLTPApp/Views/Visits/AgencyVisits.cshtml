@@ -1,3 +1,4 @@
+@using OLTPApp.Services
 @model AgencyVisitsViewModel
 @{
     ViewData["Title"] = "Agency Visits";
@@ -30,12 +31,21 @@
             <tbody>
                 @foreach (var visit in Model.Visits)
                 {
+                    var (statusClass, statusLabel) = visit.Status switch
+                    {
+                        VisitDisplayStatus.Scheduled => ("status-scheduled", "Scheduled"),
+                        VisitDisplayStatus.InProgress => ("status-inprogress", "In Progress"),
+                        VisitDisplayStatus.Completed => ("status-completed", "Completed"),
+                        VisitDisplayStatus.Cancelled => ("status-cancelled", "Cancelled"),
+                        VisitDisplayStatus.Missed => ("status-missed", "Missed"),
+                        _ => ("status-scheduled", visit.Status.ToString())
+                    };
                     <tr>
                         <td>@visit.ScheduledStart.ToString("MMM d, h:mm tt")</td>
                         <td>@visit.SeniorName</td>
                         <td>@visit.CaregiverName</td>
                         <td>@visit.ServiceName</td>
-                        <td>@visit.Status</td>
+                        <td><span class="status-badge @statusClass">@statusLabel</span></td>
                     </tr>
                 }
             </tbody>
