@@ -198,6 +198,8 @@ public class VisitsController : Controller
             r.Author,
             r.NoteText)).ToList();
 
+        var cutoff = visit.ScheduledStart.AddMinutes(60);
+
         return new VisitDetailsViewModel
         {
             VisitID = visit.VisitID,
@@ -214,7 +216,8 @@ public class VisitsController : Controller
                         : null,
             Status = visit.Status,
             IsMissed = visit.Status != VisitStatus.Cancelled
-                        && DateTime.UtcNow > visit.ScheduledStart.AddMinutes(60),
+                        && DateTime.UtcNow > cutoff
+                        && (visit.ActualCheckIn == null || visit.ActualCheckIn > cutoff),
             Notes = notes
         };
     }
