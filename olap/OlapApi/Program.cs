@@ -24,6 +24,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
     options.AddPolicy(ClientCorsPolicy, policy => policy.WithOrigins(allowedOrigins).AllowAnyHeader().WithMethods("GET")));
 builder.Services.AddSingleton<IReportRepository>(new OdbcReportRepository(connectionString));
+builder.Services.AddSingleton<IEtlRepository>(new OdbcEtlRepository(connectionString));
 
 var app = builder.Build();
 
