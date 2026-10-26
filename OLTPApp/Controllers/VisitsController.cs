@@ -186,8 +186,6 @@ public class VisitsController : Controller
         if (visit == null)
             return null;
 
-        visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz);
-
         var p = visit.Senior.Person;
         var rows = await _db.VisitNote
             .Where(n => n.Visit.SeniorID == visit.SeniorID)
@@ -207,11 +205,15 @@ public class VisitsController : Controller
             ResidentAddress = $"{p.Street}, {p.City}, {p.Province}",
             ServiceName = visit.Service.ServiceName,
             DestinationAddress = visit.DestinationAddress,
-            ScheduledStart = visit.ScheduledStart,
-            ActualCheckIn = visit.ActualCheckIn,
-            ActualCheckOut = visit.ActualCheckOut,
+            ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz),
+            ActualCheckIn = visit.ActualCheckIn.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckIn.Value, DateTimeKind.Utc), VancouverTz)
+                        : null,
+            ActualCheckOut = visit.ActualCheckOut.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckOut.Value, DateTimeKind.Utc), VancouverTz)
+                        : null,
             Status = visit.Status,
-            IsMissed = visit.Status == VisitStatus.Scheduled
+            IsMissed = visit.Status != VisitStatus.Cancelled
                         && DateTime.UtcNow > visit.ScheduledStart.AddMinutes(60),
             Notes = notes
         };
