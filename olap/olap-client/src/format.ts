@@ -62,7 +62,11 @@ export function formatDateTime(date: Date): string {
   return dateTime.format(date)
 }
 
-/** Whether a yyyy-MM month is the current calendar month, i.e. its numbers are still growing. */
+/**
+ * Whether a yyyy-MM month is the current month, i.e. its numbers are still growing. The API groups visits
+ * by UTC month (docs/Query1-Contract.md), so this uses UTC too; local time picks the wrong month for the
+ * hours around midnight at the end of a month.
+ */
 export function isCurrentMonth(month: string, now = new Date()): boolean {
-  return month === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  return month === `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`
 }
