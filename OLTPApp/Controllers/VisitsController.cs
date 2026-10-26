@@ -104,17 +104,17 @@ public class VisitsController : Controller
         var agencyId = await GetManagerAgencyIdAsync();
         if (agencyId == null)
             return Forbid();
-        
+
         var agencyName = await _db.Agency
             .Where(a => a.AgencyID == agencyId)
             .Select(a => a.Name)
             .SingleAsync();
-    
+
         // Bound page number within available range
         var totalCount = await _db.Visit.CountAsync(v => v.AgencyID == agencyId.Value);
         var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
         page = Math.Clamp(page, 1, totalPages);
-        
+
         var agencyVisits = await _db.Visit
             .Where(v => v.AgencyID == agencyId.Value)
             .OrderByDescending(v => v.ScheduledStart).ThenByDescending(v => v.VisitID)
@@ -131,10 +131,9 @@ public class VisitsController : Controller
             })
             .ToListAsync();
 
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Vancouver");
         foreach (var visit in agencyVisits)
-            visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), timeZone);
-        
+            visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz);
+
         return View(new AgencyVisitsViewModel
         {
             AgencyName = agencyName,
