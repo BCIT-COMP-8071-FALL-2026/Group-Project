@@ -1,0 +1,37 @@
+@model List<AgencyVisitListItem>
+@{
+    ViewData["Title"] = "Agency Visits";
+}
+
+<h1>Agency Visits</h1>
+
+@if (Model.Count == 0)
+{
+    <p>There are no upcoming visits.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Senior Name</th>
+                <th scope="col">Caregiver Name</th>
+                <th scope="col">Appointment Type</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var visit in Model)
+            {
+                <tr>
+                    <td>@visit.ScheduledStart.ToString("MMM d, h:mm tt")</td>
+                    <td>@visit.SeniorName</td>
+                    <td>@visit.CaregiverName</td>
+                    <td>@visit.ServiceName</td>
+                    <td>@visit.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

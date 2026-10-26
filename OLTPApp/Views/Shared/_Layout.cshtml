@@ -45,6 +45,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Visits" asp-action="Schedule">Schedule visit</a>
                             </li>
+                            <li>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Visits" asp-action="AgencyVisits">Agency visits</a>
+                            </li>
                         }
                         @if (User.IsInRole(RoleNames.Admin))
                         {
