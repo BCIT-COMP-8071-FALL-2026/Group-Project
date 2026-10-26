@@ -1,6 +1,6 @@
 # Senior Care Management - Seed Specification
 
-Draft, 2026-10-16; updated 2026-10-24 for the OLTP seed (#56). Aligned with the merged ERD, [OLAP_Queries.md](../OLAP_Queries.md) and [Query1-Contract.md](../Query1-Contract.md). Where it conflicts, the user stories, ERD, OLAP_Queries.md and Query1-Contract.md win.
+Draft, 2026-10-16; updated 2026-10-24 for the OLTP seed (#56) and 2026-10-25 to match the seeder on develop. Aligned with the merged ERD, [OLAP_Queries.md](../OLAP_Queries.md) and [Query1-Contract.md](../Query1-Contract.md). Where it conflicts, the user stories, ERD, OLAP_Queries.md and Query1-Contract.md win.
 
 Source: `Senior Care Management - Seed Specification.xlsx`
 
@@ -14,10 +14,10 @@ Source: `Senior Care Management - Seed Specification.xlsx`
 | Caregivers | 30 |
 | Agencies | 8 |
 | Services | 3 |
-| Visits | 3000 history visits, plus 14 demo visits for the OLTP screens |
+| Visits | 3000 history visits, plus 14 demo visits for the OLTP screens (3,014 Visit rows in total) |
 | Date range | Relative to seed time (UTC): the 15 months from the 1st of the month 14 months back, ending 4 hours before seed time. The current month is partial. |
-| Referential integrity | Every Visit references an existing Senior, Caregiver, Service and Agency. Visit.AgencyID equals the caregiver's AgencyID at scheduling. |
-| Source definitions | Business rules from OLAP_Queries.md and Query1-Contract.md: missed, late, completed, missed percentage, age bands at the anchor date, and the Query 4 window of 90 days before the anchor date. |
+| Referential integrity | Every Visit references an existing Senior, Caregiver, Service and Agency. Visit.AgencyID equals the caregiver's AgencyID at scheduling. Missed and not yet due are computed by the OLAP queries at run time, not stored. |
+| Source definitions | Business rules from OLAP_Queries.md and Query1-Contract.md: missed, late, completed, missed percentage, age bands at the anchor date, and the Query 4 window of 90 days before the anchor date. Implementation: OLTPApp/Data/DbSeeder.History.cs and DbSeeder.cs, the OLTP models and migrations, and the OLAP DDL and query procedures. |
 
 ## Entity Counts
 
@@ -29,7 +29,7 @@ Source: `Senior Care Management - Seed Specification.xlsx`
 | Agency Manager | 8 | One per agency; a Person row, an AgencyManager row (AgencyManagerID = PersonID, AgencyID), and a user account in the Agency Manager role linked by PersonID. | Required by OLTP-18 |
 | Person | 191 | One per senior, caregiver and Agency Manager (150 + 30 + 8), plus 2 Family Members and 1 Staff login without a role. Senior.SeniorID and Caregiver.CaregiverID equal Person.PersonID. Each has FirstName, LastName, Street, City, Province, Country, PostalCode and Phone. | Required relationship |
 | Service | 3 | Doctor, Home visit, Bathing (OLTP-16); every visit ServiceID must match. | Required by OLTP-16 |
-| Visit | 3000 + 14 | Unique VisitID; exactly one fact row per visit. The 14 demo visits belong to the 6 demo seniors (S145-S150) and the demo caregivers C028-C029. | Proposed synthetic count |
+| Visit | 3000 + 14 | Unique VisitID; exactly one fact row per visit. The 14 demo visits belong to the 6 demo seniors (S145-S150) and the demo caregivers C028-C029. | Implemented seed count |
 | Senior–Visit | n/a | Visits distributed across seniors; exactly five seniors (S001-S005) have 3+ misses in the 90 days before the anchor date. | Required test pattern |
 | Caregiver–Agency | n/a | Every caregiver has a valid AgencyID and agencies have multiple caregivers where possible. | Required relationship |
 | Visit-Agency | n/a | Every visit's AgencyID equals its caregiver's AgencyID at scheduling. | Required relationship |
@@ -73,7 +73,7 @@ The months below map in order onto the 15 months ending at seed time (2025-01 is
 
 | Topic | Specification | Coverage target | Notes / approval |
 |---|---|---|---|
-| Age bands | Generate DateOfBirth values so age at the anchor date spans Under 65, 65-74, 75-84, and 85+. | All four bands represented | The query computes the band at the anchor date (OLAP_Queries.md). |
+| Age bands | Generate DateOfBirth values so age at the anchor date spans Under 65, 65-74, 75-84, and 85+. | All four bands represented | The query computes the band at the anchor date (OLAP_Queries.md). The seeder draws ages from 58-64, 65-74, 75-84 and 85-96 (HistoryAgeBands); 58-64 falls in Under 65. |
 | Living arrangement | Set IsLivingAlone = true for a meaningful subset and false for the remainder. | Both values represented | Exact percentage is proposed and should be agreed by group. |
 | Caregiver assignment | Distribute 30 caregivers across 8 agencies. | All agencies represented | Some caregivers should have higher late rates, and at least one has no Late visits, for Query 3. |
 | Service mix | Use all 3 services (Doctor, Home visit, Bathing) with varied visit volumes. | All services represented | Seeded names per OLTP-16. |
