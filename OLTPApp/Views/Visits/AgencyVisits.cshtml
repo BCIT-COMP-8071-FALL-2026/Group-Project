@@ -13,7 +13,7 @@
 
     @if (Model.TotalCount == 0)
     {
-        <p>There are no upcoming visits.</p>
+        <p>There are no visits for your agency yet.</p>
     }
     else
     {
@@ -60,7 +60,7 @@
                                 <a class="page-link" asp-action="AgencyVisits" asp-route-page="@pageNum">@pageNum</a>
                             </li>
                         }
-                        <li class="page-item">
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                             <a class="page-link" asp-action="AgencyVisits" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
                         </li>
                         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
