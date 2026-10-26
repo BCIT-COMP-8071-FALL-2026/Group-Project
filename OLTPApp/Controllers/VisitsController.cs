@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
+using OLTPApp.Services;
 using System.Security.Claims;
 
 namespace OLTPApp.Controllers;
@@ -216,9 +217,7 @@ public class VisitsController : Controller
                         ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckOut.Value, DateTimeKind.Utc), VancouverTz)
                         : null,
             Status = visit.Status,
-            IsMissed = visit.Status != VisitStatus.Cancelled
-                        && DateTime.UtcNow > cutoff
-                        && (visit.ActualCheckIn == null || visit.ActualCheckIn > cutoff),
+            IsMissed = VisitStatusHelper.GetDisplayStatus(visit) == VisitDisplayStatus.Missed,
             Notes = notes
         };
     }
