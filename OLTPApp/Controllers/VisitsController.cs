@@ -102,6 +102,11 @@ public class VisitsController : Controller
         if (agencyId == null)
             return Forbid();
         
+        var agencyName = await _db.Agency
+            .Where(a => a.AgencyID == agencyId)
+            .Select(a => a.Name)
+            .SingleAsync();
+        
         var agencyVisits = await _db.Visit
             .Where(v => v.Caregiver.AgencyID == agencyId)
             .OrderByDescending(v => v.ScheduledStart)
@@ -120,7 +125,7 @@ public class VisitsController : Controller
         foreach (var visit in agencyVisits)
             visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), timeZone);
         
-        return View(agencyVisits);
+        return View(new AgencyVisitsViewModel { AgencyName = agencyName, Visits = agencyVisits });
     }
 
     [HttpGet]
