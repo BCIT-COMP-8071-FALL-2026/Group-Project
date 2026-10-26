@@ -1,23 +1,30 @@
 # OLAP app
 
-The OLAP app shows Query 1 (missed visits per month) as a Chart.js line chart and a table, with a print button.
-The React client calls an ASP.NET Core Web API, and the API runs the Query 1 stored procedure over ODBC.
-The procedure and the JSON it becomes are defined in the [Query 1 contract](../docs/Query1-Contract.md).
+The OLAP app gives agency managers three reports, each with its own Print button:
+
+| Report | Address | Query | What it shows |
+|---|---|---|---|
+| Missed visits | `#/missed-visits` (home) | 1 | Line chart of successful and missed visits per month, and the same months as a table (OLAP-1) |
+| Late check-ins | `#/late-check-ins` | 3 | Bar chart of average minutes late per caregiver, with a table view of the same values (OLAP-2) |
+| Outreach list | `#/outreach` | 2 and 4 | Seniors with 3 or more missed visits in the last 90 days, with lives alone and age band (OLAP-3) |
+
+The React client calls an ASP.NET Core Web API, and the API runs the report stored procedures in `sql/procs` over ODBC.
+The queries are defined in [OLAP_Queries.md](../docs/OLAP_Queries.md), and Query 1's procedure and JSON in the [Query 1 contract](../docs/Query1-Contract.md).
 
 ## Layout
 
 | Path | What it is |
 |---|---|
-| `OlapApi/` | ASP.NET Core Web API (.NET 9) exposing `GET /api/reports/missed-visits-by-month` |
+| `OlapApi/` | ASP.NET Core Web API (.NET 9) with the three report endpoints under `/api/reports` |
 | `OlapApi.Tests/` | xUnit tests for the JSON contract, CORS and the ODBC call |
-| `olap-client/` | React + TypeScript + Vite client with the chart, the table and printing |
+| `olap-client/` | React + TypeScript + Vite client with the three reports and printing |
 | `Olap.slnx` | Solution containing the two .NET projects |
 
 ## Prerequisites
 
 - .NET 9 SDK
 - Node.js 22.13+ or 24+ (LTS) and npm
-- A SQL Server OLAP database that has `dbo.usp_MissedVisitsByMonth`
+- A SQL Server OLAP database (`OlapDW`) with the report procedures from `sql/procs`
 - [ODBC Driver 18 for SQL Server](https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server) to run the API (Microsoft's page covers Windows, macOS and Linux)
 
 ## Configuration
@@ -67,8 +74,9 @@ The dev server always uses port 5173, because that is the origin the API allows 
 
 ## Printing
 
-The Print button (or Ctrl+P / Cmd+P) prints only the report: the navigation and the button are hidden, and the chart is redrawn to fit the page.
-The seed data's 15 months fit on one Letter portrait page (OLAP-4), and table rows are never split across pages.
+The Print button (or Ctrl+P / Cmd+P) prints only the open report: the navigation and the controls are hidden, and the chart is redrawn to fit the page.
+With the seed data, each report fits on one Letter portrait page (OLAP-4), including the late check-ins report in either its chart or its table view.
+Table rows are never split across pages.
 
 ## Test and lint
 
@@ -95,14 +103,13 @@ In PowerShell, run `$env:OLAP_TEST_SQLSERVER = '...'` first.
 
 ## API
 
-`GET /api/reports/missed-visits-by-month` takes no parameters and returns one object per month, oldest first:
-
-```json
-[
-  { "month": "2025-01", "visitCount": 4, "missedCount": 1, "missedPercent": 25.0 },
-  { "month": "2025-02", "visitCount": 3, "missedCount": 2, "missedPercent": 66.7 }
-]
-```
-
+Each endpoint takes no parameters and returns a JSON array, in the order the report shows it.
 A query string is ignored, other methods get `405`, and a failed database call gets a `500` whose details stay in the API's log.
-See the [Query 1 contract](../docs/Query1-Contract.md) for the full definition.
+
+| Endpoint | Procedure | Each object |
+|---|---|---|
+| `GET /api/reports/missed-visits-by-month` | `dbo.usp_MissedVisitsByMonth` | `{ "month": "2025-01", "visitCount": 4, "missedCount": 1, "missedPercent": 25.0 }`, oldest month first |
+| `GET /api/reports/caregiver-lateness` | `dbo.usp_CaregiverLateness` | `{ "caregiverName": "Aisha Khan", "avgMinutesLate": 53.6 }`, most late first |
+| `GET /api/reports/senior-outreach` | `dbo.usp_SeniorOutreach` | `{ "seniorName": "Dorothy Fleming", "missedCount": 3, "serviceTypes": "Bathing, Doctor, Home visit", "livesAlone": true, "ageBand": "Under 65" }`, most missed first |
+
+See the [Query 1 contract](../docs/Query1-Contract.md) for the full definition of Query 1, and the procedures in `sql/procs` for Queries 2 to 4.
