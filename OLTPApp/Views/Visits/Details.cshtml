@@ -35,7 +35,7 @@
 </div>
 
 @* Details section *@
-<div class="row mt-4">
+<div class="row mt-2 g-3">
     <div class="col-md-6">
         <div class="text-muted small">Scheduled start</div>
         <div class="fw-semibold mb-3">@Model.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</div>
@@ -51,7 +51,7 @@
 </div>
 
 @* Check in / Check out section *@
-<div class="row mt-4 mx-1 py-2 rounded gap-2" style="background-color: #e4edfe">
+<div class="d-flex flex-column mt-4 p-3 rounded gap-3" style="background-color: #e4edfe">
     <div class="fw-semibold">@checkHeading</div>
 
     <div class="d-flex gap-2">
@@ -64,16 +64,25 @@
         </form>
     </div>
 
-    <div class="d-flex gap-5">
+    <div class="d-flex gap-5 p-0">
         <div>
                 <div class="text-muted small">Checked in at</div>
-                <div class="fw-semibold mb-3">@(Model.ActualCheckIn?.ToString("h:mm tt") ?? "--")</div>
+                <div class="fw-semibold">@(Model.ActualCheckIn?.ToString("h:mm tt") ?? "--")</div>
         </div>
         <div>
             <div class="text-muted small">Checked out at</div>
             <div class="fw-semibold">@(Model.ActualCheckOut?.ToString("h:mm tt") ?? "--")</div>
         </div>
     </div>
+
+    @if (Model.IsMissed)
+    {
+        <div class="text-danger fw-semibold small">
+            @(Model.ActualCheckIn == null
+                ? "This visit is marked Missed because no check-in was recorded within 60 minutes of the scheduled start. You can still check in to log it."
+                : "This visit is marked Missed because check-in happened more than 60 minutes after the scheduled start.")
+        </div>
+    }
 </div>
 
 @* Add notes section *@

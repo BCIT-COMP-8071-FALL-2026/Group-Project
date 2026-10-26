@@ -6,8 +6,7 @@
     font-weight: 400;
 }
 
-.status-missed,
-.status-cancelled {
+.status-missed {
     background: #fcb3ad;
     color: #ca1b1e;
 }
@@ -28,6 +27,8 @@
 }
 
 .status-cancelled {
+    background: #9b9ba0;
+    color: #fff;
     text-decoration: line-through;
 }
 
