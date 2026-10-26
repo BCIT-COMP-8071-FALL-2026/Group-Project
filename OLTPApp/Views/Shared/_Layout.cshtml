@@ -35,6 +35,9 @@
                         @if (User.IsInRole(RoleNames.Caregiver))
                         {
                             @* Caregiver: visit list (#62) *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Visits" asp-action="MyVisits">My visits</a>
+                            </li>
                         }
                         @if (User.IsInRole(RoleNames.AgencyManager))
                         {
