@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
@@ -200,8 +199,6 @@ public class VisitsController : Controller
             r.Author,
             r.NoteText)).ToList();
 
-        var cutoff = visit.ScheduledStart.AddMinutes(60);
-
         return new VisitDetailsViewModel
         {
             VisitID = visit.VisitID,
@@ -216,7 +213,8 @@ public class VisitsController : Controller
             ActualCheckOut = visit.ActualCheckOut.HasValue
                         ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckOut.Value, DateTimeKind.Utc), VancouverTz)
                         : null,
-            Status = VisitStatusHelper.GetDisplayStatus(visit),
+            Status = visit.Status,
+            DisplayStatus = VisitStatusHelper.GetDisplayStatus(visit),
             Notes = notes
         };
     }
