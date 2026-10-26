@@ -59,19 +59,19 @@
             <button type="submit" class="btn btn-primary fw-semibold" disabled="@(!Model.CanCheckIn)">Check In</button>
         </form>
         <form asp-action="CheckOut" asp-route-id="@Model.VisitID" method="post">
-            <button type="submit" class="btn btn-outline-primary bg-white fw-semibold"
+            <button type="submit" class="btn btn-outline-primary btn-checkout fw-semibold"
                     disabled="@(!Model.CanCheckOut)">Check Out</button>
         </form>
     </div>
 
     <div class="d-flex gap-5">
         <div>
-                <div class="text-muted small">Appointment type</div>
-                <div class="fw-semibold mb-3">@Model.ServiceName</div>
+                <div class="text-muted small">Checked in at</div>
+                <div class="fw-semibold mb-3">@(Model.ActualCheckIn?.ToString("h:mm tt") ?? "--")</div>
         </div>
         <div>
-            <div class="text-muted small">Destination address</div>
-            <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.DestinationAddress) ? "-" : Model.DestinationAddress)</div>
+            <div class="text-muted small">Checked out at</div>
+            <div class="fw-semibold">@(Model.ActualCheckOut?.ToString("h:mm tt") ?? "--")</div>
         </div>
     </div>
 </div>
