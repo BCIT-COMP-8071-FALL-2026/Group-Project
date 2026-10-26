@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
+using OLTPApp.Services;
 using System.Security.Claims;
 
 namespace OLTPApp.Controllers;
@@ -16,6 +17,7 @@ namespace OLTPApp.Controllers;
 public class VisitsController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private static readonly TimeZoneInfo VancouverTz = TimeZoneInfo.FindSystemTimeZoneById("America/Vancouver");
 
     public VisitsController(ApplicationDbContext db)
     {
@@ -160,5 +162,138 @@ public class VisitsController : Controller
         model.Services = await _db.Service.OrderBy(s => s.ServiceName)
             .Select(s => new SelectListItem { Value = s.ServiceID.ToString(), Text = s.ServiceName })
             .ToListAsync();
+    }
+
+    [HttpGet]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> Details(int id)
+    {
+        var model = await BuildDetailsAsync(id);
+        if (model == null)
+            return NotFound();
+        return View(model);
+    }
+
+    private async Task<VisitDetailsViewModel?> BuildDetailsAsync(int visitId)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return null;
+        
+        var visit = await _db.Visit
+            .Include(v => v.Senior).ThenInclude(s => s.Person)
+            .Include(v => v.Service)
+            .SingleOrDefaultAsync(v => v.VisitID == visitId && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return null;
+
+        var p = visit.Senior.Person;
+        var rows = await _db.VisitNote
+            .Where(n => n.Visit.SeniorID == visit.SeniorID)
+            .OrderByDescending(n => n.CreatedAt)
+            .Select(n => new { n.CreatedAt, Author = n.Caregiver.Person.FirstName + " " + n.Caregiver.Person.LastName, n.NoteText })
+            .ToListAsync();
+
+        var notes = rows.Select(r => new VisitDetailsViewModel.NoteItem(
+            TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(r.CreatedAt, DateTimeKind.Utc), VancouverTz),
+            r.Author,
+            r.NoteText)).ToList();
+
+        return new VisitDetailsViewModel
+        {
+            VisitID = visit.VisitID,
+            SeniorName = p.FirstName + " " + p.LastName,
+            ResidentAddress = $"{p.Street}, {p.City}, {p.Province}",
+            ServiceName = visit.Service.ServiceName,
+            DestinationAddress = visit.DestinationAddress,
+            ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz),
+            ActualCheckIn = visit.ActualCheckIn.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckIn.Value, DateTimeKind.Utc), VancouverTz)
+                        : null,
+            ActualCheckOut = visit.ActualCheckOut.HasValue
+                        ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ActualCheckOut.Value, DateTimeKind.Utc), VancouverTz)
+                        : null,
+            Status = visit.Status,
+            DisplayStatus = VisitStatusHelper.GetDisplayStatus(visit),
+            Notes = notes
+        };
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> CheckIn(int id)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return Forbid();
+        
+        var visit = await _db.Visit.SingleOrDefaultAsync(v => v.VisitID == id && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return Forbid();
+        
+        if (visit.Status == VisitStatus.Scheduled)
+        {
+            visit.ActualCheckIn = DateTime.UtcNow;
+            visit.Status = VisitStatus.InProgress;
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> CheckOut(int id)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return Forbid();
+
+        var visit = await _db.Visit.SingleOrDefaultAsync(v => v.VisitID == id && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return Forbid();
+
+        if (visit.Status == VisitStatus.InProgress)
+        {
+            visit.ActualCheckOut = DateTime.UtcNow;
+            visit.Status = VisitStatus.Completed;
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> AddNote(int id, string? newNote)
+    {
+        var model = await BuildDetailsAsync(id);
+        if (model == null)
+            return NotFound();
+
+        newNote = newNote?.Trim();
+        if (string.IsNullOrEmpty(newNote))
+            ModelState.AddModelError(nameof(model.NewNote), "Enter a note.");
+        else if (newNote.Length > 2000)
+            ModelState.AddModelError(nameof(model.NewNote), "A note cannot exceed 2000 characters.");
+        
+        if (!ModelState.IsValid)
+        {
+            model.NewNote = newNote;
+            return View(nameof(Details), model);
+        }
+
+        var caregiverId = (await GetCaregiverIdAsync())!.Value;
+        _db.VisitNote.Add(new VisitNote
+        {
+            VisitID = id,
+            CaregiverID = caregiverId,
+            NoteText = newNote!,
+            CreatedAt = DateTime.UtcNow
+        });
+        await _db.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Details), new { id });
     }
 }

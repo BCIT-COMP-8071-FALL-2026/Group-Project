@@ -44,6 +44,54 @@ html {
   background-color: var(--color-active-bg);
 }
 
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.status-missed {
+  background: var(--color-important);
+  color: #ca1b1e;
+}
+
+.status-inprogress {
+  background: #fff4e5;
+  color: #c93400;
+}
+
+.status-completed {
+  background: var(--color-active-bg);
+  color: var(--color-button-primary);
+}
+
+.status-scheduled {
+  background: var(--color-background);
+  color: var(--color-secondary-text);
+}
+
+.status-cancelled {
+  background: #9b9ba0;
+  color: #fff;
+  text-decoration: line-through;
+}
+
+.check-box {
+  background-color: var(--color-active-bg);
+}
+
+.btn-checkout {
+  background-color: #fff;
+}
+
+.btn-checkout:hover:not(:disabled) {
+  background-color: #f0f6ff;
+  color: var(--color-button-primary);
+  border-color: var(--color-button-primary);
+}
+
 html {
   position: relative;
   min-height: 100%;
