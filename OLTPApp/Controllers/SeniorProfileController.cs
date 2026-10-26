@@ -121,8 +121,6 @@ namespace OLTPApp.Controllers
 			}
 			var senior = await GetCurrentSeniorAsync(seniorID);
 			ViewBag.CurrentSenior = senior;
-
-
 			if (senior == null)
 			{
 				return View("~/Views/Profile/Senior/CreateSenior.cshtml");
@@ -165,7 +163,8 @@ namespace OLTPApp.Controllers
 
 			ViewBag.CurrentSenior = senior;
 
-			var conditions = new List<MedicalConditionItem>();
+            List<MedicalConditionItem> conditions = new List<MedicalConditionItem>();
+			bool inValidData = false;
 
 			if (!string.IsNullOrWhiteSpace(senior.MedicalConditions))
 			{
@@ -178,11 +177,22 @@ namespace OLTPApp.Controllers
 				}
 				catch (JsonException)
 				{
-					return BadRequest("Unable to read the saved medical conditions.");
+					inValidData = true;
+                    conditions = new List<MedicalConditionItem>();
+                    if (senior?.MedicalConditions != null)
+                    {
+                        var item = new MedicalConditionItem();
+                        item.Description = senior?.MedicalConditions;
+                        conditions.Add(item);
+                    }
 				}
 			}
 
 			var condition = conditions.FirstOrDefault(c => c.ID == id);
+			if (inValidData)
+			{
+				condition = conditions[0];
+			}
 
 			if (condition == null)
 				return NotFound();
@@ -714,7 +724,9 @@ namespace OLTPApp.Controllers
 			}
 
 			List<MedicationItem> medications;
-			try
+			bool hasInvalidMedication = false;
+
+            try
 			{
 				medications = string.IsNullOrWhiteSpace(senior.CurrentMedication)
 					? new List<MedicationItem>()
@@ -725,16 +737,15 @@ namespace OLTPApp.Controllers
 			}
 			catch (JsonException)
 			{
-				ModelState.AddModelError(
-					string.Empty,
-					"The existing medication data could not be read. No changes were saved."
-				);
-
-				return View(
-					"~/Views/Profile/Medicine/AddMedicine.cshtml",
-					medication
-				);
-			}
+                hasInvalidMedication = true;
+                medications = new List<MedicationItem>();
+                if (senior?.CurrentMedication != null)
+                {
+                    var item = new MedicationItem();
+                    item.Name = senior?.CurrentMedication;
+                    medications.Add(item);
+                }
+            }
 
 			medication.ID = Guid.NewGuid().ToString();
 			medications.Add(medication);
@@ -774,8 +785,9 @@ namespace OLTPApp.Controllers
 			ViewBag.CurrentSenior = senior;
 
 			List<MedicationItem> medications;
+			bool hasInvalidMedication = false;
 
-			try
+            try
 			{
 				medications = string.IsNullOrWhiteSpace(senior.CurrentMedication)
 					? new List<MedicationItem>()
@@ -786,10 +798,22 @@ namespace OLTPApp.Controllers
 			}
 			catch (JsonException)
 			{
-				return BadRequest("The medication data could not be read.");
-			}
+                hasInvalidMedication = true;
+                medications = new List<MedicationItem>();
+                if (senior?.CurrentMedication != null)
+                {
+                    var item = new MedicationItem();
+                    item.Name = senior?.CurrentMedication;
+                    medications.Add(item);
+                }
+            }
 
 			var medication = medications.FirstOrDefault(m => m.ID == id);
+			
+			if(hasInvalidMedication && medication == null)
+			{
+				medication = medications[0];
+			}
 
 			if (medication == null)
 				return NotFound();
@@ -802,9 +826,7 @@ namespace OLTPApp.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> EditMedicine(
-			MedicationItem medication,
-			int? seniorID)
+		public async Task<IActionResult> EditMedicine( MedicationItem medication, int? seniorID)
 		{
 			if (User.IsInRole("Admin") && seniorID == null)
 				return Forbid();
@@ -825,8 +847,9 @@ namespace OLTPApp.Controllers
 			}
 
 			List<MedicationItem> medications;
+			bool hasInvalidMedication = false;
 
-			try
+            try
 			{
 				medications = string.IsNullOrWhiteSpace(senior.CurrentMedication)
 					? new List<MedicationItem>()
@@ -837,12 +860,24 @@ namespace OLTPApp.Controllers
 			}
 			catch (JsonException)
 			{
-				return BadRequest("The medication data could not be read.");
+                hasInvalidMedication = true;
+                medications = new List<MedicationItem>();
+                if (senior?.CurrentMedication != null)
+                {
+                    var item = new MedicationItem();
+                    item.Name = senior?.CurrentMedication;
+                    medications.Add(item);
+                }
 			}
 
 			var existingMedication = medications.FirstOrDefault(
 				m => m.ID == medication.ID
 			);
+
+			if (hasInvalidMedication && existingMedication == null)
+			{
+				existingMedication = medications[0];
+			}
 
 			if (existingMedication == null)
 				return NotFound();
@@ -909,16 +944,11 @@ namespace OLTPApp.Controllers
 			}
 			catch (JsonException)
 			{
-				ModelState.AddModelError(
-					string.Empty,
-					"Existing medical condition data could not be read. No changes were saved."
-				);
-
-				return View(
-					"~/Views/Profile/Condition/AddCondition.cshtml",
-					condition
-				);
-			}
+                conditions = new List<MedicalConditionItem>();
+                var item = new MedicalConditionItem();
+                item.Description = senior.MedicalConditions;
+                conditions.Add(item);
+            }
 
 			condition.ID = Guid.NewGuid().ToString();
 
@@ -969,9 +999,10 @@ namespace OLTPApp.Controllers
 			}
 
 			List<MedicalConditionItem> conditions;
+            var hasInvalidMedicalConditions = false;
 
-			try
-			{
+            try
+            {
 				conditions = string.IsNullOrWhiteSpace(senior.MedicalConditions)
 					? new List<MedicalConditionItem>()
 					: JsonSerializer.Deserialize<List<MedicalConditionItem>>(
@@ -981,19 +1012,34 @@ namespace OLTPApp.Controllers
 			}
 			catch (JsonException)
 			{
-				ModelState.AddModelError(
-					string.Empty,
-					"The existing medical condition data could not be read. No changes were saved.");
-
-				return View(
-					"~/Views/Profile/Condition/EditCondition.cshtml",
-					condition);
-			}
+                hasInvalidMedicalConditions = true;
+                conditions = new List<MedicalConditionItem>();
+                if (senior?.MedicalConditions != null)
+				{
+                    var item = new MedicalConditionItem();
+                    item.Description = senior?.MedicalConditions;
+                    conditions.Add(item);
+                }
+            }
 
 			var existingCondition = conditions.FirstOrDefault(c => c.ID == id);
 
-			if (existingCondition == null)
-				return NotFound();
+			if (existingCondition == null && hasInvalidMedicalConditions)
+				existingCondition = conditions[0];
+
+			if(existingCondition == null)
+			{
+                ViewBag.ReturnUrl = Url.Action(
+                                "Conditions",
+                                "SeniorProfile",
+                                new { seniorID = senior.SeniorID }
+                            );
+
+                return View(
+                    "~/Views/Shared/ErrorMessage.cshtml",
+                    "Cannot save this medical condition"
+                );
+            }
 
 			// Update only the selected condition.
 			existingCondition.Name = condition.Name;

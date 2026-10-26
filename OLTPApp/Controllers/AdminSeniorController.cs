@@ -56,6 +56,55 @@ namespace OLTPApp.Controllers
             );
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CreateSenior()
+        {
+            ViewBag.createNewSenior = true;
+            return View("~/Views/Profile/Senior/CreateSenior.cshtml", new Senior());
+        }
+
+        [HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> CreateSenior(Senior senior)
+		{
+			if (senior.Person == null)
+				ModelState.AddModelError("Person", "Personal information is required.");
+
+			foreach (var error in ModelState)
+			{
+				foreach (var e in error.Value!.Errors)
+				{
+					Console.WriteLine(
+						$"Field: {error.Key}, Error: {e.ErrorMessage}");
+				}
+			}
+			if (senior.DateOfBirth >= DateOnly.FromDateTime(DateTime.Today))
+			{
+				ModelState.AddModelError(
+					nameof(senior.DateOfBirth),
+					"Date of birth must be before today.");
+			}
+			if (!ModelState.IsValid)
+			{
+                ViewBag.createNewSenior = true;
+				return View("~/Views/Profile/Senior/CreateSenior.cshtml", senior);
+			}
+
+			var person = senior.Person!;
+
+			_context.Person.Add(person);
+			await _context.SaveChangesAsync();
+
+			senior.SeniorID = person.PersonID;
+			senior.Person = person;
+			senior.Status = SeniorStatus.Active;
+
+			_context.Senior.Add(senior);
+			await _context.SaveChangesAsync();
+
+			return RedirectToAction(nameof(Seniors));
+		}
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -106,6 +155,8 @@ namespace OLTPApp.Controllers
 
             return RedirectToAction(nameof(Seniors));
         }
+
+
 
     }
 }

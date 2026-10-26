@@ -1,11 +1,18 @@
 ﻿@model OLTPApp.Models.Senior
 @{
 	ViewData["Title"] = "Create Profile";
+	bool isNew = ViewBag.createNewSenior !=null ? ViewBag.createNewSenior : false;
 }
 <div class="create-profile-wrapper">
 	<div class="create-profile">
-		<h2 class="create-title">About You</h2>
-		<span class="note">Tell us about you</span>
+		@if(!isNew)
+		{
+			<h2 class="create-title">About You</h2>
+			<span class="note">Tell us about you</span>
+		} else
+		{
+			<h2 class="create-title">Create Senior Profile</h2>
+		}
 		<form asp-action="CreateSenior" method="post" enctype="multipart/form-data" class="profile-detail-form personal-detail-form create-profile-form">
 			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 			<div class="form-input">

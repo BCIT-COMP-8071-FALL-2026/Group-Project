@@ -25,6 +25,9 @@
         catch (JsonException)
         {
             medications = new List<MedicationItem>();
+            MedicationItem item = new MedicationItem();
+            item.Name = Model.CurrentMedication;
+            medications.Add(item);
         }
     }
 

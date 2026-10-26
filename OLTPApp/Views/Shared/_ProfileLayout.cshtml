@@ -23,7 +23,8 @@
 		var selectedSeniorId = ViewBag.CurrentSenior?.SeniorID;
 	}
 	<div class="profile-wrapper">
-		@if (personID != null || User.IsInRole("Admin")){
+		@if (personID != null || (User.IsInRole("Admin")) && selectedSeniorId != null)
+		{
 			<div class="d-flex flex-column flex-shrink-0 p-3 bg-1 left-menu profile-page-div"
 				 style="width: 280px">
 				<a class="d-flex align-items-center mb-3 md:mb-0 md:me-auto theme-inverse text-decoration-none senior-name-home">
