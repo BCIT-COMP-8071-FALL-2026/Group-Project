@@ -16,6 +16,7 @@ namespace OLTPApp.Controllers;
 public class VisitsController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private static readonly TimeZoneInfo VancouverTz = TimeZoneInfo.FindSystemTimeZoneById("America/Vancouver");
 
     public VisitsController(ApplicationDbContext db)
     {
@@ -185,16 +186,20 @@ public class VisitsController : Controller
         if (visit == null)
             return null;
 
+        visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz);
+
         var p = visit.Senior.Person;
-        var notes = await _db.VisitNote
+        var rows = await _db.VisitNote
             .Where(n => n.Visit.SeniorID == visit.SeniorID)
             .OrderByDescending(n => n.CreatedAt)
-            .Select(n => new VisitDetailsViewModel.NoteItem(
-                n.CreatedAt,
-                n.Caregiver.Person.FirstName + " " + n.Caregiver.Person.LastName,
-                n.NoteText))
+            .Select(n => new { n.CreatedAt, Author = n.Caregiver.Person.FirstName + " " + n.Caregiver.Person.LastName, n.NoteText })
             .ToListAsync();
-        
+
+        var notes = rows.Select(r => new VisitDetailsViewModel.NoteItem(
+            TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(r.CreatedAt, DateTimeKind.Utc), VancouverTz),
+            r.Author,
+            r.NoteText)).ToList();
+
         return new VisitDetailsViewModel
         {
             VisitID = visit.VisitID,
@@ -210,5 +215,5 @@ public class VisitsController : Controller
                         && DateTime.UtcNow > visit.ScheduledStart.AddMinutes(60),
             Notes = notes
         };
-    }   
+    }
 }
