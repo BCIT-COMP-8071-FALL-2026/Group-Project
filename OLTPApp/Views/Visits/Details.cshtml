@@ -1,0 +1,106 @@
+@model VisitDetailsViewModel
+@{
+    ViewData["Title"] = "Visit Details";
+}
+
+@{
+    var (statusClass, statusLabel) = Model.IsMissed
+        ? ("status-missed", "Missed")
+        : Model.Status switch
+        {
+            VisitStatus.Scheduled => ("status-scheduled", "Scheduled"),
+            VisitStatus.InProgress => ("status-inprogress", "In Progress"),
+            VisitStatus.Completed => ("status-completed", "Completed"),
+            VisitStatus.Cancelled => ("status-cancelled", "Cancelled"),
+            _ => ("status-scheduled", Model.Status.ToString())
+        };
+}
+
+@{
+    var checkHeading = Model.Status switch
+    {
+        VisitStatus.Scheduled => "Not Checked In",
+        VisitStatus.InProgress => "Checked In",
+        VisitStatus.Completed => "Checked Out",
+        VisitStatus.Cancelled => "Visit Cancelled",
+        _ => ""
+    };
+}
+
+@* Top section *@
+<div>
+    <a asp-controller="Visits" asp-action="MyVisits" class="btn btn-link p-0 fw-semibold">Back to my visits</a>
+    <h1 class="mt-2 mb-1">@Model.SeniorName</h1>
+    <span class="status-badge @statusClass">@statusLabel</span>
+</div>
+
+@* Details section *@
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="text-muted small">Scheduled start</div>
+        <div class="fw-semibold mb-3">@Model.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</div>
+        <div class="text-muted small">Resident address</div>
+        <div class="fw-semibold">@Model.ResidentAddress</div>
+    </div>
+    <div class="col-md-6">
+        <div class="text-muted small">Appointment type</div>
+        <div class="fw-semibold mb-3">@Model.ServiceName</div>
+        <div class="text-muted small">Destination address</div>
+        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.DestinationAddress) ? "-" : Model.DestinationAddress)</div>
+    </div>
+</div>
+
+@* Check in / Check out section *@
+<div class="row mt-4 mx-1 py-2 rounded gap-2" style="background-color: #e4edfe">
+    <div class="fw-semibold">@checkHeading</div>
+
+    <div class="d-flex gap-2">
+        <form asp-action="CheckIn" asp-route-id="@Model.VisitID" method="post">
+            <button type="submit" class="btn btn-primary fw-semibold" disabled="@(!Model.CanCheckIn)">Check In</button>
+        </form>
+        <form asp-action="CheckOut" asp-route-id="@Model.VisitID" method="post">
+            <button type="submit" class="btn btn-outline-primary bg-white fw-semibold"
+                    disabled="@(!Model.CanCheckOut)">Check Out</button>
+        </form>
+    </div>
+
+    <div class="d-flex gap-5">
+        <div>
+                <div class="text-muted small">Appointment type</div>
+                <div class="fw-semibold mb-3">@Model.ServiceName</div>
+        </div>
+        <div>
+            <div class="text-muted small">Destination address</div>
+            <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.DestinationAddress) ? "-" : Model.DestinationAddress)</div>
+        </div>
+    </div>
+</div>
+
+@* Add notes section *@
+<form asp-action="AddNote" asp-route-id="@Model.VisitID" method="post" class="mt-4">
+    <div class="fs-5 fw-semibold mb-2">Add a note</div>
+    <textarea asp-for="NewNote" class="form-control" rows="4"
+                placeholder="What should the next caregiver know?"></textarea>
+    <span asp-validation-for="NewNote" class="text-danger"></span>
+    <div>
+        <button type="submit" class="btn btn-primary fw-semibold mt-2">Save notes</button>
+    </div>
+</form>
+
+@* Notes section *@
+<div class="mt-4">
+    <div class="fs-5 fw-semibold">Notes</div>
+
+    @if (!Model.Notes.Any())
+    {
+        <div class="text-muted">No notes yet.</div>
+    }
+
+    @foreach (var n in Model.Notes)
+    {
+        <div class="py-2 border-bottom">
+            <div class="text-muted fw-semibold small">@n.CreatedAt.ToString("MMM d, h:mm tt") · @n.AuthorName</div>
+            <div class="text-break" style="white-space: pre-wrap">@n.Text</div>
+        </div>
+    }
+</div>
