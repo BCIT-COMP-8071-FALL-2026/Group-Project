@@ -21,7 +21,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Date &amp; Time</th>
+                    <th scope="col">Time (Vancouver time)</th>
                     <th scope="col">Senior Name</th>
                     <th scope="col">Caregiver Name</th>
                     <th scope="col">Appointment Type</th>
@@ -41,7 +41,7 @@
                         _ => ("status-scheduled", visit.Status.ToString())
                     };
                     <tr>
-                        <td>@visit.ScheduledStart.ToString("MMM d, h:mm tt")</td>
+                        <td>@visit.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</td>
                         <td>@visit.SeniorName</td>
                         <td>@visit.CaregiverName</td>
                         <td>@visit.ServiceName</td>
