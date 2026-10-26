@@ -40,7 +40,8 @@ html {
 
 .register-input:focus {
   outline: none;
-  box-shadow: none;
+  box-shadow: inset 3px 0 0 var(--color-button-primary);
+  background-color: var(--color-active-bg);
 }
 
 html {
@@ -49,6 +50,7 @@ html {
 }
 
 body {
+  margin-bottom: 60px;
   min-height: 100%;
   background-color: var(--color-background);
 }

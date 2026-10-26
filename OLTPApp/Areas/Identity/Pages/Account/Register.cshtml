@@ -96,7 +96,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary custom-rounded w-100" id="continueBtn" onclick="nextStep()">
+                        <button type="button" class="btn btn-primary custom-rounded w-100" id="continueBtn1" onclick="nextStep()">
                             Continue
                         </button>
                     </div>
@@ -153,11 +153,10 @@
                             <div id="seniorFields">
                                 <hr class="m-0 mx-3 opacity-25">
 
+                                <label for="birthday" class="d-block px-4 pt-3 mb-0 text-muted">Birthday</label>
                                 <input type="date"
                                         class="register-input"
                                         id="birthday"
-                                        placeholder="Birthday"
-                                        aria-label="Birthday"
                                         autocomplete="bday"
                                         asp-for="Input.Birthday"
                                         required>
@@ -192,12 +191,12 @@
                         </div>
 
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn"
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn2"
                                     onclick="previousStep()">
                                 Back
                             </button>
 
-                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn"
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn2"
                                     onclick="nextStep()">
                                 Continue
                             </button>
@@ -216,6 +215,7 @@
                                     class="register-input"
                                     id="streetAddress"
                                     placeholder="Street address"
+                                    aria-label="Street address"
                                     autocomplete="address-line1"
                                     asp-for="Input.Street"
                                     required>
@@ -226,6 +226,7 @@
                                     class="register-input"
                                     id="city"
                                     placeholder="City"
+                                    aria-label="City"
                                     autocomplete="address-level2"
                                     asp-for="Input.City"
                                     required>
@@ -236,6 +237,7 @@
                                     class="register-input"
                                     id="province"
                                     placeholder="Province / State / Region"
+                                    aria-label="Province / State / Region"
                                     autocomplete="address-level1"
                                     asp-for="Input.Province"
                                     required>
@@ -246,6 +248,7 @@
                                     class="register-input"
                                     id="postalCode"
                                     placeholder="Postal Code"
+                                    aria-label="Postal Code"
                                     autocomplete="postal-code"
                                     asp-for="Input.PostalCode"
                                     required>
@@ -256,6 +259,7 @@
                                     class="register-input"
                                     id="country"
                                     placeholder="Country"
+                                    aria-label="Country"
                                     autocomplete="country-name"
                                     asp-for="Input.Country"
                                     required>
@@ -270,12 +274,12 @@
                         </div>
 
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn"
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn3"
                                     onclick="previousStep()">
                                 Back
                             </button>
 
-                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn"
+                            <button type="button" class="btn btn-primary custom-rounded py-2 w-50" id="continueBtn3"
                                     onclick="nextStep()">
                                 Continue
                             </button>
@@ -304,12 +308,13 @@
                         </div>
 
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn"
+                            <button type="button" class="btn btn-outline-secondary custom-rounded py-2 w-50" id="backBtn4"
                                     onclick="previousStep()">
                                 Back
                             </button>
 
-                            <button type="submit" class="btn btn-primary custom-rounded py-2 w-50" id="submitBtn">
+                            <button type="submit" class="btn btn-primary custom-rounded py-2 w-50" id="submitBtn"
+                                    onclick="return showFirstInvalidStep()">
                                 Create account
                             </button>
                         </div>
@@ -348,30 +353,51 @@
             currentStep = step;
         }
 
-        function nextStep() {
-            const currentStepElement = document.querySelector(
-                `.form-step[data-step="${currentStep}"]`
-            );
+        function stepElement(step) {
+            return document.querySelector(`.form-step[data-step="${step}"]`);
+        }
 
-            const inputs = currentStepElement.querySelectorAll(
+        // Shows the message for the first invalid input on the visible step
+        function isCurrentStepValid() {
+            const inputs = stepElement(currentStep).querySelectorAll(
                 'input, select, textarea'
             );
 
             for (const input of inputs) {
                 if (!$(input).valid()) {
                     input.focus();
-                    return;
+                    return false;
                 }
 
                 if (!input.checkValidity()) {
                     input.reportValidity();
-                    return;
+                    return false;
                 }
             }
 
-            if (currentStep < totalSteps) {
+            return true;
+        }
+
+        function nextStep() {
+            if (isCurrentStepValid() && currentStep < totalSteps) {
                 showStep(currentStep + 1);
             }
+        }
+
+        // jQuery validate skips hidden steps, so check earlier steps before submitting
+        // (e.g. passwords are cleared after a server error)
+        function showFirstInvalidStep() {
+            for (let step = 1; step < totalSteps; step++) {
+                const inputs = stepElement(step).querySelectorAll('input:not(:disabled)');
+
+                if ([...inputs].some(input => !input.checkValidity())) {
+                    showStep(step);
+                    isCurrentStepValid();
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         function previousStep() {
@@ -393,5 +419,25 @@
             .forEach(radio => radio.addEventListener('change', updateAccountType));
 
         updateAccountType();
+
+        // Enter moves to the next step instead of submitting the whole form early
+        document.getElementById('registerForm').addEventListener('keydown', event => {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT' && currentStep < totalSteps) {
+                event.preventDefault();
+                nextStep();
+            }
+        });
+
+        // After a server error, open the step that shows it
+        const serverError = document.querySelector('.form-step .field-validation-error');
+        if (serverError) {
+            showStep(Number(serverError.closest('.form-step').dataset.step));
+        }
+
+        // Clearing an error on blur moves Continue up mid-click, so the click misses.
+        // Errors still clear on Continue and on typing. Runs on ready, after unobtrusive sets up the validator.
+        $(() => {
+            $('#registerForm').validate().settings.onfocusout = false;
+        });
     </script>
 }
