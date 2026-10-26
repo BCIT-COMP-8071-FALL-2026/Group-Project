@@ -1,12 +1,19 @@
--- A8a + A8b (combined): full reload of the OlapDW star schema from OLTPAppDb.
+-- A8a (dimensions, PR #98) + A8b (facts): full reload of the OlapDW star from OLTPAppDb.
 -- Per docs/olap/ETL-Mapping.md, docs/OLAP_Queries.md and docs/Query1-Contract.md.
 --
--- Option A: one atomic "full reload" so the star holds OLTPAppDb data only.
---   1. TRUNCATE FactVisit (child; releases every FK so the dims can be cleared).
---   2. DELETE each dimension and reseed its surrogate identity so keys regenerate
---      deterministically (1..N in natural-key order) on every run.
---   3. INSERT the dimensions, ordered by natural key for stable surrogate keys.
---   4. INSERT FactVisit after the dimensions (FKs), one row per OLTP visit.
+-- Division of labor (agreed with A8a):
+--   * dbo.usp_LoadDimensions (A8a) loads all five dimensions. It does NOT clear the
+--     tables, does NOT reseed identities, and does NOT start a transaction; it requires
+--     a caller transaction and expects the tables already cleared + reseeded.
+--   * dbo.usp_LoadStar (A8b) owns the full reload in a single transaction:
+--       1. TRUNCATE FactVisit (child; releases every FK so the dims can be cleared).
+--       2. DELETE each dimension and reseed its surrogate identity so the A8a inserts
+--          restart the surrogate keys at 1.
+--       3. EXEC dbo.usp_LoadDimensions  (loads DimDate + the four entity dimensions).
+--       4. INSERT FactVisit after the dimensions (FKs), one row per OLTP visit.
+--
+-- The C# ODBC runner keeps calling usp_LoadStar (unchanged); it just now delegates the
+-- dimension inserts to usp_LoadDimensions.
 --
 -- Missed / not-yet-due are NOT stored here: the reporting procedures
 -- (dbo.usp_MissedVisitsByMonth, ...) compute MissedCount and the eligible
@@ -15,9 +22,9 @@
 -- deterministic ones: DurationMinutes, LateMinutes, CompletedCount,
 -- CancelledCount, LateCheckInCount.
 --
--- Rerunnable: each run produces an identical star (full reload, no duplicates).
--- Assumption: OLTPAppDb enforces ActualCheckOut >= ActualCheckIn (the DDL CHECK
--- constraint CK_FactVisit_CheckOutAfterCheckIn otherwise rejects the row).
+-- Rerunnable: each run is a full reload -- the star holds OLTPAppDb data only, no
+-- duplicates. Assumes OLTPAppDb enforces ActualCheckOut >= ActualCheckIn (the DDL CHECK
+-- CK_FactVisit_CheckOutAfterCheckIn otherwise rejects the row).
 
 USE OlapDW;
 GO
@@ -47,64 +54,15 @@ BEGIN
         DELETE FROM dbo.DimOrganization;
         DBCC CHECKIDENT ('dbo.DimOrganization', RESEED, 0) WITH NO_INFOMSGS;
 
-        -- 2) DimDate: a complete calendar from the earliest to the latest scheduled visit.
-        --    The two-table cross join yields ~tens of thousands of numbers, ample for the
-        --    reporting horizon; extend it only if a horizon longer than ~170 years is needed.
-        DECLARE @StartDate DATE, @EndDate DATE;
-        SELECT
-            @StartDate = MIN(CAST(ScheduledStart AS DATE)),
-            @EndDate   = MAX(CAST(ScheduledStart AS DATE))
-        FROM OLTPAppDb.dbo.Visit;
+        -- 2) Load all five dimensions via the A8a procedure. It inserts DimDate
+        --    (calendar from the OLTP scheduled-visit date range) and DimSenior /
+        --    DimProfessional / DimService / DimOrganization from OLTPAppDb, each row
+        --    keyed on the OLTP natural key (SeniorID, CaregiverID, ServiceID, AgencyID).
+        --    It does not clear or reseed (the clear above did) and runs inside this
+        --    transaction, so the surrogate identities restart at 1.
+        EXEC dbo.usp_LoadDimensions;
 
-        IF @StartDate IS NOT NULL
-        BEGIN
-            ;WITH Numbers AS (
-                SELECT TOP (DATEDIFF(DAY, @StartDate, @EndDate) + 1)
-                    ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1 AS n
-                FROM sys.all_objects a
-                CROSS JOIN sys.all_objects b
-            ),
-            CalendarDates AS (
-                SELECT DATEADD(DAY, n, @StartDate) AS FullDate
-                FROM Numbers
-            )
-            INSERT INTO dbo.DimDate (DateKey, FullDate, [Day], [Month], [Year], [Quarter], [DayOfWeek])
-            SELECT
-                YEAR(FullDate) * 10000 + MONTH(FullDate) * 100 + DAY(FullDate),
-                FullDate,
-                DAY(FullDate),
-                MONTH(FullDate),
-                YEAR(FullDate),
-                DATEPART(QUARTER, FullDate),
-                DATENAME(WEEKDAY, FullDate)
-            FROM CalendarDates;
-        END;
-
-        -- 3) The four entity dimensions, ordered by natural key so the surrogate
-        --    key each row receives is stable across reloads.
-        INSERT INTO dbo.DimSenior (SeniorID, FirstName, LastName, DateOfBirth, IsLivingAlone, City)
-        SELECT s.SeniorID, p.FirstName, p.LastName, s.DateOfBirth, s.IsLivingAlone, p.City
-        FROM OLTPAppDb.dbo.Senior s
-        JOIN OLTPAppDb.dbo.Person p ON p.PersonID = s.SeniorID
-        ORDER BY s.SeniorID;
-
-        INSERT INTO dbo.DimProfessional (ProfessionalID, FirstName, LastName)
-        SELECT c.CaregiverID, p.FirstName, p.LastName
-        FROM OLTPAppDb.dbo.Caregiver c
-        JOIN OLTPAppDb.dbo.Person p ON p.PersonID = c.CaregiverID
-        ORDER BY c.CaregiverID;
-
-        INSERT INTO dbo.DimService (ServiceID, ServiceName)
-        SELECT ServiceID, ServiceName
-        FROM OLTPAppDb.dbo.Service
-        ORDER BY ServiceID;
-
-        INSERT INTO dbo.DimOrganization (OrganizationID, OrganizationName)
-        SELECT AgencyID, Name
-        FROM OLTPAppDb.dbo.Agency
-        ORDER BY AgencyID;
-
-        -- 4) Facts, one row per OLTP visit, loaded after the dimensions (FKs).
+        -- 3) Facts, one row per OLTP visit, loaded after the dimensions (FKs).
         INSERT INTO dbo.FactVisit
             (VisitFactID, DateKey, SeniorKey, ProfessionalKey, ServiceKey, OrganizationKey,
              ScheduledStart, ActualCheckIn, ActualCheckOut,
