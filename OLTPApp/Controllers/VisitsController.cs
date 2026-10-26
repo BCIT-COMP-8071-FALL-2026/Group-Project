@@ -216,4 +216,48 @@ public class VisitsController : Controller
             Notes = notes
         };
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> CheckIn(int id)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return Forbid();
+        
+        var visit = await _db.Visit.SingleOrDefaultAsync(v => v.VisitID == id && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return Forbid();
+        
+        if (visit.Status == VisitStatus.Scheduled)
+        {
+            visit.ActualCheckIn = DateTime.UtcNow;
+            visit.Status = VisitStatus.InProgress;
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> CheckOut(int id)
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return Forbid();
+
+        var visit = await _db.Visit.SingleOrDefaultAsync(v => v.VisitID == id && v.CaregiverID == caregiverId);
+        if (visit == null)
+            return Forbid();
+
+        if (visit.Status == VisitStatus.InProgress)
+        {
+            visit.ActualCheckOut = DateTime.UtcNow;
+            visit.Status = VisitStatus.Completed;
+            await _db.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Details), new { id });
+    }
 }
