@@ -93,6 +93,49 @@ public class VisitsController : Controller
         return RedirectToAction(nameof(Schedule));
     }
 
+    [HttpGet]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> MyVisits()
+    {
+        var caregiverId = await GetCaregiverIdAsync();
+        if (caregiverId == null)
+            return Forbid();
+
+        // Missed visits stay on the list: they are still Scheduled (OLTP-17 computes Missed for display only)
+        var visits = await _db.Visit
+            .Where(v => v.CaregiverID == caregiverId.Value
+                        && v.Status != VisitStatus.Completed && v.Status != VisitStatus.Cancelled)
+            .OrderBy(v => v.ScheduledStart).ThenBy(v => v.VisitID)
+            .Select(v => new CaregiverVisitListItem
+            {
+                VisitID = v.VisitID,
+                ScheduledStart = v.ScheduledStart,
+                SeniorName = v.Senior.Person.FirstName + " " + v.Senior.Person.LastName,
+                ServiceName = v.Service.ServiceName,
+                ResidentAddress = v.Senior.Person.Street + ", " + v.Senior.Person.City + ", "
+                                  + v.Senior.Person.Province + " " + v.Senior.Person.PostalCode,
+                DestinationAddress = v.DestinationAddress
+            })
+            .ToListAsync();
+
+        // Stored in UTC; show in the same zone the Schedule form uses
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Vancouver");
+        foreach (var visit in visits)
+            visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), timeZone);
+
+        return View(visits);
+    }
+
+    // Shared by the visit list (#62) and visit page (#63); null when the user has no Caregiver row
+    private async Task<int?> GetCaregiverIdAsync()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return await (from user in _db.Users
+                      join caregiver in _db.Caregiver on user.PersonID equals caregiver.CaregiverID
+                      where user.Id == userId
+                      select (int?)caregiver.CaregiverID).SingleOrDefaultAsync();
+    }
+
     private async Task<int?> GetManagerAgencyIdAsync()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
