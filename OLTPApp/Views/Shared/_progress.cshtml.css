@@ -1,0 +1,92 @@
+.deactivation-progress {
+    width: 100%;
+    margin: 24px 0;
+}
+
+.progress-label {
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
+.progress-track {
+    width: 100%;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #007AFF;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 16px;
+    gap: 8px;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+    gap: 8px;
+    color: #777;
+}
+
+.step-circle {
+    width: 34px;
+    height: 34px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-weight: 600;
+}
+
+.progress-step.active {
+    color: #198754;
+    font-weight: 600;
+}
+
+    .progress-step.active .step-circle {
+        border-color: #198754;
+        background: #198754;
+        color: white;
+    }
+
+.progress-step.completed {
+    color: #198754;
+}
+
+    .progress-step.completed .step-circle {
+        border-color: #198754;
+        background: #198754;
+        color: white;
+    }
+
+.step-title {
+    font-size: 13px;
+}
+
+@media (max-width: 576px) {
+    .step-title {
+        font-size: 11px;
+    }
+
+    .step-circle {
+        width: 30px;
+        height: 30px;
+    }
+}

@@ -1,0 +1,61 @@
+﻿@model OLTPApp.ViewModels.Admin.ConfirmDeactivationViewModel
+
+@{
+    ViewData["Title"] = "Confirm Action";
+
+    var senior = ViewBag.senior;
+    var isArchive = Model.ActionType == "Archive";
+    var steps = new[] { "Review profile", "Choose action", "Confirm" };
+}
+
+<div class="center-page-wrapper">
+    <div class="center-page">
+        <partial name="_progress" model='@( (3, steps, false))' />
+        <h2 class="align-center">Confirm @(isArchive ? "Archive" : "Deactivation")</h2>
+        <span class="note align-center">
+            This is the last step. Nothing changes until you confirm.
+        </span>
+
+        <form asp-controller="AdminSenior"
+              asp-action="ConfirmDeactivation"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <input asp-for="SeniorID" type="hidden" />
+            <input asp-for="ActionType" type="hidden" />
+
+            <div class="page-content-sp">
+                <label asp-for="ConfirmationUsername" class="enter-name-require-lbl">
+                    Type @senior.Person.FirstName @senior.Person.LastName to confirm
+                </label>
+
+                <input asp-for="ConfirmationUsername"
+                       class="form-control"
+                       autocomplete="off"
+                       placeholder="Enter your username" />
+
+                <span asp-validation-for="ConfirmationUsername"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-btn-group">
+
+                <a asp-controller="SeniorProfile" asp-action="Index" asp-route-seniorID="@senior.SeniorID" class="secondary-btn">
+                    Cancel
+                </a>
+                <button type="submit" class="primary-btn">
+                    Confirm @(isArchive ? "Archive" : "Deactivation")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/deactivate.css" asp-append-version="true" />
+}

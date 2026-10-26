@@ -125,7 +125,7 @@
 {
 	@if(@Model.Status == SeniorStatus.Active)
 	{
-		<form asp-controller="AdminSenior" asp-action="Deactivate" method="post">
+		<form asp-controller="AdminSenior" asp-action="OpenDeactivation" method="post">
 
 			@Html.AntiForgeryToken()
 
@@ -136,7 +136,7 @@
 			</button>
 		</form>
 		
-	} else
+	} else if (Model.Status == SeniorStatus.Deactivated)
 	{
 		<form asp-controller="AdminSenior" asp-action="Activate" method="post">
 

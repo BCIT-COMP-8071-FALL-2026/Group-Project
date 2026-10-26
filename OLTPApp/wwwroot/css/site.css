@@ -73,6 +73,10 @@ body {
   text-align: start;
 }
 
+.deactivate-btn, .primary-btn, .secondary-btn {
+	text-decoration: none;
+}
+
 .deactivate-btn {
 	background-color: #FFECEB;
 	color: var(--error-text);

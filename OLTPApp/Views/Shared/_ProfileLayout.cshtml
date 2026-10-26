@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OLTPApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
@@ -68,5 +68,6 @@
 	<script src="~/js/loading.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+	@await RenderSectionAsync("Styles", required: false)
 </body>
 </html>

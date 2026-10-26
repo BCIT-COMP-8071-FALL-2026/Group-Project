@@ -1,9 +1,11 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OLTPApp.Data;
 using OLTPApp.Models;
+using OLTPApp.ViewModels.Admin;
 
 namespace OLTPApp.Controllers
 {
@@ -105,31 +107,195 @@ namespace OLTPApp.Controllers
 			return RedirectToAction(nameof(Seniors));
 		}
 
+        [HttpPost]
+        public async Task<IActionResult> OpenDeactivation(int seniorID)
+        {
+            var senior = await _context.Senior
+               .Include(s => s.Person)
+               .FirstOrDefaultAsync(s => s.SeniorID == seniorID);
+
+            if (senior == null)
+                return NotFound("Cannot find current senior");
+
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("Only active senior profiles can be deactivated or archived.");
+
+            return View("~/Views/Profile/Deactivate/DeactivateSenior.cshtml", senior);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Deactivate(int seniorId)
+        public async Task<IActionResult> ContinueDeactivation(int seniorID)
         {
             var senior = await _context.Senior
-                .FirstOrDefaultAsync(s => s.SeniorID == seniorId);
+                .FirstOrDefaultAsync(s => s.SeniorID == seniorID);
+
+            ViewBag.senior = senior;
 
             if (senior == null)
-            {
                 return NotFound();
-            }
 
-            if (senior.Status == SeniorStatus.Deactivated)
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("The senior profile is not active.");
+
+            return RedirectToAction(
+                nameof(ChooseDeactivation),
+                new { seniorID });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChooseDeactivation(int seniorID)
+        {
+            var senior = await _context.Senior
+                .FirstOrDefaultAsync(s => s.SeniorID == seniorID);
+
+            ViewBag.senior = senior;
+
+            if (senior == null)
+                return NotFound();
+
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("The senior profile is not active.");
+
+            var model = new DeactivationChoiceViewModel
             {
-                return RedirectToAction(nameof(Seniors));
+                SeniorID = seniorID
+            };
+
+            return View(
+                "~/Views/Profile/Deactivate/ChooseDeactivation.cshtml",
+                model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChooseDeactivation(
+            DeactivationChoiceViewModel model)
+        {
+            var senior = await _context.Senior
+                .FirstOrDefaultAsync(s => s.SeniorID == model.SeniorID);
+
+            if (senior == null)
+                return NotFound();
+
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("The senior profile is not active.");
+
+            if (model.ActionType != "Deactivate" &&
+                model.ActionType != "Archive")
+            {
+                ModelState.AddModelError(
+                    nameof(model.ActionType),
+                    "Please select a valid action.");
             }
 
-            senior.Status = SeniorStatus.Deactivated;
+            if (!ModelState.IsValid)
+            {
+                return View(
+                    "~/Views/Profile/Deactivate/ChooseDeactivation.cshtml",
+                    model);
+            }
+
+            return RedirectToAction(
+                nameof(ConfirmDeactivation),
+                new
+                {
+                    seniorID = model.SeniorID,
+                    actionType = model.ActionType
+                });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmDeactivation( int seniorID, string actionType)
+        {
+            var senior = await _context.Senior
+                .Include(s => s.Person)
+                .FirstOrDefaultAsync(s => s.SeniorID == seniorID);
+
+            ViewBag.senior = senior;
+
+            if (senior == null)
+                return NotFound();
+
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("The senior profile is not active.");
+
+            if (actionType != "Deactivate" &&
+                actionType != "Archive")
+            {
+                return BadRequest("Invalid action.");
+            }
+
+            var model = new ConfirmDeactivationViewModel
+            {
+                SeniorID = seniorID,
+                ActionType = actionType
+            };
+
+            return View(
+                "~/Views/Profile/Deactivate/ConfirmDeactivation.cshtml",
+                model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDeactivation(
+            ConfirmDeactivationViewModel model)
+        {
+            var senior = await _context.Senior
+                .Include(s => s.Person)
+                .FirstOrDefaultAsync(s => s.SeniorID == model.SeniorID);
+            ViewBag.senior = senior;
+
+            if (senior == null)
+                return NotFound();
+
+            if (senior.Status != SeniorStatus.Active)
+                return BadRequest("The senior profile is not active.");
+
+            if (model.ActionType != "Deactivate" &&
+                model.ActionType != "Archive")
+            {
+                return BadRequest("Invalid action.");
+            }
+            string name = $"{senior.Person.FirstName} {senior.Person.LastName}";
+            if (!string.Equals(
+                model.ConfirmationUsername?.Trim(),
+                name,
+                StringComparison.Ordinal))
+            {
+                ModelState.AddModelError(
+                    nameof(model.ConfirmationUsername),
+                    "The username does not match");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(
+                    "~/Views/Profile/Deactivate/ConfirmDeactivation.cshtml",
+                    model);
+            }
+
             senior.DeactivatedAt = DateTime.UtcNow;
+
+            if (model.ActionType == "Deactivate")
+            {
+                senior.Status = SeniorStatus.Deactivated;
+            }
+            else
+            {
+                senior.Status = SeniorStatus.Archived;
+            }
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Seniors));
+            return RedirectToAction(
+                            "Index",
+                            "SeniorProfile",
+                            new { seniorID = senior.SeniorID }
+                        );
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -153,7 +319,11 @@ namespace OLTPApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Seniors));
+            return RedirectToAction(
+                            "Index",
+                            "SeniorProfile",
+                            new { seniorID = senior.SeniorID }
+                        );
         }
 
 

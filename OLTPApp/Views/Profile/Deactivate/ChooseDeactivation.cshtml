@@ -1,0 +1,74 @@
+﻿@model OLTPApp.ViewModels.Admin.DeactivationChoiceViewModel
+
+@{
+    ViewData["Title"] = "Choose Action";
+    var steps = new[] { "Review profile", "Choose action", "Confirm" };
+    var senior = ViewBag.senior;
+
+}
+<div class="center-page-wrapper">
+    <div class="center-page">
+        <partial name="_progress" model='@( (2, steps, false))' />
+        <h2 class="align-center">Choose what to do</h2>
+
+        <span class="note align-center">You can change this later only for the first option.</span>
+
+        <form asp-controller="AdminSenior" asp-action="ChooseDeactivation" method="post">
+
+            <div class="page-content-sp">
+                @Html.AntiForgeryToken()
+
+                <input asp-for="SeniorID" type="hidden" />
+
+                <div class="form-check mb-3">
+                    <input asp-for="ActionType" type="radio" value="Deactivate" id="deactivateOption" class="form-check-input" />
+
+                    <div class="radio-label">
+                        <label for="deactivateOption" class="form-check-label">
+                        Deactivate for now
+                        </label>
+
+                        <label class="note" for="deactivateOption">
+                            You can reactivate this account later.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="ActionType" type="radio" value="Archive" id="archiveOption" class="form-check-input" />
+
+                    <div class="radio-label">
+                        <label for="archiveOption" class="form-check-label">
+                            Archive permanently
+                        </label>
+
+                        <label class="note" for="archiveOption">
+                            The account stays archived and cannot be reactivated.
+                        </label>
+                    </div>
+                </div>
+
+                <span asp-validation-for="ActionType"
+                      class="text-danger"></span>
+            </div>
+            <div class="form-btn-group">
+
+                <a asp-controller="SeniorProfile" asp-action="Index" asp-route-seniorID="@senior.SeniorID" class="secondary-btn">
+                    Cancel
+                </a>
+                <button type="submit" class="primary-btn">
+                    Continue
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+                  
+@section Styles {
+    <link rel="stylesheet" href="~/css/deactivate.css" asp-append-version="true" />
+}

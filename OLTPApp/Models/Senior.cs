@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OLTPApp.Models;
 
-public enum SeniorStatus { Active, Deactivated }
+public enum SeniorStatus { Active, Deactivated, Archived }
 
 public class Senior
 {
