@@ -42,21 +42,34 @@ public sealed class OltpAppFixture : IAsyncLifetime
     }
 
     // Each test gets its own account, so the lockout test can't affect the others and reruns start clean.
-    public async Task<TestUser> CreateUserAsync()
+    // A null role gives a Staff-style account with no role (OLTP-2).
+    public async Task<TestUser> CreateUserAsync(string? role = null)
     {
         var user = new TestUser($"e2e-{Guid.NewGuid():N}@example.test", $"Test-{Guid.NewGuid():N}A1!");
         await WithUserManagerAsync(async users =>
         {
-            var result = await users.CreateAsync(
-                new ApplicationUser { UserName = user.Email, Email = user.Email, EmailConfirmed = true },
-                user.Password);
+            var identityUser = new ApplicationUser { UserName = user.Email, Email = user.Email, EmailConfirmed = true };
+            var result = await users.CreateAsync(identityUser, user.Password);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException(
                     $"Could not seed {user.Email}: {string.Join("; ", result.Errors.Select(e => e.Description))}");
             }
+            // Tracked before the role add, so a failed role add still gets cleaned up
+            _createdUsers.Add(user.Email);
+
+            if (role is null)
+            {
+                return;
+            }
+            // Roles come from the app's startup seed, which only runs in Development.
+            var roleResult = await users.AddToRoleAsync(identityUser, role);
+            if (!roleResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Could not add {user.Email} to role '{role}' (is the app seeded?): {string.Join("; ", roleResult.Errors.Select(e => e.Description))}");
+            }
         });
-        _createdUsers.Add(user.Email);
         return user;
     }
 

@@ -1,0 +1,56 @@
+@model ScheduleVisitViewModel
+@{
+    ViewData["Title"] = "Schedule visit";
+}
+
+<h1>Schedule visit</h1>
+
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success" role="status">@message</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Schedule" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="SeniorID" class="form-label"></label>
+                <select asp-for="SeniorID" asp-items="Model.Seniors" class="form-select">
+                    <option value="">Choose a senior</option>
+                </select>
+                <span asp-validation-for="SeniorID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CaregiverID" class="form-label"></label>
+                <select asp-for="CaregiverID" asp-items="Model.Caregivers" class="form-select">
+                    <option value="">Choose a caregiver</option>
+                </select>
+                <span asp-validation-for="CaregiverID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ScheduledStart" class="form-label"></label>
+                <input asp-for="ScheduledStart" type="datetime-local" class="form-control" />
+                <span asp-validation-for="ScheduledStart" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ServiceID" class="form-label"></label>
+                <select asp-for="ServiceID" asp-items="Model.Services" class="form-select">
+                    <option value="">Choose a visit type</option>
+                </select>
+                <span asp-validation-for="ServiceID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DestinationAddress" class="form-label"></label>
+                <input asp-for="DestinationAddress" class="form-control" />
+                <span asp-validation-for="DestinationAddress" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Schedule visit</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

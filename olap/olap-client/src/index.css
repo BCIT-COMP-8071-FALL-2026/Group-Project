@@ -19,6 +19,9 @@
   /* Chart series, validated for color-vision deficiency and 3:1 contrast on --surface. */
   --series-successful: #007aff;
   --series-missed: #eb6834;
+  /* Single-series bars (late check-ins) and their hover state. */
+  --series-bar: #007aff;
+  --series-bar-hover: #3d97ff;
 
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
@@ -121,6 +124,12 @@ svg {
   font-weight: 600;
   color: var(--text-primary);
   text-decoration: none;
+}
+
+/* As in the mockup: unselected items sit on divider lines, the selected one is a rounded blue pill. */
+.nav-item:not([aria-current='page']) {
+  border-bottom: 1px solid var(--divider);
+  border-radius: 0;
 }
 
 .nav-item:hover {
@@ -292,6 +301,47 @@ h2 {
   height: 300px;
 }
 
+/* Room under the bars for caregiver names turned upright. */
+.chart-frame-tall {
+  height: 400px;
+}
+
+/* Chart / Table switch, styled like the mockup's segmented controls. */
+.view-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--page);
+}
+
+.view-toggle button {
+  min-height: 28px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.view-toggle button:hover {
+  color: var(--text-primary);
+}
+
+.view-toggle button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.view-toggle button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Table */
 
 .report-table {
@@ -326,6 +376,16 @@ h2 {
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+/* Headers of narrow number columns may wrap ("Missed / visits"), so a phone-width table still fits. */
+.report-table thead .num {
+  white-space: normal;
+}
+
+/* A left-aligned column right after a number column would sit against the numbers' right edge. */
+.report-table .num + :not(.num) {
+  padding-left: 32px;
 }
 
 /* Keep "Oct 2025" on one line; only the "(to date)" note may wrap below it. */
@@ -375,6 +435,10 @@ h2 {
   margin-top: 8px;
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -411,6 +475,10 @@ h2 {
   .report-table td {
     padding-left: 10px;
   }
+
+  .report-table .num + :not(.num) {
+    padding-left: 16px;
+  }
 }
 
 /* Printing: just the report, on white, at the page width. */
@@ -432,7 +500,8 @@ h2 {
   }
 
   .sidebar,
-  .report-header .button {
+  .report-header .button,
+  .view-toggle {
     display: none;
   }
 
@@ -447,9 +516,11 @@ h2 {
     break-inside: avoid;
   }
 
-  /* Tighter rows, so the seed data's 15 months fit on one Letter page with the chart (OLAP-4). */
+  /* Tighter rows, so the seed data's 15 months fit on one Letter page with the chart, and its 28 late
+     caregivers fit on one page as a table (OLAP-4). */
   .report-table {
     font-size: 13px;
+    line-height: 1.3;
   }
 
   .report-table th,

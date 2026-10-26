@@ -8,16 +8,13 @@ describe('format', () => {
     expect(formatMonthShort('2026-09')).toBe('Sep 2026')
   })
 
-  it('adds the year to the first axis label and to each January, and marks the current month', () => {
-    const now = new Date(2026, 2, 13)
-    expect(['2025-11', '2025-12', '2026-01', '2026-02', '2026-03'].map((month, index) => formatAxisMonth(month, index, now))).toEqual([
+  it('adds the year to the first axis label and to each January', () => {
+    expect(['2025-11', '2025-12', '2026-01', '2026-02'].map(formatAxisMonth)).toEqual([
       ['Nov', '2025'],
       'Dec',
       ['Jan', '2026'],
       'Feb',
-      ['Mar', 'to date'],
     ])
-    expect(formatAxisMonth('2027-01', 5, new Date(2027, 0, 2))).toEqual(['Jan', '2027', 'to date'])
   })
 
   it('describes a range of months', () => {
@@ -30,9 +27,17 @@ describe('format', () => {
   })
 
   it('knows which month is the current one', () => {
-    const now = new Date(2026, 9, 13)
+    const now = new Date('2026-10-13T12:00:00Z')
     expect(isCurrentMonth('2026-10', now)).toBe(true)
     expect(isCurrentMonth('2026-09', now)).toBe(false)
     expect(isCurrentMonth('2025-10', now)).toBe(false)
+  })
+
+  it('uses the UTC month, like the API, near the end of a month', () => {
+    // 6 pm on Oct 31 in Vancouver is already Nov 1 in UTC.
+    expect(isCurrentMonth('2026-11', new Date('2026-10-31T18:00:00-07:00'))).toBe(true)
+    expect(isCurrentMonth('2026-10', new Date('2026-10-31T18:00:00-07:00'))).toBe(false)
+    // 12:30 am on Nov 1 in India is still Oct 31 in UTC.
+    expect(isCurrentMonth('2026-10', new Date('2026-11-01T00:30:00+05:30'))).toBe(true)
   })
 })

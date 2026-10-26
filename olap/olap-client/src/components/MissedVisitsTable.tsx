@@ -1,4 +1,4 @@
-import type { MissedVisitsMonth } from '../api/missedVisits'
+import type { MissedVisitsMonth } from '../api/reports'
 import { formatCount, formatMonth, formatMonthShort, formatPercent, isCurrentMonth } from '../format'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 

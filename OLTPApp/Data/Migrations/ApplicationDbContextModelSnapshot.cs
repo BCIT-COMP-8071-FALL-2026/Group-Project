@@ -209,7 +209,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasKey("AgencyID");
 
-                    b.ToTable("Agency");
+                    b.ToTable("Agency", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.AgencyManager", b =>
@@ -224,7 +224,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasIndex("AgencyID");
 
-                    b.ToTable("AgencyManager");
+                    b.ToTable("AgencyManager", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.ApplicationUser", b =>
@@ -311,7 +311,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasIndex("AgencyID");
 
-                    b.ToTable("Caregiver");
+                    b.ToTable("Caregiver", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.FamilyMember", b =>
@@ -321,7 +321,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasKey("FamilyMemberID");
 
-                    b.ToTable("FamilyMember");
+                    b.ToTable("FamilyMember", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.Person", b =>
@@ -378,7 +378,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasKey("PersonID");
 
-                    b.ToTable("Person");
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.Senior", b =>
@@ -428,7 +428,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasKey("SeniorID");
 
-                    b.ToTable("Senior");
+                    b.ToTable("Senior", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.SeniorFamilyMember", b =>
@@ -443,7 +443,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasIndex("FamilyMemberID");
 
-                    b.ToTable("SeniorFamilyMember");
+                    b.ToTable("SeniorFamilyMember", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.Service", b =>
@@ -464,7 +464,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Service");
+                    b.ToTable("Service", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.Visit", b =>
@@ -522,7 +522,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasIndex("ServiceID");
 
-                    b.ToTable("Visit");
+                    b.ToTable("Visit", (string)null);
                 });
 
             modelBuilder.Entity("OLTPApp.Models.VisitNote", b =>
@@ -552,7 +552,7 @@ namespace OLTPApp.Data.Migrations
 
                     b.HasIndex("VisitID");
 
-                    b.ToTable("VisitNote");
+                    b.ToTable("VisitNote", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

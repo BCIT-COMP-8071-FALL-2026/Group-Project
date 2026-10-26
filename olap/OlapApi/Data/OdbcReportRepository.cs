@@ -38,4 +38,60 @@ public class OdbcReportRepository(string connectionString) : IReportRepository
 
         return months;
     }
+
+    public async Task<IReadOnlyList<CaregiverLateness>> GetCaregiverLatenessAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = new OdbcConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = connection.CreateCommand();
+        command.CommandType = CommandType.StoredProcedure;
+        command.CommandText = "{CALL dbo.usp_CaregiverLateness}";
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        var caregiverName = reader.GetOrdinal("CaregiverName");
+        var avgMinutesLate = reader.GetOrdinal("AvgMinutesLate");
+
+        var caregivers = new List<CaregiverLateness>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            caregivers.Add(new CaregiverLateness(
+                reader.GetString(caregiverName),
+                reader.GetDecimal(avgMinutesLate)));
+        }
+
+        return caregivers;
+    }
+
+    public async Task<IReadOnlyList<SeniorOutreach>> GetSeniorOutreachAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = new OdbcConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = connection.CreateCommand();
+        command.CommandType = CommandType.StoredProcedure;
+        command.CommandText = "{CALL dbo.usp_SeniorOutreach}";
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        var seniorName = reader.GetOrdinal("SeniorName");
+        var missedCount = reader.GetOrdinal("MissedCount");
+        var serviceTypes = reader.GetOrdinal("ServiceTypes");
+        var livesAlone = reader.GetOrdinal("LivesAlone");
+        var ageBand = reader.GetOrdinal("AgeBand");
+
+        var seniors = new List<SeniorOutreach>();
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            seniors.Add(new SeniorOutreach(
+                reader.GetString(seniorName),
+                reader.GetInt32(missedCount),
+                reader.GetString(serviceTypes),
+                reader.GetBoolean(livesAlone),
+                reader.GetString(ageBand)));
+        }
+
+        return seniors;
+    }
 }

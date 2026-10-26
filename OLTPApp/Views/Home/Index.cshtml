@@ -4,5 +4,9 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @* OLTP-2: Staff accounts have no role until Admin assigns one *@
+    @if (!RoleNames.All.Any(User.IsInRole))
+    {
+        <p>Waiting for Admin to assign a role</p>
+    }
 </div>
