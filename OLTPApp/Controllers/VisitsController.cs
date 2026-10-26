@@ -145,15 +145,6 @@ public class VisitsController : Controller
                       select (int?)manager.AgencyID).SingleOrDefaultAsync();
     }
 
-    private async Task<int?> GetCaregiverIdAsync()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return await _db.Users
-            .Where(u => u.Id == userId)
-            .Select(u => u.PersonID)
-            .SingleOrDefaultAsync();
-    }
-
     private async Task LoadScheduleOptionsAsync(ScheduleVisitViewModel model, int agencyId)
     {
         model.Seniors = await _db.Senior
