@@ -27,89 +27,91 @@
     };
 }
 
-@* Top section *@
-<div>
-    <a asp-controller="Visits" asp-action="MyVisits" class="btn btn-link p-0 fw-semibold">Back to my visits</a>
-    <h1 class="mt-2 mb-1">@Model.SeniorName</h1>
-    <span class="status-badge @statusClass">@statusLabel</span>
-</div>
-
-@* Details section *@
-<div class="row mt-2 g-3">
-    <div class="col-md-6">
-        <div class="text-muted small">Scheduled start</div>
-        <div class="fw-semibold mb-3">@Model.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</div>
-        <div class="text-muted small">Resident address</div>
-        <div class="fw-semibold">@Model.ResidentAddress</div>
-    </div>
-    <div class="col-md-6">
-        <div class="text-muted small">Appointment type</div>
-        <div class="fw-semibold mb-3">@Model.ServiceName</div>
-        <div class="text-muted small">Destination address</div>
-        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.DestinationAddress) ? "-" : Model.DestinationAddress)</div>
-    </div>
-</div>
-
-@* Check in / Check out section *@
-<div class="d-flex flex-column mt-4 p-3 rounded gap-3" style="background-color: #e4edfe">
-    <div class="fw-semibold">@checkHeading</div>
-
-    <div class="d-flex gap-2">
-        <form asp-action="CheckIn" asp-route-id="@Model.VisitID" method="post">
-            <button type="submit" class="btn btn-primary fw-semibold" disabled="@(!Model.CanCheckIn)">Check In</button>
-        </form>
-        <form asp-action="CheckOut" asp-route-id="@Model.VisitID" method="post">
-            <button type="submit" class="btn btn-outline-primary btn-checkout fw-semibold"
-                    disabled="@(!Model.CanCheckOut)">Check Out</button>
-        </form>
-    </div>
-
-    <div class="d-flex gap-5 p-0">
-        <div>
-                <div class="text-muted small">Checked in at</div>
-                <div class="fw-semibold">@(Model.ActualCheckIn?.ToString("h:mm tt") ?? "--")</div>
-        </div>
-        <div>
-            <div class="text-muted small">Checked out at</div>
-            <div class="fw-semibold">@(Model.ActualCheckOut?.ToString("h:mm tt") ?? "--")</div>
-        </div>
-    </div>
-
-    @if (Model.IsMissed)
-    {
-        <div class="text-danger fw-semibold small">
-            @(Model.ActualCheckIn == null
-                ? "This visit is marked Missed because no check-in was recorded within 60 minutes of the scheduled start. You can still check in to log it."
-                : "This visit is marked Missed because check-in happened more than 60 minutes after the scheduled start.")
-        </div>
-    }
-</div>
-
-@* Add notes section *@
-<form asp-action="AddNote" asp-route-id="@Model.VisitID" method="post" class="mt-4">
-    <div class="fs-5 fw-semibold mb-2">Add a note</div>
-    <textarea asp-for="NewNote" class="form-control" rows="4"
-                placeholder="What should the next caregiver know?"></textarea>
-    <span asp-validation-for="NewNote" class="text-danger"></span>
+<div class="bg-white p-4 rounded-4">
+    @* Top section *@
     <div>
-        <button type="submit" class="btn btn-primary fw-semibold mt-2">Save notes</button>
+        <a asp-controller="Visits" asp-action="MyVisits" class="btn btn-link p-0 fw-semibold">Back to my visits</a>
+        <h1 class="mt-2 mb-1">@Model.SeniorName</h1>
+        <span class="status-badge @statusClass">@statusLabel</span>
     </div>
-</form>
 
-@* Notes section *@
-<div class="mt-4">
-    <div class="fs-5 fw-semibold">Notes</div>
-
-    @if (!Model.Notes.Any())
-    {
-        <div class="text-muted">No notes yet.</div>
-    }
-
-    @foreach (var n in Model.Notes)
-    {
-        <div class="py-2 border-bottom">
-            <div class="text-muted fw-semibold small">@n.CreatedAt.ToString("MMM d, h:mm tt") · @n.AuthorName</div>
-            <div class="text-break" style="white-space: pre-wrap">@n.Text</div>
+    @* Details section *@
+    <div class="row mt-2 g-3">
+        <div class="col-md-6">
+            <div class="text-muted small">Scheduled start</div>
+            <div class="fw-semibold mb-3">@Model.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</div>
+            <div class="text-muted small">Resident address</div>
+            <div class="fw-semibold">@Model.ResidentAddress</div>
         </div>
-    }
+        <div class="col-md-6">
+            <div class="text-muted small">Appointment type</div>
+            <div class="fw-semibold mb-3">@Model.ServiceName</div>
+            <div class="text-muted small">Destination address</div>
+            <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.DestinationAddress) ? "-" : Model.DestinationAddress)</div>
+        </div>
+    </div>
+
+    @* Check in / Check out section *@
+    <div class="d-flex flex-column mt-4 p-3 rounded gap-3" style="background-color: var(--color-active-bg)">
+        <div class="fw-semibold">@checkHeading</div>
+
+        <div class="d-flex gap-2">
+            <form asp-action="CheckIn" asp-route-id="@Model.VisitID" method="post">
+                <button type="submit" class="btn btn-primary fw-semibold" disabled="@(!Model.CanCheckIn)">Check In</button>
+            </form>
+            <form asp-action="CheckOut" asp-route-id="@Model.VisitID" method="post">
+                <button type="submit" class="btn btn-outline-primary btn-checkout fw-semibold"
+                        disabled="@(!Model.CanCheckOut)">Check Out</button>
+            </form>
+        </div>
+
+        <div class="d-flex gap-5 p-0">
+            <div>
+                    <div class="text-muted small">Checked in at</div>
+                    <div class="fw-semibold">@(Model.ActualCheckIn?.ToString("h:mm tt") ?? "--")</div>
+            </div>
+            <div>
+                <div class="text-muted small">Checked out at</div>
+                <div class="fw-semibold">@(Model.ActualCheckOut?.ToString("h:mm tt") ?? "--")</div>
+            </div>
+        </div>
+
+        @if (Model.IsMissed)
+        {
+            <div class="text-danger fw-semibold small">
+                @(Model.ActualCheckIn == null
+                    ? "This visit is marked Missed because no check-in was recorded within 60 minutes of the scheduled start. You can still check in to log it."
+                    : "This visit is marked Missed because check-in happened more than 60 minutes after the scheduled start.")
+            </div>
+        }
+    </div>
+
+    @* Add notes section *@
+    <form asp-action="AddNote" asp-route-id="@Model.VisitID" method="post" class="mt-4">
+        <div class="fs-5 fw-semibold mb-2">Add a note</div>
+        <textarea asp-for="NewNote" class="form-control" rows="4"
+                    placeholder="What should the next caregiver know?"></textarea>
+        <span asp-validation-for="NewNote" class="text-danger"></span>
+        <div>
+            <button type="submit" class="btn btn-primary fw-semibold mt-2">Save notes</button>
+        </div>
+    </form>
+
+    @* Notes section *@
+    <div class="mt-4">
+        <div class="fs-5 fw-semibold">Notes</div>
+
+        @if (!Model.Notes.Any())
+        {
+            <div class="text-muted">No notes yet.</div>
+        }
+
+        @foreach (var n in Model.Notes)
+        {
+            <div class="py-2 border-bottom">
+                <div class="text-muted fw-semibold small">@n.CreatedAt.ToString("MMM d, h:mm tt") · @n.AuthorName</div>
+                <div class="text-break" style="white-space: pre-wrap">@n.Text</div>
+            </div>
+        }
+    </div>
 </div>
