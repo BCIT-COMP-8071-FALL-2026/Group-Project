@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
+using OLTPApp.Services;
 using System.Security.Claims;
 
 namespace OLTPApp.Controllers;
@@ -91,6 +92,35 @@ public class VisitsController : Controller
 
         TempData["SuccessMessage"] = "Visit scheduled.";
         return RedirectToAction(nameof(Schedule));
+    }
+
+    [HttpGet]
+    [Authorize(Policy = Policies.AgencyManager)]
+    public async Task<IActionResult> AgencyVisits()
+    {
+        var agencyId = await GetManagerAgencyIdAsync();
+        if (agencyId == null)
+            return Forbid();
+        
+        var agencyVisits = await _db.Visit
+            .Where(v => v.Caregiver.AgencyID == agencyId)
+            .OrderByDescending(v => v.ScheduledStart)
+            .Select(v => new AgencyVisitListItem
+            {
+                VisitID = v.VisitID,
+                ScheduledStart = v.ScheduledStart,
+                SeniorName = v.Senior.Person.FirstName + " " + v.Senior.Person.LastName,
+                CaregiverName = v.Caregiver.Person.FirstName + " " + v.Caregiver.Person.LastName,
+                ServiceName = v.Service.ServiceName,
+                Status = VisitStatusHelper.GetDisplayStatus(v)
+            })
+            .ToListAsync();
+
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Vancouver");
+        foreach (var visit in agencyVisits)
+            visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), timeZone);
+        
+        return View(agencyVisits);
     }
 
     [HttpGet]
