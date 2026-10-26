@@ -1,0 +1,46 @@
+﻿@model OLTPApp.Models.Senior
+
+@{
+	ViewData["Title"] = "Review Senior";
+	var steps = new[] { "Review profile", "Choose action", "Confirm" };
+}
+
+<div class="center-page-wrapper">
+	<div class="center-page">
+		<partial name="_progress" model='@( (1, steps, false))' />
+		<h2 class="align-center">Deactivate @Model.Person.FirstName @Model.Person.LastName's account?</h2>
+
+		<span class="note align-center">Please read this before you continue</span>
+		<div class="warning-message">
+			<span class="material-symbols-outlined warning-icon">
+				warning
+			</span>
+			<span>@Model.Person.FirstName's information won't be deleted. It will be kept safely for 5 years</span>
+		</div>
+		<div class="page-content-sp">
+			<ul>
+				<li>@Model.Person.FirstName's profile will be hidden from the active list.</li>
+				<li>No one will be able to log in to this account.</li>
+				<li>The record stay archived and are not deleted.</li>
+			</ul>
+		</div>
+		<form asp-controller="AdminSenior" asp-action="ContinueDeactivation" method="post">
+
+			@Html.AntiForgeryToken()
+
+			<input type="hidden" name="seniorID" value="@Model.SeniorID" />
+
+			<div class="form-btn-group">
+
+				<a asp-controller="SeniorProfile" asp-action="Index" asp-route-seniorID="@Model.SeniorID" class="secondary-btn">
+					Cancel
+				</a>
+				<button type="submit" class="primary-btn">Continue</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/deactivate.css" asp-append-version="true" />
+}

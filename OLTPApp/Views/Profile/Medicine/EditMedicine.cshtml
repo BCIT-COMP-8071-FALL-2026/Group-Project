@@ -1,0 +1,97 @@
+﻿@model OLTPApp.Models.MedicationItem
+
+@{
+    ViewData["Title"] = "Edit Medicine";
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Edit @Model.Name</span>
+    </div>
+
+    <form asp-controller="SeniorProfile"
+          asp-action="EditMedicine"
+          asp-route-seniorID="@ViewBag.CurrentSenior.SeniorID"
+          method="post"
+          class="profile-detail-form personal-detail-form">
+
+        @Html.AntiForgeryToken()
+
+        <input asp-for="ID" type="hidden" />
+        <input type="hidden"
+               name="seniorID"
+               value="@ViewBag.CurrentSenior.SeniorID" />
+
+        <div class="form-input">
+            <label asp-for="Name" class="control-label">Medication name</label>
+            <input asp-for="Name" class="form-control" required />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="Dose" class="control-label">Dose</label>
+            <input asp-for="Dose" class="form-control" required />
+            <span asp-validation-for="Dose" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="Frequency" class="control-label">How often</label>
+            <input asp-for="Frequency" class="form-control" required />
+            <span asp-validation-for="Frequency" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="PrescribedBy" class="control-label">Prescribed by</label>
+            <input asp-for="PrescribedBy" class="form-control" required />
+            <span asp-validation-for="PrescribedBy" class="text-danger"></span>
+        </div>
+
+        <div class="input2">
+            <div class="form-input">
+                <label asp-for="StartDate" class="control-label">Start date</label>
+                <input asp-for="StartDate" type="date" class="form-control" required />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-input">
+                <label asp-for="NextRefillDate" class="control-label">Next refill date</label>
+                <input asp-for="NextRefillDate" type="date" class="form-control" required />
+                <span asp-validation-for="NextRefillDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-input radio-input">
+            <label class="control-label">Status</label>
+
+            <div>
+                <input asp-for="Status" type="radio" value="Active" id="active" required />
+                <label for="active">Active</label>
+
+                <input asp-for="Status" type="radio" value="Stopped" id="stopped" />
+                <label for="stopped">Stopped</label>
+            </div>
+
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-group-btn">
+            <button type="submit" class="primary-btn">Save</button>
+
+            <button type="button"
+                    class="secondary-btn"
+                    onclick="window.location.href='@Url.Action("Medications", "SeniorProfile", new { seniorID = ViewBag.CurrentSenior.SeniorID })'">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/senior-profile.js" asp-append-version="true"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        applyInitialNameColors();
+    </script>
+}

@@ -1,0 +1,76 @@
+﻿body {
+    min-height: unset;
+    margin-bottom: unset;
+}
+
+.center-page-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    height: calc(100vh - 60px);
+}
+
+.center-page {
+    max-width: 60vw;
+    width: fit-content;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.warning-message {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.form-btn-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px
+}
+
+.page-content-sp {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+ul {
+    margin-bottom: 0px;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.radio-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-check {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    border-bottom: solid 1px var(--border-color);
+    margin-bottom: 0px !important;
+    padding-bottom: 10px;
+}
+
+form .form-check:last-of-type {
+    border: none;
+}
+
+form .page-content-sp  {
+    margin-bottom: 20px
+}
+
+.enter-name-require-lbl {
+    padding-bottom: 10px;
+}

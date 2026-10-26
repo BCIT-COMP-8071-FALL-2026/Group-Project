@@ -2,14 +2,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OLTPApp.Models;
 
-public enum SeniorStatus { Active, Deactivated }
+public enum SeniorStatus { Active, Deactivated, Archived }
 
 public class Senior
 {
     public int SeniorID { get; set; }               // PK and FK to Person
     public Person Person { get; set; } = null!;
 
+    [Required(ErrorMessage = "Date of birth is required")]
     public DateOnly DateOfBirth { get; set; }
+    [Required(ErrorMessage = "Please select whether you live alone.")]
     public bool IsLivingAlone { get; set; }
     [MaxLength(200)] public string? CurrentDoctorName { get; set; }
     [MaxLength(20)] public string? CurrentDoctorPhone { get; set; }

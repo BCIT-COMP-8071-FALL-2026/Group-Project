@@ -1,0 +1,201 @@
+﻿@model OLTPApp.Models.Senior
+@{
+	ViewData["Title"] = "Index";
+	var isAdmin = User.IsInRole("Admin");
+
+}
+
+<div class="personal-detail-wrapper profile-page-div" 
+	data-keep-editing-senior-information="@(ViewBag.KeepEditingSeniorInformation == true ? "true" : "false")"
+	data-keep-editing-personal-information="@(ViewBag.KeepEditingPersonalInformation == true ? "true" : "false")">
+			<div class="profile-detail-title">
+				<span class="detail-title">Personal details</span>
+				<button type="button" id="editPersonalDetailBtn" class="primary-btn">Edit</button>
+			</div>
+			<form asp-action="EditPersonalInformation" method="post" enctype="multipart/form-data" class="profile-detail-form personal-detail-form" id="personalDetailForm">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<input type="hidden" name="seniorID" value="@Model.SeniorID" />
+				<div class="form-input">
+					<label asp-for="Person.FirstName" class="control-label">First Name</label>
+					<input asp-for="Person.FirstName" class="form-control" readonly/>
+					<span asp-validation-for="Person.FirstName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.MiddleName" class="control-label">Middle Name</label>
+					<input asp-for="Person.MiddleName" class="form-control" readonly/>
+					<span asp-validation-for="Person.MiddleName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.LastName" class="control-label">Last Name</label>
+					<input asp-for="Person.LastName" class="form-control" readonly/>
+					<span asp-validation-for="Person.LastName" class="text-danger"></span>
+				</div>
+				<div class="form-input">
+					<label asp-for="Person.Phone" class="control-label">Phone Number</label>
+					<input asp-for="Person.Phone" class="form-control phone-format"type="tel" id="phone" />
+					<span asp-validation-for="Person.Phone" class="text-danger"></span>
+				</div>
+				<div class="form-input" id="addressInput">
+					<label class="control-label">Address</label>
+					<input class="form-control" value="@($"{Model?.Person.Street}{(!string.IsNullOrWhiteSpace(Model?.Person?.Street) && !string.IsNullOrWhiteSpace(Model?.Person?.City) ? ", " : "")} {Model?.Person.City}{(!string.IsNullOrWhiteSpace(Model?.Person?.City) && !string.IsNullOrWhiteSpace(Model?.Person?.Province) ? ", " : "")} {Model?.Person.Province} {Model?.Person.PostalCode}")" />
+				</div>
+				
+				<div class="d-none" id="addressInputDetail">
+					<div class="form-input">
+						<label asp-for="Person.Street" class="control-label">Street</label>
+						<input asp-for="Person.Street" class="form-control" />
+						<span asp-validation-for="Person.Street" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.City" class="control-label">City</label>
+						<input asp-for="Person.City" class="form-control" />
+						<span asp-validation-for="Person.City" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.Province" class="control-label">Province</label>
+						<input asp-for="Person.Province" class="form-control" />
+						<span asp-validation-for="Person.Province" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.PostalCode" class="control-label">Postal Code</label>
+						<input asp-for="Person.PostalCode" class="form-control" />
+						<span asp-validation-for="Person.PostalCode" class="text-danger"></span>
+					</div>
+					<div class="form-input">
+						<label asp-for="Person.Country" class="control-label">Country</label>
+						<input asp-for="Person.Country" class="form-control" />
+						<span asp-validation-for="Person.Country" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="form-input" id="addressInput">
+					<label class="control-label">Email</label>
+					<input class="form-control" name="email" id="Email" value="@ViewBag.SeniorEmail" data-original-email="@ViewBag.OriginalSeniorEmail" readonly/>
+					<span class="text-danger">@Html.ValidationMessage("Email")</span>				
+				</div>
+				<div class="form-group-btn d-none" id="personalDetailsActionBtn">
+					<button type="submit" class="primary-btn">Save</button>
+					<button type="button" class="secondary-btn" onclick="cancelEditPersonalInfo()">Cancel</button>
+				</div>
+			</form>
+		</div>
+	<div class="senior-detail-wrapper profile-page-div">
+	<div class="profile-detail-title">
+		<span class="detail-title">Senior details</span>
+		<button type="button" id="editSeniorDetailBtn" class="primary-btn">Edit</button>
+	</div>
+	<form asp-action="EditSeniorInformation" method="post" enctype="multipart/form-data" class="profile-detail-form senior-detail-form" id="seniorDetailForm">
+		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+		<input type="hidden" asp-for="SeniorID" />
+		<div class="form-input">
+			<label asp-for="DateOfBirth" class="control-label">Date of Birth</label>
+			<input asp-for="DateOfBirth" class="form-control" readonly type="date"/>
+			<span asp-validation-for="DateOfBirth" class="text-danger"></span>
+				</div>
+		<div class="form-input" id="isLivingAloneData">
+			<label asp-for="IsLivingAlone" class="control-label">Living Situation</label>
+			<input class="form-control" value="@(Model.IsLivingAlone ? "Lives alone" : "Does not live alone")" readonly />		
+		</div>
+		<div class="form-input d-none radio-input" id="isLivingAloneInput">
+			<label asp-for="IsLivingAlone" class="control-label">Living Alone: </label>
+			<div>
+				<input asp-for="IsLivingAlone" type="radio" value="true" id="yes"/>
+				<label for="yes">Yes</label>
+				<input asp-for="IsLivingAlone" type="radio" value="false" id="no" />
+				<label for="no">No</label>
+			</div>
+			<span asp-validation-for="IsLivingAlone" class="text-danger"></span>
+		</div>
+		<div class="form-input">
+			<label asp-for="CurrentDoctorName" class="control-label">Primary Professional</label>
+			<input asp-for="CurrentDoctorName" class="form-control" />
+			<span asp-validation-for="CurrentDoctorName" class="text-danger"></span>
+		</div>	
+		<div class="form-input">
+			<label asp-for="CurrentDoctorPhone" class="control-label">Professional Phone Number</label>
+			<input asp-for="CurrentDoctorPhone" class="form-control phone-format" type="tel" id="doctorPhone"/>
+			<span asp-validation-for="CurrentDoctorPhone" class="text-danger"></span>
+		</div>
+		<div class="form-group-btn d-none" id="seniorDetailsActionBtn">
+			<button type="submit" class="primary-btn">Save</button>
+			<button type="reset" class="secondary-btn" onclick="cancelEditPersonalInfo()">Cancel</button>
+		</div>
+	</form>
+</div>
+@if (User.IsInRole(RoleNames.Admin))
+{
+	@if(@Model.Status == SeniorStatus.Active)
+	{
+		<form asp-controller="AdminSenior" asp-action="OpenDeactivation" method="post">
+
+			@Html.AntiForgeryToken()
+
+			<input type="hidden" name="seniorId" value="@Model.SeniorID" />
+
+			<button type="submit" class="deactivate-btn">
+				Deactivate Account
+			</button>
+		</form>
+		
+	} else if (Model.Status == SeniorStatus.Deactivated)
+	{
+		<form asp-controller="AdminSenior" asp-action="Activate" method="post">
+
+			@Html.AntiForgeryToken()
+
+			<input type="hidden" name="seniorId" value="@Model.SeniorID" />
+
+			<button type="submit" class="activate-btn">
+				Activate Account
+			</button>
+		</form>
+	}
+}
+
+
+@section Scripts {
+	@if (isAdmin)
+	{
+		<script>
+
+		console.log("admin-senior.js loaded");
+		</script>
+
+		<script src="~/js/admin-senior.js"
+				asp-append-version="true"></script>
+	}
+	else
+	{
+		<script src="~/js/senior-profile.js"
+				asp-append-version="true"></script>
+	}
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			document.querySelectorAll(".phone-format").forEach(function (phoneInput) {
+				phoneInput.addEventListener("input", function () {
+					let digits = phoneInput.value
+						.replace(/\D/g, "")
+						.substring(0, 10);
+
+					if (digits.length > 6) {
+						phoneInput.value =
+							digits.substring(0, 3) + "-" +
+							digits.substring(3, 6) + "-" +
+							digits.substring(6);
+					} else if (digits.length > 3) {
+						phoneInput.value =
+							digits.substring(0, 3) + "-" +
+							digits.substring(3);
+					} else {
+						phoneInput.value = digits;
+					}
+				});
+			});
+		});
+	</script>
+	<script>
+		applyInitialNameColors();
+	</script>
+
+}
+

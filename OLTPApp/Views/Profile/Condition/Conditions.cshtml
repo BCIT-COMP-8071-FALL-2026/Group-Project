@@ -1,0 +1,109 @@
+﻿ @model OLTPApp.Models.Senior
+@using System.Text.Json
+@using System.Globalization
+@using OLTPApp.Models
+@using System.Text.Json.Serialization
+
+@{
+	ViewData["Title"] = "Conditions";
+
+	var conditions = new List<MedicalConditionItem>();
+	var hasInvalidMedicalConditions = false;
+
+	var jsonOptions = new JsonSerializerOptions
+	{
+		Converters = { new JsonStringEnumConverter() }
+	};
+
+	if (!string.IsNullOrWhiteSpace(Model.MedicalConditions))
+	{
+		try
+		{
+			conditions = JsonSerializer.Deserialize<List<MedicalConditionItem>>(
+				Model.MedicalConditions,
+				jsonOptions
+			) ?? new List<MedicalConditionItem>();
+		}
+		catch (JsonException)
+		{
+			hasInvalidMedicalConditions = true;
+			conditions = new List<MedicalConditionItem>();
+			var item = new MedicalConditionItem();
+			item.Description = Model.MedicalConditions;
+			conditions.Add(item);
+		}
+    }
+
+	var seniorID = Model.SeniorID;
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+	<div class="profile-detail-title">
+		<span class="detail-title">Medical Conditions</span>
+
+		<button type="button"
+				class="secondary-btn"
+				onclick="window.location.href='@Url.Action("AddCondition", "SeniorProfile", new { seniorID = seniorID })'">
+			+ Condition
+		</button>
+	</div>
+
+	<div class="m-list-wrapper">
+		<div class="m-list">
+
+			@if (conditions.Count == 0)
+			{
+				<p>No medical conditions have been added.</p>
+			}
+			else
+			{
+				@foreach (var condition in conditions)
+				{
+					<div class="m-data">
+						<div class="m-detail">
+							<div class="m-info">
+								<span class="prescribed-by note">
+									Diagnosed
+									@(condition.DiagnosisDate.HasValue
+										? condition.DiagnosisDate.Value.ToString(
+											"MMM d, yyyy",
+											CultureInfo.InvariantCulture)
+										: "date not specified")
+									· @condition.Description
+								</span>
+
+								<span class="m-name">
+									@condition.Name
+								</span>
+
+								<span class="note @(condition.Status?.ToString().ToLowerInvariant() +"-m" ?? "not-specified")">
+									@(condition.Status?.ToString() ?? "")
+								</span>
+							</div>
+						</div>
+
+						<button type="button"
+								class="primary-btn"
+								onclick="window.location.href='@Url.Action("EditCondition", "SeniorProfile", new { id = condition.ID, seniorID = seniorID })'">
+							Edit
+						</button>
+					</div>
+				}
+			}
+
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="~/js/senior-profile.js"
+			asp-append-version="true"></script>
+
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+
+	<script>
+		applyInitialNameColors();
+	</script>
+}

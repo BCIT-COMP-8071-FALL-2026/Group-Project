@@ -1,0 +1,129 @@
+﻿@model OLTPApp.Models.Senior
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using System.Globalization
+@using OLTPApp.Models
+@{
+    ViewData["Title"] = "Medications";
+
+    var medications = new List<MedicationItem>();
+
+    var jsonOptions = new JsonSerializerOptions
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    if (!string.IsNullOrWhiteSpace(Model.CurrentMedication))
+    {
+        try
+        {
+            medications = JsonSerializer.Deserialize<List<MedicationItem>>(
+                Model.CurrentMedication,
+                jsonOptions
+            ) ?? new List<MedicationItem>();
+        }
+        catch (JsonException)
+        {
+            medications = new List<MedicationItem>();
+            MedicationItem item = new MedicationItem();
+            item.Name = Model.CurrentMedication;
+            medications.Add(item);
+        }
+    }
+
+    var today = DateOnly.FromDateTime(DateTime.Today);
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Medications</span>
+
+        <button type="button" class="secondary-btn" onclick="window.location.href='@Url.Action("AddMedicine", "SeniorProfile", new { seniorID = Model.SeniorID })'">
+            + Medication
+        </button>
+    </div>
+
+    <div class="m-list-wrapper">
+        <div class="m-list">
+
+            @if (medications.Count == 0)
+            {
+                <p>No medications have been added.</p>
+            }
+            else
+            {
+                @foreach (var medicine in medications)
+                {
+                    var daysUntilRefill = medicine.NextRefillDate.HasValue
+                        ? medicine.NextRefillDate.Value.DayNumber - today.DayNumber
+                        : (int?)null;
+
+                    var refillClass = daysUntilRefill.HasValue &&
+                                      daysUntilRefill.Value <= 7
+                        ? "important-note"
+                        : "regular-note";
+
+                    var refillText = !medicine.NextRefillDate.HasValue
+                        ? "No refill date set"
+                        : daysUntilRefill == 0
+                            ? $"Refill {medicine.NextRefillDate.Value.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)} (today)"
+                            : daysUntilRefill < 0
+                                ? $"Refill {medicine.NextRefillDate.Value.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)} (overdue by {Math.Abs(daysUntilRefill.Value)} days)"
+                                : $"Refill {medicine.NextRefillDate.Value.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)} (in {daysUntilRefill.Value} days)";
+                    <div class="m-data">
+                        <div class="m-detail">
+                            <div class="m-info">
+                                <span class="prescribed-by note">
+                                    @(string.IsNullOrWhiteSpace(medicine.PrescribedBy)
+                                        ? "Prescriber not specified"
+                                        : $"Prescribed by {medicine.PrescribedBy}")
+                                    @if (medicine.StartDate.HasValue)
+                                    {
+                                        <text> · Started @medicine.StartDate.Value.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)</text>
+                                    }
+                                </span>
+
+                                <span class="m-name">
+                                    @medicine.Name
+                                </span>
+
+                                <span class="note">
+                                    @medicine.Dose · @medicine.Frequency
+                                </span>
+                            </div>
+
+                            <div>
+                                @if (medicine.Status == MedicationStatus.Active)
+                                {
+                                    <span class="active-m">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="regular-note">Stopped</span>
+                                }
+
+                                <span class="@refillClass">
+                                    @refillText
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                class="primary-btn"
+                                onclick="window.location.href='@Url.Action("EditMedicine", "SeniorProfile", new { id = medicine.ID, seniorID = Model.SeniorID })'">
+                            Edit
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/senior-profile.js" asp-append-version="true"></script>
+	<script>
+		applyInitialNameColors();
+	</script>
+}

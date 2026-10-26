@@ -1,0 +1,76 @@
+﻿@model OLTPApp.Models.Senior
+
+@{
+    ViewData["Title"] = "Emergency Contact";
+
+    var hasEmergencyContact =
+        !string.IsNullOrWhiteSpace(Model.EmergencyContactName) ||
+        !string.IsNullOrWhiteSpace(Model.EmergencyContactPhone) ||
+        !string.IsNullOrWhiteSpace(Model.EmergencyContactRelationship);
+
+    var seniorID = Model.SeniorID;
+
+    var contactUrl = Url.Action(
+        hasEmergencyContact ? "EditEmergencyContact" : "AddEmergencyContact",
+        "SeniorProfile",
+        new { seniorID }
+    );
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Emergency Contact</span>
+
+        <button type="button"
+                class="secondary-btn"
+                onclick="window.location.href='@contactUrl'">
+            @(hasEmergencyContact
+                ? "Edit Emergency Contact"
+                : "+ New Emergency Contact")
+        </button>
+    </div>
+
+    <div class="m-list-wrapper">
+        @if (hasEmergencyContact)
+        {
+            <div class="m-list">
+                <div class="m-data">
+                    <div class="m-detail">
+                        <div class="m-info">
+                            <span class="m-name">
+                                @Model.EmergencyContactName
+                            </span>
+
+                            <div>
+                                <span class="attoney note">
+                                    @Model.EmergencyContactRelationship
+                                </span>
+
+                                <span class="phone-number note">
+                                    @Model.EmergencyContactPhone
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>No emergency contact has been added yet.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/senior-profile.js"
+            asp-append-version="true"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        applyInitialNameColors();
+    </script>
+}

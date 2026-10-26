@@ -1,0 +1,42 @@
+﻿@model (int CurrentStep, string[] Steps, bool showStepName)
+
+@{
+    var currentStep = Model.CurrentStep;
+    var steps = Model.Steps;
+    var showStepName = Model.showStepName;
+    var progress = steps.Length > 1
+        ? (currentStep - 1) * 100 / (steps.Length - 1)
+        : 100;
+}
+
+<div class="deactivation-progress mb-4">
+    <div class="progress-label">
+        Step @currentStep of @steps.Length
+    </div>
+
+    <div class="progress-track">
+        <div class="progress-fill"
+             style="width: @(progress)%">
+        </div>
+    </div>
+
+    @if (showStepName)
+    {
+        <div class="progress-steps">
+            @for (int i = 0; i < steps.Length; i++)
+            {
+                var stepNumber = i + 1;
+                var completed = stepNumber < currentStep;
+                var active = stepNumber == currentStep;
+
+                <div class="progress-step @(completed ? "completed" : "") @(active ? "active" : "")">
+                    <div class="step-circle">
+                        @(completed ? "✓" : stepNumber.ToString())
+                    </div>
+
+                    <span class="step-title">@steps[i]</span>
+                </div>
+            }
+        </div>
+    }
+</div>

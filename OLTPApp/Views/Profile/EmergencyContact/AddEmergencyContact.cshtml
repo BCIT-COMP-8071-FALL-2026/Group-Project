@@ -1,0 +1,85 @@
+﻿@model OLTPApp.Models.Senior
+
+@{
+    ViewData["Title"] = "Add Emergency Contact";
+}
+
+<div class="personal-detail-wrapper profile-page-div">
+    <div class="profile-detail-title">
+        <span class="detail-title">Add Emergency Contact</span>
+    </div>
+
+    <form asp-action="AddEmergencyContact"
+          asp-controller="SeniorProfile"
+          method="post"
+          class="profile-detail-form personal-detail-form">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="seniorID" value="@ViewBag.CurrentSenior?.SeniorID" />
+        <div class="form-input">
+            <label asp-for="EmergencyContactName">Name</label>
+            <input asp-for="EmergencyContactName" class="form-control"placeholder="Name" />
+            <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label asp-for="EmergencyContactPhone">Phone Number</label>
+            <input asp-for="EmergencyContactPhone" class="form-control" type="tel" placeholder="604-555-0190"/>
+            <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+        </div>
+
+        <div class="form-input">
+            <label for="EmergencyContactRelationship">Relationship</label>
+            <input asp-for="EmergencyContactRelationship" class="form-control" type="text" placeholder="Friend" />
+            <span asp-validation-for="EmergencyContactRelationship" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group-btn">
+            <button type="submit" class="primary-btn">Save Changes</button>
+
+            <button type="button"
+                    class="secondary-btn"
+                    onclick="window.location.href='@Url.Action("EmergencyContacts", "SeniorProfile", new { seniorID = ViewBag.CurrentSenior?.SeniorID })'">
+                Cancel
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/senior-profile.js"
+            asp-append-version="true"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        applyInitialNameColors();
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const phoneInput = document.getElementById("EmergencyContactPhone");
+
+            if (!phoneInput) return;
+
+            phoneInput.addEventListener("input", function () {
+                let digits = phoneInput.value.replace(/\D/g, "").substring(0, 10);
+
+                if (digits.length > 6) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3, 6) + "-" +
+                        digits.substring(6);
+                } else if (digits.length > 3) {
+                    phoneInput.value =
+                        digits.substring(0, 3) + "-" +
+                        digits.substring(3);
+                } else {
+                    phoneInput.value = digits;
+                }
+            });
+        });
+    </script>
+}

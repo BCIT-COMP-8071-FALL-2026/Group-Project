@@ -15,7 +15,7 @@ html {
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+	font-size: 16px;
   }
 }
 
@@ -93,8 +93,17 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+	position: relative;
+	min-height: 100%;
+	--background-color: #F2F2F7;
+	--secondary-text: #6D6D72;
+	--primary-text: #2C2C2A;
+	--row-divider: #C6C6C8;
+	--border-color: #C6C6C8;
+	--important: #FCB3AD;
+	--active: #34C759;
+	--active-background: #CFF7D3;
+	--error-text: #D70015;
 }
 
 body {
@@ -110,4 +119,73 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+.deactivate-btn, .primary-btn, .secondary-btn {
+	text-decoration: none;
+}
+
+.deactivate-btn {
+	background-color: #FFECEB;
+	color: var(--error-text);
+	border-radius: 10px;
+	padding: 10px 20px 10px 20px;
+	font-size: 14px;
+	width: fit-content;
+	font-weight: 500;
+}
+
+.primary-btn {
+	background-color: #007AFF;
+	color: #FFFFFF;
+	border-radius: 10px;
+	padding: 10px 20px 10px 20px;
+	border: solid 1px #FFFFFF;
+	font-weight: 500;
+	font-size: 14px;
+}
+.primary-btn:hover {
+
+}
+
+.secondary-btn {
+	background-color: #FFFFFF;
+	color: #007AFF;
+	padding: 10px 20px 10px 20px;
+	border-radius: 10px;
+	border: solid 1px #007AFF;
+	font-weight: 500;
+	font-size: 14px;
+}
+
+.error-message {
+	color: #D70015;
+	background-color: #FFECEB;
+}
+
+.warning-message {
+	color: #C93400;
+	background-color: #FFF4E5;
+}
+
+.user-role {
+	padding: 10px 0px;
+}
+
+.user-role label {
+	padding-right: 10px
+}
+
+.search-input {
+	width: calc(100% - 165px);
+}
+
+.search-btn-group {
+	width: 165px;
+}
+
+.search-form {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
 }

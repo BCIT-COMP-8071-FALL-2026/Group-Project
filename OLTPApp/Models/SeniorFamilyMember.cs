@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace OLTPApp.Models;
 
 public class SeniorFamilyMember
