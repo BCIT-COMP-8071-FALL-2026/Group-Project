@@ -23,8 +23,8 @@
 -- CancelledCount, LateCheckInCount.
 --
 -- Rerunnable: each run is a full reload -- the star holds OLTPAppDb data only, no
--- duplicates. Assumes OLTPAppDb enforces ActualCheckOut >= ActualCheckIn (the DDL CHECK
--- CK_FactVisit_CheckOutAfterCheckIn otherwise rejects the row).
+-- duplicates. OLTPAppDb does not enforce ActualCheckOut >= ActualCheckIn, so a check-out
+-- before check-in loads as NULL instead of failing CK_FactVisit_CheckOutAfterCheckIn.
 
 USE OlapDW;
 GO
@@ -76,9 +76,11 @@ BEGIN
             doz.OrganizationKey,
             v.ScheduledStart,
             v.ActualCheckIn,
-            v.ActualCheckOut,
-            -- DurationMinutes: whole minutes check-in -> check-out, when both exist.
-            CASE WHEN v.ActualCheckIn IS NOT NULL AND v.ActualCheckOut IS NOT NULL
+            -- ActualCheckOut: NULL when before check-in, so one bad row cannot fail the reload.
+            CASE WHEN v.ActualCheckOut >= v.ActualCheckIn THEN v.ActualCheckOut
+                 ELSE NULL END,
+            -- DurationMinutes: whole minutes check-in -> check-out, when both exist and in order.
+            CASE WHEN v.ActualCheckOut >= v.ActualCheckIn
                  THEN DATEDIFF(MINUTE, v.ActualCheckIn, v.ActualCheckOut)
                  ELSE NULL END,
             -- LateMinutes: NULL if no check-in; 0 if early/on time; else minutes past start.
