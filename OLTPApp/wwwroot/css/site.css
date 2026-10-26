@@ -46,6 +46,8 @@ html {
 
 .status-badge {
   display: inline-block;
+  min-width: 7rem;
+  text-align: center;
   padding: 4px 14px;
   border-radius: 999px;
   font-size: 0.875rem;

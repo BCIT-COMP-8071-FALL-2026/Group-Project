@@ -1,0 +1,84 @@
+@using OLTPApp.Services
+@model AgencyVisitsViewModel
+@{
+    ViewData["Title"] = "Agency Visits";
+    var first = (Model.CurrentPage - 1) * Model.PageSize + 1;
+    var last = first + Model.Visits.Count - 1;
+}
+
+<div class="bg-white p-4 rounded-4">
+    <h1>Agency Visits</h1>
+    <div class="text-muted fw-semibold">
+        Visits for @Model.AgencyName, Newest first
+    </div>
+
+    @if (Model.TotalCount == 0)
+    {
+        <p>There are no visits for your agency yet.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Time (Vancouver time)</th>
+                    <th scope="col">Senior Name</th>
+                    <th scope="col">Caregiver Name</th>
+                    <th scope="col">Appointment Type</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var visit in Model.Visits)
+                {
+                    var (statusClass, statusLabel) = visit.Status switch
+                    {
+                        VisitDisplayStatus.Scheduled => ("status-scheduled", "Scheduled"),
+                        VisitDisplayStatus.InProgress => ("status-inprogress", "In Progress"),
+                        VisitDisplayStatus.Completed => ("status-completed", "Completed"),
+                        VisitDisplayStatus.Cancelled => ("status-cancelled", "Cancelled"),
+                        VisitDisplayStatus.Missed => ("status-missed", "Missed"),
+                        _ => ("status-scheduled", visit.Status.ToString())
+                    };
+                    <tr>
+                        <td>@visit.ScheduledStart.ToString("yyyy-MM-dd h:mm tt")</td>
+                        <td>@visit.SeniorName</td>
+                        <td>@visit.CaregiverName</td>
+                        <td>@visit.ServiceName</td>
+                        <td><span class="status-badge @statusClass">@statusLabel</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">Showing @first-@last of @Model.TotalCount</div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Agency visits pages">
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="AgencyVisits" asp-route-page="1">First</a>
+                        </li>
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="AgencyVisits" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                        </li>
+                        @for (var pageNum = Math.Max(1, Model.CurrentPage - 2); pageNum <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); pageNum++)
+                        {
+                            <li class="page-item @(pageNum == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="AgencyVisits" asp-route-page="@pageNum">@pageNum</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="AgencyVisits" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                        </li>
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="AgencyVisits" asp-route-page="@(Model.TotalPages)">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    }
+</div>

@@ -96,6 +96,55 @@ public class VisitsController : Controller
     }
 
     [HttpGet]
+    [Authorize(Policy = Policies.AgencyManager)]
+    public async Task<IActionResult> AgencyVisits(int page = 1)
+    {
+        const int pageSize = 20;
+
+        var agencyId = await GetManagerAgencyIdAsync();
+        if (agencyId == null)
+            return Forbid();
+
+        var agencyName = await _db.Agency
+            .Where(a => a.AgencyID == agencyId)
+            .Select(a => a.Name)
+            .SingleAsync();
+
+        // Bound page number within available range
+        var totalCount = await _db.Visit.CountAsync(v => v.AgencyID == agencyId.Value);
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalCount / (double)pageSize));
+        page = Math.Clamp(page, 1, totalPages);
+
+        var agencyVisits = await _db.Visit
+            .Where(v => v.AgencyID == agencyId.Value)
+            .OrderByDescending(v => v.ScheduledStart).ThenByDescending(v => v.VisitID)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(v => new AgencyVisitListItem
+            {
+                VisitID = v.VisitID,
+                ScheduledStart = v.ScheduledStart,
+                SeniorName = v.Senior.Person.FirstName + " " + v.Senior.Person.LastName,
+                CaregiverName = v.Caregiver.Person.FirstName + " " + v.Caregiver.Person.LastName,
+                ServiceName = v.Service.ServiceName,
+                Status = VisitStatusHelper.GetDisplayStatus(v)
+            })
+            .ToListAsync();
+
+        foreach (var visit in agencyVisits)
+            visit.ScheduledStart = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(visit.ScheduledStart, DateTimeKind.Utc), VancouverTz);
+
+        return View(new AgencyVisitsViewModel
+        {
+            AgencyName = agencyName,
+            Visits = agencyVisits,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+        });
+    }
+
+    [HttpGet]
     [Authorize(Policy = Policies.Caregiver)]
     public async Task<IActionResult> MyVisits()
     {
