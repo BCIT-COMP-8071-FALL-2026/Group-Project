@@ -9,10 +9,10 @@ import {
   type ChartOptions,
   type Plugin,
 } from 'chart.js'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { Line } from 'react-chartjs-2'
-import type { MissedVisitsMonth } from '../api/missedVisits'
-import { CHART_PRINT_SIZE } from '../chartPrintSize'
+import type { MissedVisitsMonth } from '../api/reports'
+import { MISSED_VISITS_PRINT_SIZE } from '../chartPrintSize'
 import { readChartTheme } from '../chartTheme'
 import {
   formatAxisMonth,
@@ -22,6 +22,7 @@ import {
   formatPercent,
   isCurrentMonth,
 } from '../format'
+import { useChartPrintSize } from '../hooks/useChartPrintSize'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip)
 
@@ -33,29 +34,7 @@ export function MissedVisitsChart({ months }: { months: MissedVisitsMonth[] }) {
   const chartRef = useRef<ChartJS<'line'>>(null)
   const theme = useMemo(() => readChartTheme(), [])
 
-  useEffect(() => {
-    // Unset by default, which makes Chart.js follow the screen's pixel ratio.
-    let screenRatio: number | undefined
-    const beforePrint = () => {
-      const chart = chartRef.current
-      if (!chart) return
-      screenRatio = chart.options.devicePixelRatio
-      chart.options.devicePixelRatio = CHART_PRINT_SIZE.devicePixelRatio
-      chart.resize(CHART_PRINT_SIZE.width, CHART_PRINT_SIZE.height)
-    }
-    const afterPrint = () => {
-      const chart = chartRef.current
-      if (!chart) return
-      chart.options.devicePixelRatio = screenRatio as number
-      chart.resize()
-    }
-    window.addEventListener('beforeprint', beforePrint)
-    window.addEventListener('afterprint', afterPrint)
-    return () => {
-      window.removeEventListener('beforeprint', beforePrint)
-      window.removeEventListener('afterprint', afterPrint)
-    }
-  }, [])
+  useChartPrintSize(chartRef, MISSED_VISITS_PRINT_SIZE)
 
   const data = useMemo<ChartData<'line'>>(() => {
     // The current month is still filling up, so it gets a hollow point and a dashed segment

@@ -8,16 +8,13 @@ describe('format', () => {
     expect(formatMonthShort('2026-09')).toBe('Sep 2026')
   })
 
-  it('adds the year to the first axis label and to each January, and marks the current month', () => {
-    const now = new Date(2026, 2, 13)
-    expect(['2025-11', '2025-12', '2026-01', '2026-02', '2026-03'].map((month, index) => formatAxisMonth(month, index, now))).toEqual([
+  it('adds the year to the first axis label and to each January', () => {
+    expect(['2025-11', '2025-12', '2026-01', '2026-02'].map(formatAxisMonth)).toEqual([
       ['Nov', '2025'],
       'Dec',
       ['Jan', '2026'],
       'Feb',
-      ['Mar', 'to date'],
     ])
-    expect(formatAxisMonth('2027-01', 5, new Date(2027, 0, 2))).toEqual(['Jan', '2027', 'to date'])
   })
 
   it('describes a range of months', () => {

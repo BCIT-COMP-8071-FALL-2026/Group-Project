@@ -6,7 +6,7 @@ const shortMonthYear = new Intl.DateTimeFormat(locale, { month: 'short', year: '
 const longMonth = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' })
 const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
 const count = new Intl.NumberFormat(locale)
-const percent = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const oneDecimal = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 /** A yyyy-MM month as a UTC date, so formatting never shifts it into the previous month. */
 function monthDate(month: string): Date {
@@ -24,13 +24,14 @@ export function formatMonthShort(month: string): string {
   return shortMonthYear.format(monthDate(month))
 }
 
-/** "Oct", with the year underneath on the first label and on every January, and "to date" under the current month. */
-export function formatAxisMonth(month: string, index: number, now = new Date()): string | string[] {
+/**
+ * "Oct", with the year underneath on the first label and on every January. Labels stay this narrow so that
+ * a printed chart can show every month; the current month is marked on the line and in the table instead.
+ */
+export function formatAxisMonth(month: string, index: number): string | string[] {
   const date = monthDate(month)
-  const lines = [shortMonth.format(date)]
-  if (index === 0 || date.getUTCMonth() === 0) lines.push(String(date.getUTCFullYear()))
-  if (isCurrentMonth(month, now)) lines.push('to date')
-  return lines.length === 1 ? lines[0] : lines
+  const label = shortMonth.format(date)
+  return index === 0 || date.getUTCMonth() === 0 ? [label, String(date.getUTCFullYear())] : label
 }
 
 /** "October 2025 to October 2026" */
@@ -44,7 +45,17 @@ export function formatCount(value: number): string {
 
 /** 7.5 -> "7.5%" */
 export function formatPercent(value: number): string {
-  return `${percent.format(value)}%`
+  return `${oneDecimal.format(value)}%`
+}
+
+/** 45.25 -> "45.3" (minutes, always one decimal place) */
+export function formatMinutes(value: number): string {
+  return oneDecimal.format(value)
+}
+
+/** "Yes" or "No" */
+export function formatYesNo(value: boolean): string {
+  return value ? 'Yes' : 'No'
 }
 
 export function formatDateTime(date: Date): string {

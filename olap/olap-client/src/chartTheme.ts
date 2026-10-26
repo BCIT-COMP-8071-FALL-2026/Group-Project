@@ -9,6 +9,8 @@ export interface ChartTheme {
   baseline: string
   successful: string
   missed: string
+  bar: string
+  barHover: string
 }
 
 // Chart.js draws on a canvas, so it can't use CSS variables directly. Read the tokens from index.css.
@@ -27,5 +29,7 @@ export function readChartTheme(): ChartTheme {
     baseline: token('--baseline'),
     successful: token('--series-successful'),
     missed: token('--series-missed'),
+    bar: token('--series-bar'),
+    barHover: token('--series-bar-hover'),
   }
 }
