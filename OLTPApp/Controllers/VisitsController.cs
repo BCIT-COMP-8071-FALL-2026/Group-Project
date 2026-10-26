@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OLTPApp.Authorization;
 using OLTPApp.Data;
 using OLTPApp.Models;
@@ -263,6 +264,40 @@ public class VisitsController : Controller
             visit.Status = VisitStatus.Completed;
             await _db.SaveChangesAsync();
         }
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = Policies.Caregiver)]
+    public async Task<IActionResult> AddNote(int id, string? newNote)
+    {
+        var model = await BuildDetailsAsync(id);
+        if (model == null)
+            return NotFound();
+
+        newNote = newNote?.Trim();
+        if (string.IsNullOrEmpty(newNote))
+            ModelState.AddModelError(nameof(model.NewNote), "Enter a note.");
+        else if (newNote.Length > 2000)
+            ModelState.AddModelError(nameof(model.NewNote), "A note cannot exceed 2000 characters.");
+        
+        if (!ModelState.IsValid)
+        {
+            model.NewNote = newNote;
+            return View(nameof(Details), model);
+        }
+
+        var caregiverId = (await GetCaregiverIdAsync())!.Value;
+        _db.VisitNote.Add(new VisitNote
+        {
+            VisitID = id,
+            CaregiverID = caregiverId,
+            NoteText = newNote!,
+            CreatedAt = DateTime.UtcNow
+        });
+        await _db.SaveChangesAsync();
+
         return RedirectToAction(nameof(Details), new { id });
     }
 }
