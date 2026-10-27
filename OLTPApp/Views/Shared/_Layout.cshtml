@@ -35,6 +35,9 @@
                         @if (User.IsInRole(RoleNames.FamilyMember))
                         {
                             @* Family Member: linked senior tab lives on Home (#66) *@
+                            <li class="nav-item">
+                                <span class="nav-link disabled" aria-disabled="true">My senior (coming soon)</span>
+                            </li>
                         }
                         @if (User.IsInRole(RoleNames.Caregiver))
                         {
@@ -58,6 +61,9 @@
                             @* Admin: users (#64) *@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="AdminSenior" asp-action="Seniors">Manage Seniors</a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link disabled" aria-disabled="true">Manage users (coming soon)</span>
                             </li>
                         }
                     </ul>
