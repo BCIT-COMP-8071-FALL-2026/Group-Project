@@ -113,3 +113,6 @@ A query string is ignored, other methods get `405`, and a failed database call g
 | `GET /api/reports/senior-outreach` | `dbo.usp_SeniorOutreach` | `{ "seniorName": "Dorothy Fleming", "missedCount": 3, "serviceTypes": "Bathing, Doctor, Home visit", "livesAlone": true, "ageBand": "Under 65" }`, most missed first |
 
 See the [Query 1 contract](../docs/Query1-Contract.md) for the full definition of Query 1, and the procedures in `sql/procs` for Queries 2 to 4.
+
+<!-- ci demo scratch 2026-10-26 — do not merge -->
+
