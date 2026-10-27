@@ -7,6 +7,10 @@
     @* OLTP-2: Staff accounts have no role until Admin assigns one *@
     @if (!RoleNames.All.Any(User.IsInRole))
     {
-        <p>Waiting for Admin to assign a role</p>
+        <p>Staff tools are coming soon.</p>
+    }
+    @if (User.IsInRole(RoleNames.FamilyMember))
+    {
+        <p>Your linked senior's details are coming soon.</p>
     }
 </div>
